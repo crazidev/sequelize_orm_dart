@@ -5,9 +5,71 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "my_dart_server",
+      "name": "Example App (Dart Server)",
+      "type": "dart",
       "request": "launch",
-      "type": "dart"
+      "program": "${workspaceFolder}/example/lib/main.dart",
+      "cwd": "${workspaceFolder}/example",
+      "args": [],
+      "console": "debugConsole",
+      "vmAdditionalArgs": [],
+      "toolArgs": [],
+      "env": {
+        // Load environment variables from .env file if it exists
+      }
+    },
+    {
+      "name": "Example App (Dart Server) - Debug Mode",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/example/lib/main.dart",
+      "cwd": "${workspaceFolder}/example",
+      "args": [],
+      "console": "debugConsole",
+      "vmAdditionalArgs": [
+        "--enable-asserts",
+        "--pause-isolates-on-exit",
+        "--pause-isolates-on-start"
+      ],
+      "toolArgs": [],
+      "env": {}
+    },
+    {
+      "name": "Example App (dart2js) - Node.js",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/example/build/index.js",
+      "cwd": "${workspaceFolder}/example",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [],
+      "env": {},
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/example/build/**/*.js"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Attach to Dart Process",
+      "type": "dart",
+      "request": "attach",
+      "vmServiceUri": "http://127.0.0.1:8181"
+    },
+    {
+      "name": "Run All Tests",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/.dart_tool/test.dart",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "debugConsole"
+    },
+    {
+      "name": "Run Example Tests",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/example/.dart_tool/test.dart",
+      "args": [],
+      "cwd": "${workspaceFolder}/example",
+      "console": "debugConsole"
     }
   ]
 }

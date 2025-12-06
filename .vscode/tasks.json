@@ -51,9 +51,26 @@
       }
     },
     {
+      "label": "Build Bridge Server",
+      "type": "shell",
+      "command": "./tools/setup_bridge.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Compile JS",
       "type": "shell",
-      "command": "./toolS/build.sh",
+      "command": "./tools/build.sh",
       "options": {
         "cwd": "${workspaceFolder}"
       },
