@@ -9,7 +9,7 @@ Future<void> main() async {
     PostgressConnection(
       url: connectionString,
       ssl: false,
-      logging: (String sql) => false,
+      logging: (String sql) => print(sql),
       pool: SequelizePoolOptions(
         max: 10, // Maximum connections (increased to handle concurrent queries)
         min: 5, // Minimum connections
@@ -25,14 +25,15 @@ Future<void> main() async {
 
   final startTime = DateTime.now();
 
-  // Fire off 100 concurrent queries
+  var totalQueries = 1;
+
   final futures = <Future>[];
-  for (var i = 0; i < 100; i++) {
+  for (var i = 0; i < totalQueries; i++) {
     final queryStart = DateTime.now();
     final future = Users.instance
         .findAll(
           Query(
-            where: or([]),
+            where: or([equal('id', 1)]),
             order: [
               ['id', 'DESC'],
             ],
@@ -41,7 +42,7 @@ Future<void> main() async {
         .then((value) {
           final queryDuration = DateTime.now().difference(queryStart);
           print(
-            "RESULT $i: ${value.map((e) => e.email)} (took ${queryDuration.inMilliseconds}ms)",
+            "\nQUERY $i: ${value.map((e) => e.toJson())} (took ${queryDuration.inMilliseconds}ms)",
           );
         });
     futures.add(future);
@@ -50,7 +51,9 @@ Future<void> main() async {
   // Wait for all queries to complete
   await Future.wait(futures);
   final totalDuration = DateTime.now().difference(startTime);
-  print("\nAll 100 queries completed in ${totalDuration.inMilliseconds}ms");
+  print(
+    "\n$totalQueries queries completed in ${totalDuration.inMilliseconds}ms",
+  );
 
   // Close the connection to free up resources
   await sequelize.close();

@@ -7,7 +7,7 @@ class PostgressConnection extends SequelizeCoreOptions {
 
   PostgressConnection({
     required super.url,
-    required super.logging,
+    super.logging,
     this.schema,
     this.ssl = false,
     this.dialect = SequelizeDialects.postgres,
@@ -24,4 +24,3 @@ class PostgressConnection extends SequelizeCoreOptions {
     };
   }
 }
-

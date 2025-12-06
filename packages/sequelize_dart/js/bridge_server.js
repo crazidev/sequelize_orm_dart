@@ -33,7 +33,7 @@ async function handleRequest(request) {
 
         // Build pool configuration (only include defined values)
         const poolConfig = {};
-        
+
         if (pool) {
           // Only include pool options that are explicitly set
           if (pool.max !== undefined && pool.max !== null) poolConfig.max = pool.max;
@@ -48,7 +48,7 @@ async function handleRequest(request) {
           dialect: selectDialect(dialect),
           logging: logging ? console.error : false, // Use stderr for logging (not stdout)
         };
-        
+
         // Only add pool config if it has values
         if (Object.keys(poolConfig).length > 0) {
           sequelizeOptions.pool = poolConfig;

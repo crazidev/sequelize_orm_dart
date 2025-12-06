@@ -28,8 +28,7 @@ class Sequelize extends SequelizeInterface {
     Map<String, dynamic> config = Map<String, dynamic>.from(input.toJson());
 
     // Remove logging function (can't serialize)
-    var logging =
-        config['logging'].runtimeType.toString() == '(String) => Null';
+    var logging = config['logging'].runtimeType.toString() != "Null";
     config.remove('logging');
     config.addEntries([
       MapEntry('logging', logging),
@@ -142,6 +141,7 @@ class Sequelize extends SequelizeInterface {
   Model? getModel(String name) => _models[name];
 
   /// Close the bridge connection
+  @override
   Future<void> close() async {
     await _bridge.close();
   }
