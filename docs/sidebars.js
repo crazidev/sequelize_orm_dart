@@ -14,9 +14,8 @@ const sidebars = {
   docs: [
     'intro',
     'getting-started',
-    'installation',
-    'models',
     'connections',
+    'models',
     {
       type: 'category',
       label: 'Querying',
@@ -27,10 +26,6 @@ const sidebars = {
         'operators',
       ],
     },
-    'examples',
-    'api-reference',
-    'troubleshooting',
-    'faq',
     'changelog',
     'contributing',
   ],

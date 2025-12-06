@@ -76,55 +76,10 @@ const config = {
       },
       footer: {
         style: 'dark',
-        links: [
-          {
-            title: 'Documentation',
-            items: [
-              {
-                label: 'Getting Started',
-                to: '/docs/getting-started',
-              },
-              {
-                label: 'Installation',
-                to: '/docs/installation',
-              },
-              {
-                label: 'API Reference',
-                to: '/docs/api-reference',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/crazidev/sequelize_dart',
-              },
-              {
-                label: 'Issues',
-                href: 'https://github.com/crazidev/sequelize_dart/issues',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'Changelog',
-                to: '/docs/changelog',
-              },
-              {
-                label: 'Contributing',
-                to: '/docs/contributing',
-              },
-            ],
-          },
-        ],
         copyright: `Copyright © ${new Date().getFullYear()} Sequelize Dart. Built with Docusaurus.`,
       },
       prism: {
-        theme: prismThemes.github,
+        theme: prismThemes.dracula,
         darkTheme: prismThemes.dracula,
         additionalLanguages: ['dart'],
       },
