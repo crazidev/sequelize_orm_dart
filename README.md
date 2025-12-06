@@ -206,13 +206,10 @@ sequelize.addModels([Users.instance]);
 ### 7. Query the Database
 
 ```dart
-// Find all records
-var allUsers = await Users.instance.findAll();
-
-// Find with conditions
+// Type-safe queries with autocomplete
 var users = await Users.instance.findAll(
-  Query(
-    where: equal('email', 'user@example.com'),
+  (q) => Query(
+    where: q.email.eq('user@example.com'),
     order: [['id', 'DESC']],
     limit: 10,
   ),
@@ -220,8 +217,8 @@ var users = await Users.instance.findAll(
 
 // Find one record
 var user = await Users.instance.findOne(
-  Query(
-    where: equal('id', 1),
+  (q) => Query(
+    where: q.id.eq(1),
   ),
 );
 
@@ -276,17 +273,18 @@ where: notEqual('id', 1)
 // Bridge supports: $gt, $gte, $lt, $lte, $like, $ilike, $in, $notIn
 ```
 
-### Complex Queries
+### Type-Safe Queries
 
 ```dart
+// Type-safe queries with full autocomplete support
 var users = await Users.instance.findAll(
-  Query(
+  (q) => Query(
     where: and([
       or([
-        equal('email', 'user1@example.com'),
-        equal('email', 'user2@example.com'),
+        q.email.eq('user1@example.com'),
+        q.email.eq('user2@example.com'),
       ]),
-      notEqual('id', 0),
+      q.id.ne(0),
     ]),
     order: [
       ['lastName', 'ASC'],
@@ -336,19 +334,19 @@ Future<void> main() async {
   });
   print('Created user: ${newUser.email}');
 
-  // Find all users
+  // Find all users with type-safe queries
   var allUsers = await Users.instance.findAll(
-    Query(
+    (q) => Query(
       order: [['id', 'DESC']],
       limit: 10,
     ),
   );
   print('Found ${allUsers.length} users');
 
-  // Find one user
+  // Find one user with type-safe query
   var user = await Users.instance.findOne(
-    Query(
-      where: equal('email', 'john.doe@example.com'),
+    (q) => Query(
+      where: q.email.eq('john.doe@example.com'),
     ),
   );
   print('Found user: ${user?.email}');
@@ -390,7 +388,7 @@ psql -U postgres -d dbname -f example/migrations/create_tables_postgres.sql
 ```dart
 try {
   var user = await Users.instance.findOne(
-    Query(where: equal('id', 999)),
+    (q) => Query(where: q.id.eq(999)),
   );
 
   if (user == null) {

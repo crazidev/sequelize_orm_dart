@@ -1,5 +1,4 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart/src/connection/core_options.dart';
 
 abstract class SequelizeInterface {
   SequelizeInterface createInstance(

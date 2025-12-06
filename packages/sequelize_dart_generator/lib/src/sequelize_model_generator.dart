@@ -43,14 +43,12 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       underscored,
       timestamps,
     );
-    _generateFindAllMethod(buffer, valuesClassName);
-    _generateFindOneMethod(buffer, valuesClassName);
-    _generateTypedFindAllMethod(
+    _generateFindAllMethod(
       buffer,
       className ?? 'Unknown',
       valuesClassName,
     );
-    _generateTypedFindOneMethod(
+    _generateFindOneMethod(
       buffer,
       className ?? 'Unknown',
       valuesClassName,
@@ -62,13 +60,6 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     _generateClassValues(buffer, valuesClassName, fields);
     _generateClassCreate(buffer, createClassName, fields);
     _generateQueryBuilder(buffer, className ?? 'Unknown', fields);
-    _generateQueryExtension(
-      buffer,
-      generatedClassName,
-      className ?? 'Unknown',
-      valuesClassName,
-      fields,
-    );
 
     return buffer.toString();
   }
@@ -177,58 +168,14 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
 
   void _generateFindAllMethod(
     StringBuffer buffer,
-    String valuesClassName,
-  ) {
-    buffer.writeln(
-      '  Future<List<$valuesClassName>> findAll([Query? options]) async {',
-    );
-    buffer.writeln('    var data = await QueryEngine().findAll(');
-    buffer.writeln('      modelName: name,');
-    buffer.writeln('      query: options,');
-    buffer.writeln('      sequelize: sequelizeInstance,');
-    buffer.writeln('      model: sequelizeModel,');
-    buffer.writeln('    );');
-    buffer.writeln();
-    buffer.writeln(
-      '    return data.map((value) => $valuesClassName.fromJson(value)).toList();',
-    );
-    buffer.writeln('  }');
-    buffer.writeln();
-  }
-
-  void _generateFindOneMethod(
-    StringBuffer buffer,
-    String valuesClassName,
-  ) {
-    buffer.writeln(
-      '  Future<$valuesClassName?> findOne([Query? options]) async {',
-    );
-    buffer.writeln('    var data = await QueryEngine().findOne(');
-    buffer.writeln('      modelName: name,');
-    buffer.writeln('      query: options,');
-    buffer.writeln('      sequelize: sequelizeInstance,');
-    buffer.writeln('      model: sequelizeModel,');
-    buffer.writeln('    );');
-    buffer.writeln();
-    buffer.writeln(
-      '    return data != null ? $valuesClassName.fromJson(data) : null;',
-    );
-    buffer.writeln('  }');
-    buffer.writeln();
-  }
-
-  void _generateTypedFindAllMethod(
-    StringBuffer buffer,
     String className,
     String valuesClassName,
   ) {
     final queryBuilderClassName = '\$${className}Query';
 
+    buffer.writeln('  @override');
     buffer.writeln(
-      '  /// Type-safe findAll with query builder',
-    );
-    buffer.writeln(
-      '  Future<List<$valuesClassName>> findAllTyped(Query Function($queryBuilderClassName) builder) {',
+      '  Future<List<$valuesClassName>> findAll(Query Function($queryBuilderClassName) builder) {',
     );
     buffer.writeln('    final query = builder($queryBuilderClassName());');
     buffer.writeln('    return QueryEngine().findAll(');
@@ -245,18 +192,16 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln();
   }
 
-  void _generateTypedFindOneMethod(
+  void _generateFindOneMethod(
     StringBuffer buffer,
     String className,
     String valuesClassName,
   ) {
     final queryBuilderClassName = '\$${className}Query';
 
+    buffer.writeln('  @override');
     buffer.writeln(
-      '  /// Type-safe findOne with query builder',
-    );
-    buffer.writeln(
-      '  Future<$valuesClassName?> findOneTyped(Query Function($queryBuilderClassName) builder) {',
+      '  Future<$valuesClassName?> findOne(Query Function($queryBuilderClassName) builder) {',
     );
     buffer.writeln('    final query = builder($queryBuilderClassName());');
     buffer.writeln('    return QueryEngine().findOne(');
@@ -361,63 +306,6 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
         "  final ${field.fieldName} = TypedColumn<$dartType>('${field.name}', DataType.${field.dataType});",
       );
     }
-
-    buffer.writeln('}');
-    buffer.writeln();
-  }
-
-  void _generateQueryExtension(
-    StringBuffer buffer,
-    String generatedClassName,
-    String className,
-    String valuesClassName,
-    List<_FieldInfo> fields,
-  ) {
-    final queryBuilderClassName = '\$${className}Query';
-
-    buffer.writeln(
-      '/// Extension for type-safe queries on $generatedClassName',
-    );
-    buffer.writeln(
-      'extension \$${className}QueryExtension on $generatedClassName {',
-    );
-    buffer.writeln();
-
-    // findAll with query builder
-    buffer.writeln(
-      '  Future<List<$valuesClassName>> findAll(Query Function($queryBuilderClassName) builder) {',
-    );
-    buffer.writeln('    final query = builder($queryBuilderClassName());');
-    buffer.writeln('    return QueryEngine().findAll(');
-    buffer.writeln('      modelName: name,');
-    buffer.writeln('      query: query,');
-    buffer.writeln('      sequelize: sequelizeInstance,');
-    buffer.writeln('      model: sequelizeModel,');
-    buffer.writeln('    ).then((data) =>');
-    buffer.writeln(
-      '      data.map((value) => $valuesClassName.fromJson(value)).toList()',
-    );
-    buffer.writeln('    );');
-    buffer.writeln('  }');
-    buffer.writeln();
-
-    // findOne with query builder
-    buffer.writeln(
-      '  Future<$valuesClassName?> findOne(Query Function($queryBuilderClassName) builder) {',
-    );
-    buffer.writeln('    final query = builder($queryBuilderClassName());');
-    buffer.writeln('    return QueryEngine().findOne(');
-    buffer.writeln('      modelName: name,');
-    buffer.writeln('      query: query,');
-    buffer.writeln('      sequelize: sequelizeInstance,');
-    buffer.writeln('      model: sequelizeModel,');
-    buffer.writeln('    ).then((data) =>');
-    buffer.writeln(
-      '      data != null ? $valuesClassName.fromJson(data) : null',
-    );
-    buffer.writeln('    );');
-    buffer.writeln('  }');
-    buffer.writeln();
 
     buffer.writeln('}');
     buffer.writeln();

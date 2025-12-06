@@ -30,25 +30,35 @@ Future<void> main() async {
   print('\n=== Testing Type-Safe Queries ===\n');
 
   // Example 1: Type-safe findAll with autocomplete
-  // final users1 = await Users.instance.findAllTyped(
-  //   (q) => Query(
-  //     where: or([
-  //       q.id.greaterThan(1),
-  //     ]),
-  //     order: [
-  //       // [q.id.name, 'DESC'],
-  //     ],
-  //   ),
-  // );
+  final users1 = await Users.instance.findAll(
+    (q) => Query(
+      where: or([
+        q.id.greaterThan(1),
+      ]),
+      order: [
+        ['id', 'DESC'],
+      ],
+    ),
+  );
 
-  // Original query style still works (backward compatible)
+  // Example 2: Type-safe findOne
+  final user = await Users.instance.findOne(
+    (q) => Query(
+      where: q.id.eq(1),
+    ),
+  );
+
+  print('Found ${users1.length} users');
+  print('Found user: ${user?.email}');
+
+  // Performance test
   final futures = <Future>[];
   for (var i = 0; i < totalQueries; i++) {
     final queryStart = DateTime.now();
     final future = Users.instance
         .findAll(
-          Query(
-            where: and([gt('id', 1)]),
+          (q) => Query(
+            where: q.id.in_([1, 2]),
             order: [
               ['id', 'DESC'],
             ],

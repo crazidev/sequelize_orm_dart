@@ -152,15 +152,26 @@ sequelize.addModels([Users.instance]);
 #### Find All Records
 
 ```dart
-// Get all users
-var allUsers = await Users.instance.findAll();
-
-// With conditions
+// Type-safe query with autocomplete
 var users = await Users.instance.findAll(
-  Query(
-    where: equal('email', 'user@example.com'),
+  (q) => Query(
+    where: q.email.eq('user@example.com'),
     order: [['id', 'DESC']],
     limit: 10,
+  ),
+);
+
+// Complex queries with type safety
+var activeUsers = await Users.instance.findAll(
+  (q) => Query(
+    where: and([
+      q.id.greaterThan(10),
+      q.email.like('%@example.com'),
+    ]),
+    order: [
+      ['lastName', 'ASC'],
+      ['firstName', 'ASC'],
+    ],
   ),
 );
 ```
@@ -168,9 +179,20 @@ var users = await Users.instance.findAll(
 #### Find One Record
 
 ```dart
+// Type-safe findOne
 var user = await Users.instance.findOne(
-  Query(
-    where: equal('id', 1),
+  (q) => Query(
+    where: q.id.eq(1),
+  ),
+);
+
+// With multiple conditions
+var userByEmail = await Users.instance.findOne(
+  (q) => Query(
+    where: and([
+      q.email.eq('user@example.com'),
+      q.id.greaterThan(0),
+    ]),
   ),
 );
 ```
@@ -233,7 +255,45 @@ where: ComparisonOperator(
 )
 ```
 
-### Complex Queries
+### Type-Safe Queries
+
+The generated model classes provide type-safe query builders with full autocomplete support:
+
+```dart
+// Type-safe queries with autocomplete
+var users = await Users.instance.findAll(
+  (q) => Query(
+    where: and([
+      or([
+        q.email.eq('user1@example.com'),
+        q.email.eq('user2@example.com'),
+      ]),
+      q.id.greaterThan(10),
+    ]),
+    order: [
+      ['lastName', 'ASC'],
+      ['firstName', 'ASC'],
+    ],
+    limit: 20,
+    offset: 0,
+  ),
+);
+
+// All operators are available on typed columns
+var results = await Users.instance.findAll(
+  (q) => Query(
+    where: or([
+      q.id.in_([1, 2, 3]),
+      q.email.startsWith('admin'),
+      q.firstName.like('%John%'),
+    ]),
+  ),
+);
+```
+
+### Legacy Query Syntax (Still Supported)
+
+For backward compatibility, you can still use the legacy syntax with string column names:
 
 ```dart
 var users = await Users.instance.findAll(
@@ -274,7 +334,7 @@ pool: SequelizePoolOptions(
 ```dart
 try {
   var user = await Users.instance.findOne(
-    Query(where: equal('id', 999)),
+    (q) => Query(where: q.id.eq(999)),
   );
 
   if (user == null) {
@@ -326,19 +386,19 @@ Future<void> main() async {
   });
   print('Created user: ${newUser.email}');
 
-  // Find all users
+  // Find all users with type-safe queries
   var allUsers = await Users.instance.findAll(
-    Query(
+    (q) => Query(
       order: [['id', 'DESC']],
       limit: 10,
     ),
   );
   print('Found ${allUsers.length} users');
 
-  // Find one user
+  // Find one user with type-safe query
   var user = await Users.instance.findOne(
-    Query(
-      where: equal('email', 'john.doe@example.com'),
+    (q) => Query(
+      where: q.email.eq('john.doe@example.com'),
     ),
   );
   print('Found user: ${user?.email}');
@@ -360,8 +420,8 @@ Future<void> main() async {
 
 ### Model
 
-- `findAll(Query?)` - Find all records matching query
-- `findOne(Query?)` - Find one record matching query
+- `findAll(Query Function(ModelQuery) builder)` - Find all records matching query (type-safe)
+- `findOne(Query Function(ModelQuery) builder)` - Find one record matching query (type-safe)
 - `create(Map<String, dynamic>)` - Create a new record
 
 ### Query

@@ -30,7 +30,12 @@ abstract class Model<T> extends ModelInterface {
   /// Get model options for Sequelize
   Map<String, dynamic> getOptionsJson();
 
-  Future<List<T>> findAll([Query? query]) {
+  /// Find all records matching the query
+  ///
+  /// Generated model classes will override this method to accept a typed query builder.
+  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
+  Future<List<T>> findAll(Query Function(dynamic) builder) {
+    final query = builder(null);
     return QueryEngine().findAll(
           modelName: name,
           query: query,
@@ -40,7 +45,12 @@ abstract class Model<T> extends ModelInterface {
         as Future<List<T>>;
   }
 
-  Future<T?> findOne([Query? query]) {
+  /// Find one record matching the query
+  ///
+  /// Generated model classes will override this method to accept a typed query builder.
+  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
+  Future<T?> findOne(Query Function(dynamic) builder) {
+    final query = builder(null);
     return QueryEngine().findOne(
           modelName: name,
           query: query,

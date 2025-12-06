@@ -33,7 +33,18 @@ abstract class Model<T> extends ModelInterface {
   Map<String, dynamic> getOptionsJson();
 
   /// Find all records matching the query
-  Future<List<T>> findAll([Query? query]) {
+  ///
+  /// Generated model classes will override this method to accept a typed query builder.
+  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
+  ///
+  /// Example usage (in generated classes):
+  /// ```dart
+  /// final users = await Users.instance.findAll((q) => Query(
+  ///   where: q.id.greaterThan(1),
+  /// ));
+  /// ```
+  Future<List<T>> findAll(Query Function(dynamic) builder) {
+    final query = builder(null);
     return QueryEngine().findAll(
           modelName: name,
           query: query,
@@ -44,7 +55,18 @@ abstract class Model<T> extends ModelInterface {
   }
 
   /// Find one record matching the query
-  Future<T?> findOne([Query? query]) {
+  ///
+  /// Generated model classes will override this method to accept a typed query builder.
+  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
+  ///
+  /// Example usage (in generated classes):
+  /// ```dart
+  /// final user = await Users.instance.findOne((q) => Query(
+  ///   where: q.id.eq(1),
+  /// ));
+  /// ```
+  Future<T?> findOne(Query Function(dynamic) builder) {
+    final query = builder(null);
     return QueryEngine().findOne(
           modelName: name,
           query: query,
