@@ -11,32 +11,6 @@ A Dart ORM for Sequelize.js integration with code generation support. Works seam
 - 🔄 **Connection Pooling**: Built-in connection pool management
 - 📝 **Annotations**: Simple, declarative model definitions
 
-## Project Structure
-
-This is a monorepo containing:
-
-```
-.
-├── packages/
-│   ├── sequelize_dart/               # Main package
-│   │   └── README.md                  # [Package Documentation](./packages/sequelize_dart/README.md)
-│   ├── sequelize_dart_annotations/    # Annotations package
-│   │   └── README.md                  # [Package Documentation](./packages/sequelize_dart_annotations/README.md)
-│   └── sequelize_dart_generator/     # Code generator
-│       └── README.md                  # [Package Documentation](./packages/sequelize_dart_generator/README.md)
-│
-├── example/                           # Example project
-│   ├── lib/
-│   │   ├── main.dart
-│   │   └── models/
-│   └── migrations/                     # SQL migration files
-│
-├── tool/
-│   └── setup_bridge.sh               # Bridge server setup script
-│
-└── README.md
-```
-
 ## Packages
 
 - **[sequelize_dart](./packages/sequelize_dart/README.md)** - Main ORM package with Sequelize.js integration
@@ -80,14 +54,12 @@ When compiling to JavaScript with `dart2js`, Sequelize Dart uses **JS interop** 
 ```yaml
 # pubspec.yaml
 dependencies:
-  sequelize_dart:
-    path: ../packages/sequelize_dart
-  sequelize_dart_annotations:
-    path: ../packages/sequelize_dart_annotations
+  sequelize_dart: letest
+  sequelize_dart_annotations: letest
 
 dev_dependencies:
   sequelize_dart_generator:
-    path: ../packages/sequelize_dart_generator
+    path: sequelize_dart_generator
   build_runner: ^2.10.4
 ```
 
@@ -144,14 +116,6 @@ dart run build_runner watch
 
 This creates `users.model.g.dart` with the generated `$Users` class.
 
-### 4. Setup Bridge (Dart Server Only)
-
-If running on Dart server, setup the bridge:
-
-```bash
-./tools/setup_bridge.sh [bun|pnpm|npm]
-```
-
 **Note**: Not required for dart2js compilation.
 
 ### 5. Create Database Connection
@@ -172,22 +136,6 @@ var sequelize = Sequelize().createInstance(
       acquire: 60000,
       evict: 1000,
     ),
-  ),
-);
-
-// MySQL
-var sequelize = Sequelize().createInstance(
-  MysqlConnection(
-    url: 'mysql://user:password@localhost:3306/dbname',
-    ssl: false,
-  ),
-);
-
-// MariaDB
-var sequelize = Sequelize().createInstance(
-  MariadbConnection(
-    url: 'mariadb://user:password@localhost:3306/dbname',
-    ssl: false,
   ),
 );
 ```
@@ -221,13 +169,6 @@ var user = await Users.instance.findOne(
     where: q.id.eq(1),
   ),
 );
-
-// Create a record
-var newUser = await Users.instance.create({
-  'email': 'newuser@example.com',
-  'firstName': 'John',
-  'lastName': 'Doe',
-});
 ```
 
 ### 8. Clean Up
@@ -245,13 +186,11 @@ await sequelize.close();
 // AND
 where: and([
   equal('email', 'user@example.com'),
-  equal('firstName', 'John'),
 ])
 
 // OR
 where: or([
   equal('id', 1),
-  equal('id', 2),
 ])
 
 // NOT
@@ -296,84 +235,6 @@ var users = await Users.instance.findAll(
 );
 ```
 
-## Complete Example
-
-```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'models/users.model.dart';
-
-Future<void> main() async {
-  // Create Sequelize instance
-  var sequelize = Sequelize().createInstance(
-    PostgressConnection(
-      url: 'postgresql://postgres:postgres@localhost:5432/postgres',
-      ssl: false,
-      logging: (String sql) => false,
-      pool: SequelizePoolOptions(
-        max: 10,
-        min: 2,
-        idle: 10000,
-        acquire: 60000,
-        evict: 1000,
-      ),
-    ),
-  );
-
-  // Authenticate
-  await sequelize.authenticate();
-  print('✅ Connected to database');
-
-  // Register models
-  sequelize.addModels([Users.instance]);
-
-  // Create a user
-  var newUser = await Users.instance.create({
-    'email': 'john.doe@example.com',
-    'firstName': 'John',
-    'lastName': 'Doe',
-  });
-  print('Created user: ${newUser.email}');
-
-  // Find all users with type-safe queries
-  var allUsers = await Users.instance.findAll(
-    (q) => Query(
-      order: [['id', 'DESC']],
-      limit: 10,
-    ),
-  );
-  print('Found ${allUsers.length} users');
-
-  // Find one user with type-safe query
-  var user = await Users.instance.findOne(
-    (q) => Query(
-      where: q.email.eq('john.doe@example.com'),
-    ),
-  );
-  print('Found user: ${user?.email}');
-
-  // Close connection
-  await sequelize.close();
-  print('✅ Connection closed');
-}
-```
-
-## Database Migrations
-
-SQL migration files are provided in the `example/migrations/` directory:
-
-- **MySQL**: `create_tables_mysql.sql`, `seed_data_mysql.sql`
-- **PostgreSQL**: `create_tables_postgres.sql`, `seed_data_postgres.sql`
-
-Run migrations manually:
-
-```bash
-# MySQL
-mysql -u root -p dbname < example/migrations/create_tables_mysql.sql
-
-# PostgreSQL
-psql -U postgres -d dbname -f example/migrations/create_tables_postgres.sql
-```
-
 ## Platform Differences
 
 | Feature          | Dart Server           | dart2js             |
@@ -382,29 +243,6 @@ psql -U postgres -d dbname -f example/migrations/create_tables_postgres.sql
 | **Performance**  | Bridge overhead       | Native performance  |
 | **Dependencies** | Bundled bridge        | Direct Sequelize.js |
 | **API**          | Same API              | Same API            |
-
-## Error Handling
-
-```dart
-try {
-  var user = await Users.instance.findOne(
-    (q) => Query(where: q.id.eq(999)),
-  );
-
-  if (user == null) {
-    print('User not found');
-  }
-} on BridgeException catch (e) {
-  // Bridge-specific errors (Dart server only)
-  print('Bridge error: ${e.message}');
-  print('Original error: ${e.originalError}');
-  if (e.sql != null) {
-    print('SQL: ${e.sql}');
-  }
-} catch (e) {
-  print('Error: $e');
-}
-```
 
 ## Connection Pooling
 
@@ -462,7 +300,3 @@ dart run lib/main.dart
 dart compile js lib/main.dart -o main.js
 node main.js
 ```
-
-## License
-
-[Add your license here]
