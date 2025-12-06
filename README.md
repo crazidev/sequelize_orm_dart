@@ -430,6 +430,19 @@ pool: SequelizePoolOptions(
 
 ## Development
 
+### Setting Up Git Hooks
+
+Install git hooks to automatically format code before committing:
+
+```bash
+./tools/setup-git-hooks.sh
+```
+
+This installs:
+
+- **pre-commit**: Formats code automatically before each commit
+- **pre-push**: Checks formatting before pushing (prevents unformatted code)
+
 ### Building the Bridge Server
 
 ```bash

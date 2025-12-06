@@ -2,6 +2,46 @@
 
 Thank you for your interest in contributing! This document provides guidelines for contributing to the project.
 
+## Git Hooks Setup
+
+This project includes git hooks to automatically format code before committing and check formatting before pushing.
+
+### Initial Setup
+
+Run the setup script to install git hooks:
+
+```bash
+./tools/setup-git-hooks.sh
+```
+
+This will install:
+
+- **pre-commit hook**: Automatically formats code before each commit
+- **pre-push hook**: Checks formatting before pushing (fails if code is not formatted)
+
+### Manual Setup
+
+If you prefer to set up hooks manually:
+
+```bash
+# Copy hooks to .git/hooks
+cp hooks/pre-commit .git/hooks/pre-commit
+cp hooks/pre-push .git/hooks/pre-push
+chmod +x .git/hooks/pre-commit .git/hooks/pre-push
+```
+
+### Bypassing Hooks (Not Recommended)
+
+If you need to bypass hooks temporarily:
+
+```bash
+# Skip pre-commit hook
+git commit --no-verify
+
+# Skip pre-push hook
+git push --no-verify
+```
+
 ## Code Formatting
 
 This project uses automated formatting to maintain consistent code style. Please ensure your code is properly formatted before submitting.
@@ -55,12 +95,14 @@ The project includes configuration for:
 
 ### Pre-commit Checklist
 
-Before committing, ensure:
+If git hooks are installed, formatting happens automatically. Otherwise:
 
 - [ ] Code is formatted: `./tools/format.sh`
 - [ ] No linting errors: `npm run lint`
 - [ ] All tests pass (if applicable)
 - [ ] Generated files are up to date
+
+**Note**: Git hooks will automatically format code before committing, so you don't need to run the formatter manually if hooks are set up.
 
 ## Code Style Guidelines
 
