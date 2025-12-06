@@ -1,12 +1,11 @@
+import 'dart:js' as js;
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
-import 'dart:js' as js;
 
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart/src/core/console.dart';
 import 'package:sequelize_dart/src/core/global.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize_interface.dart';
-import 'package:sequelize_dart/src/connection/core_options.dart';
 import 'package:sequelize_dart/src/types/data_types.dart';
 
 class Sequelize extends SequelizeInterface {
@@ -22,10 +21,10 @@ class Sequelize extends SequelizeInterface {
     SequelizeCoreOptions input, {
     List<Model>? models,
   }) {
-    Map<String, dynamic> config = input.toJson();
+    final Map<String, dynamic> config = input.toJson();
 
     if (input.url != null) {
-      var keysToRemove = ['host', 'password', 'user', 'database', 'port'];
+      final keysToRemove = ['host', 'password', 'user', 'database', 'port'];
       config.removeWhere((key, value) => keysToRemove.contains(key));
     }
 
@@ -106,18 +105,51 @@ extension type SequelizeModule._(JSObject _) implements JSObject {
 }
 
 extension type SqOp._(JSObject _) implements JSObject {
+  // Logical operators
   external JSSymbol get not;
   external JSSymbol get or;
   external JSSymbol get and;
 
+  // Basic comparison operators
   external JSSymbol get eq;
   external JSSymbol get ne;
+  @JS('is')
+  external JSSymbol get isOp;
+  // Note: Op.not is for logical NOT, for IS NOT use Op.is with negation
+
+  // Number comparison operators
   external JSSymbol get gt;
   external JSSymbol get gte;
   external JSSymbol get lt;
   external JSSymbol get lte;
+  external JSSymbol get between;
+  external JSSymbol get notBetween;
 
+  // List operators
+  @JS('in')
+  external JSSymbol get inOp;
   external JSSymbol get notIn;
+  external JSSymbol get all;
+  external JSSymbol get any;
+
+  // String operators
+  external JSSymbol get like;
+  external JSSymbol get notLike;
+  external JSSymbol get startsWith;
+  external JSSymbol get endsWith;
+  external JSSymbol get substring;
+  external JSSymbol get iLike;
+  external JSSymbol get notILike;
+
+  // Regex operators
+  external JSSymbol get regexp;
+  external JSSymbol get notRegexp;
+  external JSSymbol get iRegexp;
+  external JSSymbol get notIRegexp;
+
+  // Other operators
+  external JSSymbol get col;
+  external JSSymbol get match;
 }
 
 SqOp get Op => sequelizeModule.op;

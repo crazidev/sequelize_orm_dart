@@ -5,10 +5,9 @@ const connectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';
 
 Future<void> main() async {
-  var sequelize = Sequelize().createInstance(
+  final sequelize = Sequelize().createInstance(
     PostgressConnection(
       url: connectionString,
-      ssl: false,
       logging: (String sql) => print(sql),
       pool: SequelizePoolOptions(
         max: 10, // Maximum connections (increased to handle concurrent queries)
@@ -25,15 +24,31 @@ Future<void> main() async {
 
   final startTime = DateTime.now();
 
-  var totalQueries = 1;
+  const totalQueries = 1;
 
+  // Test type-safe queries
+  print('\n=== Testing Type-Safe Queries ===\n');
+
+  // Example 1: Type-safe findAll with autocomplete
+  // final users1 = await Users.instance.findAllTyped(
+  //   (q) => Query(
+  //     where: or([
+  //       q.id.greaterThan(1),
+  //     ]),
+  //     order: [
+  //       // [q.id.name, 'DESC'],
+  //     ],
+  //   ),
+  // );
+
+  // Original query style still works (backward compatible)
   final futures = <Future>[];
   for (var i = 0; i < totalQueries; i++) {
     final queryStart = DateTime.now();
     final future = Users.instance
         .findAll(
           Query(
-            where: or([equal('id', 1)]),
+            where: and([gt('id', 1)]),
             order: [
               ['id', 'DESC'],
             ],
@@ -42,7 +57,7 @@ Future<void> main() async {
         .then((value) {
           final queryDuration = DateTime.now().difference(queryStart);
           print(
-            "\nQUERY $i: ${value.map((e) => e.toJson())} (took ${queryDuration.inMilliseconds}ms)",
+            '\nQUERY $i: ${value.map((e) => e.toJson())} (took ${queryDuration.inMilliseconds}ms)',
           );
         });
     futures.add(future);
@@ -52,7 +67,7 @@ Future<void> main() async {
   await Future.wait(futures);
   final totalDuration = DateTime.now().difference(startTime);
   print(
-    "\n$totalQueries queries completed in ${totalDuration.inMilliseconds}ms",
+    '\n$totalQueries queries completed in ${totalDuration.inMilliseconds}ms',
   );
 
   // Close the connection to free up resources

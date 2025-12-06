@@ -1,11 +1,11 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:source_gen/source_gen.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:source_gen/source_gen.dart';
 
 class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
   @override
-  generateForAnnotatedElement(
+  String generateForAnnotatedElement(
     Element element,
     ConstantReader annotation,
     BuildStep buildStep,
@@ -45,12 +45,30 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     );
     _generateFindAllMethod(buffer, valuesClassName);
     _generateFindOneMethod(buffer, valuesClassName);
+    _generateTypedFindAllMethod(
+      buffer,
+      className ?? 'Unknown',
+      valuesClassName,
+    );
+    _generateTypedFindOneMethod(
+      buffer,
+      className ?? 'Unknown',
+      valuesClassName,
+    );
 
     buffer.writeln('}');
     buffer.writeln();
 
     _generateClassValues(buffer, valuesClassName, fields);
     _generateClassCreate(buffer, createClassName, fields);
+    _generateQueryBuilder(buffer, className ?? 'Unknown', fields);
+    _generateQueryExtension(
+      buffer,
+      generatedClassName,
+      className ?? 'Unknown',
+      valuesClassName,
+      fields,
+    );
 
     return buffer.toString();
   }
@@ -199,6 +217,62 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln();
   }
 
+  void _generateTypedFindAllMethod(
+    StringBuffer buffer,
+    String className,
+    String valuesClassName,
+  ) {
+    final queryBuilderClassName = '\$${className}Query';
+
+    buffer.writeln(
+      '  /// Type-safe findAll with query builder',
+    );
+    buffer.writeln(
+      '  Future<List<$valuesClassName>> findAllTyped(Query Function($queryBuilderClassName) builder) {',
+    );
+    buffer.writeln('    final query = builder($queryBuilderClassName());');
+    buffer.writeln('    return QueryEngine().findAll(');
+    buffer.writeln('      modelName: name,');
+    buffer.writeln('      query: query,');
+    buffer.writeln('      sequelize: sequelizeInstance,');
+    buffer.writeln('      model: sequelizeModel,');
+    buffer.writeln('    ).then((data) =>');
+    buffer.writeln(
+      '      data.map((value) => $valuesClassName.fromJson(value)).toList()',
+    );
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln();
+  }
+
+  void _generateTypedFindOneMethod(
+    StringBuffer buffer,
+    String className,
+    String valuesClassName,
+  ) {
+    final queryBuilderClassName = '\$${className}Query';
+
+    buffer.writeln(
+      '  /// Type-safe findOne with query builder',
+    );
+    buffer.writeln(
+      '  Future<$valuesClassName?> findOneTyped(Query Function($queryBuilderClassName) builder) {',
+    );
+    buffer.writeln('    final query = builder($queryBuilderClassName());');
+    buffer.writeln('    return QueryEngine().findOne(');
+    buffer.writeln('      modelName: name,');
+    buffer.writeln('      query: query,');
+    buffer.writeln('      sequelize: sequelizeInstance,');
+    buffer.writeln('      model: sequelizeModel,');
+    buffer.writeln('    ).then((data) =>');
+    buffer.writeln(
+      '      data != null ? $valuesClassName.fromJson(data) : null',
+    );
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln();
+  }
+
   void _generateClassValues(
     StringBuffer buffer,
     String valuesClassName,
@@ -266,11 +340,117 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln('    };');
     buffer.writeln('  }');
     buffer.writeln('}');
+    buffer.writeln();
+  }
+
+  void _generateQueryBuilder(
+    StringBuffer buffer,
+    String className,
+    List<_FieldInfo> fields,
+  ) {
+    final queryBuilderClassName = '\$${className}Query';
+
+    buffer.writeln('/// Type-safe query builder for $className');
+    buffer.writeln('class $queryBuilderClassName {');
+    buffer.writeln('  $queryBuilderClassName();'); // Constructor
+    buffer.writeln();
+
+    for (var field in fields) {
+      final dartType = _getDartTypeForQuery(field.dataType);
+      buffer.writeln(
+        "  final ${field.fieldName} = TypedColumn<$dartType>('${field.name}', DataType.${field.dataType});",
+      );
+    }
+
+    buffer.writeln('}');
+    buffer.writeln();
+  }
+
+  void _generateQueryExtension(
+    StringBuffer buffer,
+    String generatedClassName,
+    String className,
+    String valuesClassName,
+    List<_FieldInfo> fields,
+  ) {
+    final queryBuilderClassName = '\$${className}Query';
+
+    buffer.writeln(
+      '/// Extension for type-safe queries on $generatedClassName',
+    );
+    buffer.writeln(
+      'extension \$${className}QueryExtension on $generatedClassName {',
+    );
+    buffer.writeln();
+
+    // findAll with query builder
+    buffer.writeln(
+      '  Future<List<$valuesClassName>> findAll(Query Function($queryBuilderClassName) builder) {',
+    );
+    buffer.writeln('    final query = builder($queryBuilderClassName());');
+    buffer.writeln('    return QueryEngine().findAll(');
+    buffer.writeln('      modelName: name,');
+    buffer.writeln('      query: query,');
+    buffer.writeln('      sequelize: sequelizeInstance,');
+    buffer.writeln('      model: sequelizeModel,');
+    buffer.writeln('    ).then((data) =>');
+    buffer.writeln(
+      '      data.map((value) => $valuesClassName.fromJson(value)).toList()',
+    );
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln();
+
+    // findOne with query builder
+    buffer.writeln(
+      '  Future<$valuesClassName?> findOne(Query Function($queryBuilderClassName) builder) {',
+    );
+    buffer.writeln('    final query = builder($queryBuilderClassName());');
+    buffer.writeln('    return QueryEngine().findOne(');
+    buffer.writeln('      modelName: name,');
+    buffer.writeln('      query: query,');
+    buffer.writeln('      sequelize: sequelizeInstance,');
+    buffer.writeln('      model: sequelizeModel,');
+    buffer.writeln('    ).then((data) =>');
+    buffer.writeln(
+      '      data != null ? $valuesClassName.fromJson(data) : null',
+    );
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln();
+
+    buffer.writeln('}');
+    buffer.writeln();
+  }
+
+  String _getDartTypeForQuery(String dataType) {
+    switch (dataType) {
+      case 'INTEGER':
+      case 'BIGINT':
+      case 'TINYINT':
+      case 'SMALLINT':
+      case 'MEDIUMINT':
+        return 'int';
+      case 'FLOAT':
+      case 'DOUBLE':
+      case 'DECIMAL':
+        return 'double';
+      case 'BOOLEAN':
+        return 'bool';
+      case 'DATE':
+      case 'DATEONLY':
+        return 'DateTime';
+      case 'JSON':
+      case 'JSONB':
+        return 'Map<String, dynamic>';
+      default:
+        return 'String';
+    }
   }
 
   List<_FieldInfo> _getFields(ClassElement element) {
     final fields = <_FieldInfo>[];
-    final modelAttributesChecker = TypeChecker.fromUrl(
+    const modelAttributesChecker = TypeChecker.fromUrl(
       'package:sequelize_dart_annotations/src/model_attribute.dart#ModelAttributes',
     );
 

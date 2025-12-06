@@ -82,6 +82,34 @@ class $Users extends Model {
 
     return data != null ? $UsersValues.fromJson(data) : null;
   }
+
+  /// Type-safe findAll with query builder
+  Future<List<$UsersValues>> findAllTyped(Query Function($UsersQuery) builder) {
+    final query = builder($UsersQuery());
+    return QueryEngine()
+        .findAll(
+          modelName: name,
+          query: query,
+          sequelize: sequelizeInstance,
+          model: sequelizeModel,
+        )
+        .then(
+          (data) => data.map((value) => $UsersValues.fromJson(value)).toList(),
+        );
+  }
+
+  /// Type-safe findOne with query builder
+  Future<$UsersValues?> findOneTyped(Query Function($UsersQuery) builder) {
+    final query = builder($UsersQuery());
+    return QueryEngine()
+        .findOne(
+          modelName: name,
+          query: query,
+          sequelize: sequelizeInstance,
+          model: sequelizeModel,
+        )
+        .then((data) => data != null ? $UsersValues.fromJson(data) : null);
+  }
 }
 
 class $UsersValues {
@@ -129,5 +157,44 @@ class $UsersCreate {
 
   Map<String, dynamic> toJson() {
     return {'email': email, 'firstName': firstName, 'lastName': lastName};
+  }
+}
+
+/// Type-safe query builder for Users
+class $UsersQuery {
+  $UsersQuery();
+
+  final id = TypedColumn<int>('id', DataType.INTEGER);
+  final email = TypedColumn<String>('email', DataType.STRING);
+  final firstName = TypedColumn<String>('firstName', DataType.STRING);
+  final lastName = TypedColumn<String>('lastName', DataType.STRING);
+}
+
+/// Extension for type-safe queries on $Users
+extension $UsersQueryExtension on $Users {
+  Future<List<$UsersValues>> findAll(Query Function($UsersQuery) builder) {
+    final query = builder($UsersQuery());
+    return QueryEngine()
+        .findAll(
+          modelName: name,
+          query: query,
+          sequelize: sequelizeInstance,
+          model: sequelizeModel,
+        )
+        .then(
+          (data) => data.map((value) => $UsersValues.fromJson(value)).toList(),
+        );
+  }
+
+  Future<$UsersValues?> findOne(Query Function($UsersQuery) builder) {
+    final query = builder($UsersQuery());
+    return QueryEngine()
+        .findOne(
+          modelName: name,
+          query: query,
+          sequelize: sequelizeInstance,
+          model: sequelizeModel,
+        )
+        .then((data) => data != null ? $UsersValues.fromJson(data) : null);
   }
 }

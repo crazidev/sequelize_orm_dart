@@ -1,4 +1,4 @@
-import 'enums.dart';
+import 'package:sequelize_dart_annotations/src/enums.dart';
 
 /// Marks a class as a database table
 class Table {
