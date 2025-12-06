@@ -1,0 +1,11 @@
+{
+  "name": "my_dart_server",
+  "scripts": {
+  },
+  "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.47",
+    "@sequelize/postgres": "^7.0.0-alpha.47",
+    "@sequelize/mysql": "^7.0.0-alpha.47",
+    "@sequelize/mariadb": "^7.0.0-alpha.47"
+  }
+}

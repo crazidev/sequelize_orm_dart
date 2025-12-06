@@ -1,0 +1,21 @@
+name: sequelize_dart_generator
+description: Code generator for sequelize_dart package.
+version: 1.0.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  analyzer: ^9.0.0
+  build: ^4.0.3
+  source_gen: ^4.1.1
+  sequelize_dart_annotations:
+    path: ../sequelize_dart_annotations
+
+dev_dependencies:
+  build_runner: ^2.10.4
+  build_test: ^3.5.4
+  lints: ^6.0.0
+  test: ^1.25.6
+
+

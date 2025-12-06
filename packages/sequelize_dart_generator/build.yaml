@@ -1,0 +1,13 @@
+targets:
+  $default:
+    builders:
+      sequelize_dart_generator|sequelize_model_builder:
+        enabled: true
+
+builders:
+  sequelize_model_builder:
+    import: "package:sequelize_dart_generator/src/builder.dart"
+    builder_factories: ["sequelizeModelBuilder"]
+    build_extensions: {".model.dart": [".model.g.dart"]}
+    auto_apply: dependents
+    build_to: source

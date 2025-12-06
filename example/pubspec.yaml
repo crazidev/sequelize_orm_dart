@@ -1,0 +1,18 @@
+name: sequelize_dart_example
+description: Example project demonstrating sequelize_dart usage.
+version: 1.0.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  sequelize_dart:
+    path: ../packages/sequelize_dart
+  dotenv: ^4.2.0
+
+
+dev_dependencies:
+  sequelize_dart_generator:
+    path: ../packages/sequelize_dart_generator
+  build_runner: ^2.10.4
+  lints: ^6.0.0

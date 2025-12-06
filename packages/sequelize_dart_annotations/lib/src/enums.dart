@@ -1,0 +1,15 @@
+enum DataType {
+  STRING,
+  TEXT,
+  INTEGER,
+  BIGINT,
+  FLOAT,
+  DOUBLE,
+  DECIMAL,
+  BOOLEAN,
+  DATE,
+  DATEONLY,
+  UUID,
+  JSON,
+  JSONB,
+}
