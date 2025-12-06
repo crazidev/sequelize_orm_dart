@@ -7,4 +7,3 @@ external JSObject require(String module);
 external JSGlobal get globalThis;
 
 extension type JSGlobal._(JSObject _) implements JSObject {}
-

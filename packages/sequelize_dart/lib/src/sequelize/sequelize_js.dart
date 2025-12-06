@@ -129,4 +129,3 @@ extension type SequelizeModel._(JSObject _) implements JSObject {
   @JS('findOne')
   external JSPromise<JSObject?> findOne(JSObject? options);
 }
-

@@ -24,6 +24,7 @@ class Users {
 ```
 
 **Parameters:**
+
 - `tableName` (required): The name of the database table
 
 ### `@ModelAttributes`
@@ -45,6 +46,7 @@ dynamic id;
 ```
 
 **Parameters:**
+
 - `name` (required): The column name in the database
 - `type` (required): The data type (from `DataType` enum)
 - `primaryKey` (optional): Whether this is a primary key (default: `false`)
@@ -131,5 +133,3 @@ class Users {
 
 - [sequelize_dart](../sequelize_dart/README.md) - Main package
 - [sequelize_dart_generator](../sequelize_dart_generator/README.md) - Code generator
-
-

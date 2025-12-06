@@ -19,4 +19,3 @@ ComparisonOperator equal(String column, dynamic value) {
 ComparisonOperator notEqual(String column, dynamic value) {
   throw UnimplementedError();
 }
-

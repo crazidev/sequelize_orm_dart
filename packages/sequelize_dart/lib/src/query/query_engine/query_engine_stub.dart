@@ -32,4 +32,3 @@ class QueryEngine extends QueryEngineInterface {
     throw UnimplementedError();
   }
 }
-

@@ -4,4 +4,3 @@ abstract class QueryInterface {
   /// Convert query to JSON format
   Map<String, dynamic> toJson();
 }
-

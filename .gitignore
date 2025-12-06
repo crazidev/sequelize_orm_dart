@@ -15,3 +15,6 @@ example/build/
 packages/sequelize_dart/js/bridge_server.bundle.js
 packages/sequelize_dart/js/node_modules/
 packages/sequelize_dart/js/package-lock.json
+
+# Prettier
+.prettiercache

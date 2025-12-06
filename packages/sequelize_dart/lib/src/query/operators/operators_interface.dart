@@ -28,4 +28,3 @@ class LogicalOperator extends QueryOperator {
     };
   }
 }
-

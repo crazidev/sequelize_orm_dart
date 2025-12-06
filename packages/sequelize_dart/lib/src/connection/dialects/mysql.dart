@@ -17,4 +17,3 @@ class MysqlConnection extends SequelizeCoreOptions {
     return {...super.toJson(), "ssl": ssl, "dialect": dialect.value};
   }
 }
-

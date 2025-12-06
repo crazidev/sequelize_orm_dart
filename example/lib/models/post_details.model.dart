@@ -51,4 +51,3 @@ class PostDetails {
 
   static $PostDetails get instance => $PostDetails();
 }
-

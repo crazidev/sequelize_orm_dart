@@ -24,6 +24,7 @@ dev_dependencies:
 When running on Dart server, Sequelize Dart uses a Node.js bridge process to execute Sequelize.js operations. This allows you to use Sequelize.js features without requiring JS interop.
 
 **Setup Required:**
+
 1. Run the bridge setup script to bundle Sequelize.js:
    ```bash
    ./tools/setup_bridge.sh [bun|pnpm|npm]
@@ -275,7 +276,7 @@ try {
   var user = await Users.instance.findOne(
     Query(where: equal('id', 999)),
   );
-  
+
   if (user == null) {
     print('User not found');
   }
@@ -374,4 +375,3 @@ Future<void> main() async {
 
 - [sequelize_dart_annotations](../sequelize_dart_annotations/README.md) - Annotations package
 - [sequelize_dart_generator](../sequelize_dart_generator/README.md) - Code generator
-

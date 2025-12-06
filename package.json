@@ -1,6 +1,13 @@
 {
   "name": "my_dart_server",
   "scripts": {
+    "format": "prettier --write \"**/*.{js,json,md}\" && dart format .",
+    "format:check": "prettier --check \"**/*.{js,json,md}\" && dart format --set-exit-if-changed .",
+    "lint": "dart analyze .",
+    "lint:fix": "dart fix --apply ."
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.47",

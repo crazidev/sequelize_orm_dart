@@ -39,4 +39,3 @@ extension type SequelizeDataTypes._(JSObject _) implements JSObject {
   external JSObject get UUIDV4;
   external JSObject get VIRTUAL;
 }
-

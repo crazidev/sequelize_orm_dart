@@ -135,5 +135,3 @@ part 'users.model.g.dart';  // Must match filename
 
 - [sequelize_dart](../sequelize_dart/README.md) - Main package
 - [sequelize_dart_annotations](../sequelize_dart_annotations/README.md) - Annotations package
-
-

@@ -19,4 +19,3 @@ abstract class SequelizeInterface {
 
   Future<void> close();
 }
-

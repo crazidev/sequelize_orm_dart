@@ -45,4 +45,3 @@ class Post {
 
   static $Post get instance => $Post();
 }
-

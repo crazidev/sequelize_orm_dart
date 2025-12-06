@@ -10,4 +10,3 @@ extension type JSConsole._(JSObject _) implements JSObject {
   external void warn(JSAny? message);
   external void info(JSAny? message);
 }
-

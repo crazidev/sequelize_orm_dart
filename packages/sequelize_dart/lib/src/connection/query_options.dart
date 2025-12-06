@@ -12,4 +12,3 @@ class QueryOptions {
 
   QueryOptions({this.benchmark, this.logging, this.nest});
 }
-

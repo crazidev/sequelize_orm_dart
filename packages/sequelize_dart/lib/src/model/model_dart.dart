@@ -11,7 +11,7 @@ abstract class Model<T> extends ModelInterface {
     sequelizeInstance = sq;
     name = modelName;
     sequelize = sq as Sequelize;
-    
+
     // Set sequelizeModel to empty object for Dart VM
     // In JS, this would be the actual Sequelize model, but in Dart we just need it initialized
     sequelizeModel = <String, dynamic>{};

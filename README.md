@@ -55,6 +55,7 @@ When running on Dart server, Sequelize Dart uses a **Node.js bridge process** to
 4. **Connection Pooling**: Managed by Sequelize.js in the bridge process
 
 **Setup:**
+
 ```bash
 # Build the bridge server bundle (one-time setup)
 ./tools/setup_bridge.sh [bun|pnpm|npm]
@@ -377,12 +378,12 @@ psql -U postgres -d dbname -f example/migrations/create_tables_postgres.sql
 
 ## Platform Differences
 
-| Feature | Dart Server | dart2js |
-|---------|------------|---------|
-| **Setup** | Requires bridge setup | No setup needed |
-| **Performance** | Bridge overhead | Native performance |
-| **Dependencies** | Bundled bridge | Direct Sequelize.js |
-| **API** | Same API | Same API |
+| Feature          | Dart Server           | dart2js             |
+| ---------------- | --------------------- | ------------------- |
+| **Setup**        | Requires bridge setup | No setup needed     |
+| **Performance**  | Bridge overhead       | Native performance  |
+| **Dependencies** | Bundled bridge        | Direct Sequelize.js |
+| **API**          | Same API              | Same API            |
 
 ## Error Handling
 
@@ -391,7 +392,7 @@ try {
   var user = await Users.instance.findOne(
     Query(where: equal('id', 999)),
   );
-  
+
   if (user == null) {
     print('User not found');
   }

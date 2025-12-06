@@ -24,4 +24,3 @@ ComparisonOperator equal(String column, dynamic value) {
 ComparisonOperator notEqual(String column, dynamic value) {
   return ComparisonOperator(column: column, value: {Op.ne: value});
 }
-
