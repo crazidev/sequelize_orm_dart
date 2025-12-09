@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:js_interop';
 
-import 'package:sequelize_dart/src/sequelize/sequelize_js.dart';
 import 'package:sequelize_dart/src/model/model_value/model_value.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
-
-import 'query_engine_interface.dart';
+import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
+import 'package:sequelize_dart/src/sequelize/sequelize_js.dart';
 
 /// Recursively converts DateTime objects to ISO strings for JSON encoding
 dynamic _convertToJsonEncodable(dynamic value) {
@@ -27,16 +26,17 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    var res = await (model as SequelizeModel)
+    final res = await (model as SequelizeModel)
         .findAll(query?.toJson().jsify() as JSObject)
         .toDart;
 
-    List<ModelValue> data = res.toDart as List<ModelValue>;
+    final List<ModelValue> data = res.toDart as List<ModelValue>;
 
     return data.map((value) {
-      var dartified = value.dataValues.dartify();
-      var converted = _convertToJsonEncodable(dartified);
-      var q = jsonDecode(jsonEncode(converted));
+      final dartified = value.dataValues.dartify();
+      final converted = _convertToJsonEncodable(dartified);
+      final q = jsonDecode(jsonEncode(converted));
+
       return q as Map<String, dynamic>;
     }).toList();
   }
@@ -48,7 +48,7 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    var res = await (model as SequelizeModel)
+    final res = await (model as SequelizeModel)
         .findOne(query?.toJson().jsify() as JSObject)
         .toDart;
 
@@ -56,9 +56,9 @@ class QueryEngine extends QueryEngineInterface {
       return null;
     }
 
-    ModelValue data = res as ModelValue;
-    var dartified = data.dataValues.dartify();
-    var converted = _convertToJsonEncodable(dartified);
+    final ModelValue data = res as ModelValue;
+    final dartified = data.dataValues.dartify();
+    final converted = _convertToJsonEncodable(dartified);
     return jsonDecode(jsonEncode(converted)) as Map<String, dynamic>;
   }
 

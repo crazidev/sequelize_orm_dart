@@ -159,25 +159,12 @@ function convertQueryOptions(options) {
 
   const result = {};
 
-  if (options.where) {
-    result.where = convertWhereClause(options.where);
-  }
-
-  if (options.include) {
-    result.include = options.include;
-  }
-
-  if (options.order) {
-    result.order = options.order;
-  }
-
-  if (options.limit !== undefined) {
-    result.limit = options.limit;
-  }
-
-  if (options.offset !== undefined) {
-    result.offset = options.offset;
-  }
+  result.where = convertWhereClause(options.where);
+  result.include = options.include;
+  result.order = options.order;
+  result.limit = options.limit;
+  result.offset = options.offset;
+  result.attributes = options.attributes;
 
   return result;
 }

@@ -2,11 +2,11 @@ import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 /// Type-safe column reference for building queries
-class TypedColumn<T> {
+class Column<T> {
   final String name;
-  final DataType dataType;
+  final DataType? dataType;
 
-  const TypedColumn(this.name, this.dataType);
+  const Column(this.name, [this.dataType]);
 
   // ============================================================================
   // Basic Comparison Operators

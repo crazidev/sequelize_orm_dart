@@ -21,35 +21,8 @@ Future<void> main() async {
 
   await sequelize.authenticate();
   sequelize.addModels([Users.instance]);
-
   final startTime = DateTime.now();
-
   const totalQueries = 1;
-
-  // Test type-safe queries
-  print('\n=== Testing Type-Safe Queries ===\n');
-
-  // Example 1: Type-safe findAll with autocomplete
-  final users1 = await Users.instance.findAll(
-    (q) => Query(
-      where: or([
-        q.id.greaterThan(1),
-      ]),
-      order: [
-        ['id', 'DESC'],
-      ],
-    ),
-  );
-
-  // Example 2: Type-safe findOne
-  final user = await Users.instance.findOne(
-    (q) => Query(
-      where: q.id.eq(1),
-    ),
-  );
-
-  print('Found ${users1.length} users');
-  print('Found user: ${user?.email}');
 
   // Performance test
   final futures = <Future>[];
@@ -57,11 +30,14 @@ Future<void> main() async {
     final queryStart = DateTime.now();
     final future = Users.instance
         .findAll(
-          (q) => Query(
-            where: q.id.in_([1, 2]),
+          (users) => Query(
+            where: users.id.in_([1, 2]),
             order: [
               ['id', 'DESC'],
             ],
+            attributes: QueryAttributes(
+              columns: [const Column('id'), users.email],
+            ),
           ),
         )
         .then((value) {
@@ -70,6 +46,7 @@ Future<void> main() async {
             '\nQUERY $i: ${value.map((e) => e.toJson())} (took ${queryDuration.inMilliseconds}ms)',
           );
         });
+
     futures.add(future);
   }
 

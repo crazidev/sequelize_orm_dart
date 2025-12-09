@@ -175,7 +175,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
 
     buffer.writeln('  @override');
     buffer.writeln(
-      '  Future<List<$valuesClassName>> findAll(Query Function($queryBuilderClassName) builder) {',
+      '  Future<List<$valuesClassName>> findAll(Query Function($queryBuilderClassName ${className.toLowerCase()}) builder) {',
     );
     buffer.writeln('    final query = builder($queryBuilderClassName());');
     buffer.writeln('    return QueryEngine().findAll(');
@@ -201,7 +201,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
 
     buffer.writeln('  @override');
     buffer.writeln(
-      '  Future<$valuesClassName?> findOne(Query Function($queryBuilderClassName) builder) {',
+      '  Future<$valuesClassName?> findOne(Query Function($queryBuilderClassName ${className.toLowerCase()}) builder) {',
     );
     buffer.writeln('    final query = builder($queryBuilderClassName());');
     buffer.writeln('    return QueryEngine().findOne(');
@@ -225,7 +225,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
   ) {
     buffer.writeln('class $valuesClassName {');
     for (var field in fields) {
-      buffer.writeln('  final ${field.dartType} ${field.fieldName};');
+      buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
     }
     buffer.writeln();
     buffer.writeln('  $valuesClassName({');
