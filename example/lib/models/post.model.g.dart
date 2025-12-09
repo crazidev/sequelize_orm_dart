@@ -63,30 +63,8 @@ class $Post extends Model {
     return {'tableName': 'posts', 'underscored': true, 'timestamps': true};
   }
 
-  Future<List<$PostValues>> findAll([Query? options]) async {
-    var data = await QueryEngine().findAll(
-      modelName: name,
-      query: options,
-      sequelize: sequelizeInstance,
-      model: sequelizeModel,
-    );
-
-    return data.map((value) => $PostValues.fromJson(value)).toList();
-  }
-
-  Future<$PostValues?> findOne([Query? options]) async {
-    var data = await QueryEngine().findOne(
-      modelName: name,
-      query: options,
-      sequelize: sequelizeInstance,
-      model: sequelizeModel,
-    );
-
-    return data != null ? $PostValues.fromJson(data) : null;
-  }
-
-  /// Type-safe findAll with query builder
-  Future<List<$PostValues>> findAllTyped(Query Function($PostQuery) builder) {
+  @override
+  Future<List<$PostValues>> findAll(Query Function($PostQuery) builder) {
     final query = builder($PostQuery());
     return QueryEngine()
         .findAll(
@@ -100,8 +78,8 @@ class $Post extends Model {
         );
   }
 
-  /// Type-safe findOne with query builder
-  Future<$PostValues?> findOneTyped(Query Function($PostQuery) builder) {
+  @override
+  Future<$PostValues?> findOne(Query Function($PostQuery) builder) {
     final query = builder($PostQuery());
     return QueryEngine()
         .findOne(
@@ -190,33 +168,4 @@ class $PostQuery {
   final userId = TypedColumn<int>('userId', DataType.INTEGER);
   final createdAt = TypedColumn<DateTime>('createdAt', DataType.DATE);
   final updatedAt = TypedColumn<DateTime>('updatedAt', DataType.DATE);
-}
-
-/// Extension for type-safe queries on $Post
-extension $PostQueryExtension on $Post {
-  Future<List<$PostValues>> findAll(Query Function($PostQuery) builder) {
-    final query = builder($PostQuery());
-    return QueryEngine()
-        .findAll(
-          modelName: name,
-          query: query,
-          sequelize: sequelizeInstance,
-          model: sequelizeModel,
-        )
-        .then(
-          (data) => data.map((value) => $PostValues.fromJson(value)).toList(),
-        );
-  }
-
-  Future<$PostValues?> findOne(Query Function($PostQuery) builder) {
-    final query = builder($PostQuery());
-    return QueryEngine()
-        .findOne(
-          modelName: name,
-          query: query,
-          sequelize: sequelizeInstance,
-          model: sequelizeModel,
-        )
-        .then((data) => data != null ? $PostValues.fromJson(data) : null);
-  }
 }
