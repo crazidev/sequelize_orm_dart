@@ -1,6 +1,7 @@
 name: sequelize_dart_annotations
 description: Annotations for sequelize_dart code generation. Platform-independent.
 version: 1.0.0
+resolution: workspace
 
 environment:
   sdk: ^3.9.2

@@ -16,7 +16,15 @@ class BridgeClient {
   Completer<void>? _initializationCompleter;
   bool _isInitializing = false;
 
+  /// Callback for SQL logging
+  Function(String sql)? _loggingCallback;
+
   BridgeClient._();
+
+  /// Set the logging callback to receive SQL queries
+  void setLoggingCallback(Function(String sql)? callback) {
+    _loggingCallback = callback;
+  }
 
   static BridgeClient? _instance;
 
@@ -260,6 +268,16 @@ class BridgeClient {
   void _handleResponse(String line) {
     try {
       final response = jsonDecode(line);
+
+      // Handle SQL log notifications
+      if (response['notification'] == 'sql_log') {
+        final sql = response['sql'] as String?;
+        if (sql != null && _loggingCallback != null) {
+          _loggingCallback!(sql);
+        }
+        return;
+      }
+
       final id = response['id'];
 
       if (id != null && _pendingRequests.containsKey(id)) {

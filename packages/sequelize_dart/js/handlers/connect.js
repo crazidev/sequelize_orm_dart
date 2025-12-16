@@ -22,10 +22,24 @@ async function handleConnect(params) {
     if (pool.evict !== undefined && pool.evict !== null) poolConfig.evict = pool.evict;
   }
 
+  // Custom logging function that sends SQL to Dart via JSON-RPC notification
+  const loggingFn = logging
+    ? (sql) => {
+        // Send SQL log as JSON-RPC notification to stdout
+        const notification = {
+          notification: 'sql_log',
+          sql: typeof sql === 'string' ? sql : String(sql),
+        };
+        process.stdout.write(JSON.stringify(notification) + '\n');
+        // Also log to stderr for debugging
+        console.error(sql);
+      }
+    : false;
+
   const sequelizeOptions = {
     ...sequelizeConfig,
     dialect: selectDialect(dialect),
-    logging: logging ? console.error : false, // Use stderr for logging (not stdout)
+    logging: loggingFn,
   };
 
   // Only add pool config if it has values

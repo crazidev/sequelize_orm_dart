@@ -1,6 +1,6 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart/src/sequelize/sequelize_interface.dart';
 import 'package:sequelize_dart/src/sequelize/bridge_client.dart';
+import 'package:sequelize_dart/src/sequelize/sequelize_interface.dart';
 
 class Sequelize extends SequelizeInterface {
   final BridgeClient _bridge = BridgeClient.instance;
@@ -25,10 +25,17 @@ class Sequelize extends SequelizeInterface {
     List<Model>? models,
   }) {
     // Convert connection options to JSON, removing logging function
-    Map<String, dynamic> config = Map<String, dynamic>.from(input.toJson());
+    final Map<String, dynamic> config = Map<String, dynamic>.from(
+      input.toJson(),
+    );
 
-    // Remove logging function (can't serialize)
-    var logging = config['logging'].runtimeType.toString() != "Null";
+    // Store the logging callback in the bridge client
+    if (input.logging != null) {
+      _bridge.setLoggingCallback(input.logging);
+    }
+
+    // Remove logging function (can't serialize) - just send boolean
+    final logging = config['logging'].runtimeType.toString() != 'Null';
     config.remove('logging');
     config.addEntries([
       MapEntry('logging', logging),

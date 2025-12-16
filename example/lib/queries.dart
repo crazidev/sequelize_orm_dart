@@ -1,8 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
-import 'package:sequelize_dart_example/utils/measureQuery.dart';
+
+import 'models/users.model.dart';
+import 'utils/measureQuery.dart';
 
 /// Run all query examples
 /// This function is called from main.dart after the database connection is established

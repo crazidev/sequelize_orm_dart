@@ -1,6 +1,7 @@
 name: sequelize_dart_example
 description: Example project demonstrating sequelize_dart usage.
 version: 1.0.0
+resolution: workspace
 
 environment:
   sdk: ^3.10.0
@@ -16,3 +17,4 @@ dev_dependencies:
     path: ../packages/sequelize_dart_generator
   build_runner: ^2.10.4
   lints: ^6.0.0
+  test: ^1.25.0

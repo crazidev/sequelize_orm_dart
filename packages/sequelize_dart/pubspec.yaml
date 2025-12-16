@@ -1,6 +1,7 @@
 name: sequelize_dart
 description: A Dart ORM for Sequelize.js integration with code generation support.
 version: 1.0.0
+resolution: workspace
 
 environment:
   sdk: ^3.9.2
