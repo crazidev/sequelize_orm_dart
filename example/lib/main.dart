@@ -1,10 +1,13 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/queries.dart';
 
 const connectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';
 
+/// Main entry point - handles database setup and initialization
 Future<void> main() async {
+  // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
     PostgressConnection(
       url: connectionString,
@@ -19,43 +22,12 @@ Future<void> main() async {
     ),
   );
 
+  // Authenticate and register models
   await sequelize.authenticate();
   sequelize.addModels([Users.instance]);
-  final startTime = DateTime.now();
-  const totalQueries = 1;
 
-  // Performance test
-  final futures = <Future>[];
-  for (var i = 0; i < totalQueries; i++) {
-    final queryStart = DateTime.now();
-    final future = Users.instance
-        .findAll(
-          (users) => Query(
-            where: users.id.in_([1, 2]),
-            order: [
-              ['id', 'DESC'],
-            ],
-            attributes: QueryAttributes(
-              columns: [const Column('id'), users.email],
-            ),
-          ),
-        )
-        .then((value) {
-          final queryDuration = DateTime.now().difference(queryStart);
-          print(
-            '\nQUERY $i: ${value.map((e) => e.toJson())} (took ${queryDuration.inMilliseconds}ms)',
-          );
-        });
-
-    futures.add(future);
-  }
-
-  // Wait for all queries to complete
-  await Future.wait(futures);
-  final totalDuration = DateTime.now().difference(startTime);
-  print(
-    '\n$totalQueries queries completed in ${totalDuration.inMilliseconds}ms',
-  );
+  // Run queries - all query logic is in queries.dart
+  await runQueries();
 
   // Close the connection to free up resources
   await sequelize.close();

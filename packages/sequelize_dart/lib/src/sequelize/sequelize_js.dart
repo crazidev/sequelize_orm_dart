@@ -115,7 +115,7 @@ extension type SqOp._(JSObject _) implements JSObject {
   external JSSymbol get ne;
   @JS('is')
   external JSSymbol get isOp;
-  // Note: Op.not is for logical NOT, for IS NOT use Op.is with negation
+  external JSSymbol get isNot;
 
   // Number comparison operators
   external JSSymbol get gt;

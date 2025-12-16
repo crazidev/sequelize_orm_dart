@@ -1,20 +1,19 @@
 import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
-import 'package:sequelize_dart/src/sequelize/sequelize_js.dart';
 
 // ============================================================================
 // Logical Operators
 // ============================================================================
 
 LogicalOperator and(List<QueryOperator> values) {
-  return LogicalOperator(Op.and, values);
+  return LogicalOperator('\$and', values);
 }
 
 LogicalOperator or(List<QueryOperator> values) {
-  return LogicalOperator(Op.or, values);
+  return LogicalOperator('\$or', values);
 }
 
 LogicalOperator not(List<QueryOperator> values) {
-  return LogicalOperator(Op.not, values);
+  return LogicalOperator('\$not', values);
 }
 
 // ============================================================================
@@ -26,17 +25,15 @@ ComparisonOperator eq(String column, dynamic value) {
 }
 
 ComparisonOperator ne(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.ne: value});
+  return ComparisonOperator(column: column, value: {'\$ne': value});
 }
 
 ComparisonOperator is_(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.isOp: value});
+  return ComparisonOperator(column: column, value: {'\$is': value});
 }
 
 ComparisonOperator not_(String column, dynamic value) {
-  // Op.not is for logical NOT, for IS NOT we use Op.is with negation
-  // This is a workaround - Sequelize doesn't have a direct IS NOT operator
-  return ComparisonOperator(column: column, value: {Op.not: value});
+  return ComparisonOperator(column: column, value: {'\$not': value});
 }
 
 // ============================================================================
@@ -44,27 +41,27 @@ ComparisonOperator not_(String column, dynamic value) {
 // ============================================================================
 
 ComparisonOperator gt(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.gt: value});
+  return ComparisonOperator(column: column, value: {'\$gt': value});
 }
 
 ComparisonOperator gte(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.gte: value});
+  return ComparisonOperator(column: column, value: {'\$gte': value});
 }
 
 ComparisonOperator lt(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.lt: value});
+  return ComparisonOperator(column: column, value: {'\$lt': value});
 }
 
 ComparisonOperator lte(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.lte: value});
+  return ComparisonOperator(column: column, value: {'\$lte': value});
 }
 
 ComparisonOperator between(String column, List<dynamic> value) {
-  return ComparisonOperator(column: column, value: {Op.between: value});
+  return ComparisonOperator(column: column, value: {'\$between': value});
 }
 
 ComparisonOperator notBetween(String column, List<dynamic> value) {
-  return ComparisonOperator(column: column, value: {Op.notBetween: value});
+  return ComparisonOperator(column: column, value: {'\$notBetween': value});
 }
 
 // ============================================================================
@@ -72,19 +69,19 @@ ComparisonOperator notBetween(String column, List<dynamic> value) {
 // ============================================================================
 
 ComparisonOperator in_(String column, List<dynamic> values) {
-  return ComparisonOperator(column: column, value: {Op.inOp: values});
+  return ComparisonOperator(column: column, value: {'\$in': values});
 }
 
 ComparisonOperator notIn(String column, List<dynamic> values) {
-  return ComparisonOperator(column: column, value: {Op.notIn: values});
+  return ComparisonOperator(column: column, value: {'\$notIn': values});
 }
 
 ComparisonOperator all(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.all: value});
+  return ComparisonOperator(column: column, value: {'\$all': value});
 }
 
 ComparisonOperator any(String column, List<dynamic> values) {
-  return ComparisonOperator(column: column, value: {Op.any: values});
+  return ComparisonOperator(column: column, value: {'\$any': values});
 }
 
 // ============================================================================
@@ -92,31 +89,31 @@ ComparisonOperator any(String column, List<dynamic> values) {
 // ============================================================================
 
 ComparisonOperator like(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.like: pattern});
+  return ComparisonOperator(column: column, value: {'\$like': pattern});
 }
 
 ComparisonOperator notLike(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.notLike: pattern});
+  return ComparisonOperator(column: column, value: {'\$notLike': pattern});
 }
 
 ComparisonOperator startsWith(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.startsWith: pattern});
+  return ComparisonOperator(column: column, value: {'\$startsWith': pattern});
 }
 
 ComparisonOperator endsWith(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.endsWith: pattern});
+  return ComparisonOperator(column: column, value: {'\$endsWith': pattern});
 }
 
 ComparisonOperator substring(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.substring: pattern});
+  return ComparisonOperator(column: column, value: {'\$substring': pattern});
 }
 
 ComparisonOperator iLike(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.iLike: pattern});
+  return ComparisonOperator(column: column, value: {'\$iLike': pattern});
 }
 
 ComparisonOperator notILike(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.notILike: pattern});
+  return ComparisonOperator(column: column, value: {'\$notILike': pattern});
 }
 
 // ============================================================================
@@ -124,19 +121,19 @@ ComparisonOperator notILike(String column, String pattern) {
 // ============================================================================
 
 ComparisonOperator regexp(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.regexp: pattern});
+  return ComparisonOperator(column: column, value: {'\$regexp': pattern});
 }
 
 ComparisonOperator notRegexp(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.notRegexp: pattern});
+  return ComparisonOperator(column: column, value: {'\$notRegexp': pattern});
 }
 
 ComparisonOperator iRegexp(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.iRegexp: pattern});
+  return ComparisonOperator(column: column, value: {'\$iRegexp': pattern});
 }
 
 ComparisonOperator notIRegexp(String column, String pattern) {
-  return ComparisonOperator(column: column, value: {Op.notIRegexp: pattern});
+  return ComparisonOperator(column: column, value: {'\$notIRegexp': pattern});
 }
 
 // ============================================================================
@@ -144,11 +141,11 @@ ComparisonOperator notIRegexp(String column, String pattern) {
 // ============================================================================
 
 ComparisonOperator col(String column, String columnReference) {
-  return ComparisonOperator(column: column, value: {Op.col: columnReference});
+  return ComparisonOperator(column: column, value: {'\$col': columnReference});
 }
 
 ComparisonOperator match(String column, dynamic value) {
-  return ComparisonOperator(column: column, value: {Op.match: value});
+  return ComparisonOperator(column: column, value: {'\$match': value});
 }
 
 // ============================================================================

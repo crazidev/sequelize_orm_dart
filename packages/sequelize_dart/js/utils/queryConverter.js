@@ -40,18 +40,26 @@ function convertWhereClause(where) {
         const converted = {};
         for (const [opKey, opValue] of Object.entries(value)) {
           switch (opKey) {
-            // Basic operators
+            // Basic comparison operators (basic_comparison.dart)
+            case '$eq':
+              converted[Op.eq] = opValue;
+              break;
             case '$ne':
               converted[Op.ne] = opValue;
               break;
+
+            // IS operators (is_operators.dart)
             case '$is':
               converted[Op.is] = opValue;
+              break;
+            case '$isNot':
+              converted[Op.isNot] = opValue;
               break;
             case '$not':
               converted[Op.not] = opValue;
               break;
 
-            // Number comparison operators
+            // Numeric comparison operators (numeric_comparison.dart)
             case '$gt':
               converted[Op.gt] = opValue;
               break;
@@ -71,7 +79,7 @@ function convertWhereClause(where) {
               converted[Op.notBetween] = opValue;
               break;
 
-            // List operators
+            // List operators (list_operators.dart)
             case '$in':
               converted[Op.in] = opValue;
               break;
@@ -85,7 +93,7 @@ function convertWhereClause(where) {
               converted[Op.any] = opValue;
               break;
 
-            // String operators
+            // String operators (string_operators.dart)
             case '$like':
               converted[Op.like] = opValue;
               break;
@@ -108,7 +116,7 @@ function convertWhereClause(where) {
               converted[Op.notILike] = opValue;
               break;
 
-            // Regex operators
+            // Regex operators (regex_operators.dart)
             case '$regexp':
               converted[Op.regexp] = opValue;
               break;
@@ -122,7 +130,7 @@ function convertWhereClause(where) {
               converted[Op.notIRegexp] = opValue;
               break;
 
-            // Other operators
+            // Misc operators (misc_operators.dart)
             case '$col':
               converted[Op.col] = opValue;
               break;

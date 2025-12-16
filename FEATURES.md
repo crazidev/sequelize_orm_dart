@@ -115,16 +115,16 @@
 
 ## Type-Safe Query Builder
 
-### TypedColumn Class
+### Column Class
 
-- ✅ **Type-safe column references** - `TypedColumn<T>`
-- ✅ **All comparison operators** - Available on TypedColumn
-- ✅ **All string operators** - Available on TypedColumn
-- ✅ **All number operators** - Available on TypedColumn
-- ✅ **All list operators** - Available on TypedColumn
-- ✅ **All regex operators** - Available on TypedColumn
-- ✅ **col() method** - Column reference on TypedColumn
-- ✅ **match() method** - Text search match on TypedColumn
+- ✅ **Type-safe column references** - `Column<T>`
+- ✅ **All comparison operators** - Available on Column
+- ✅ **All string operators** - Available on Column
+- ✅ **All number operators** - Available on Column
+- ✅ **All list operators** - Available on Column
+- ✅ **All regex operators** - Available on Column
+- ✅ **col() method** - Column reference on Column
+- ✅ **match() method** - Text search match on Column
 - ✅ **Legacy aliases** - `equal()`, `not()`, `greaterThan()`, etc.
 
 ---
@@ -245,7 +245,7 @@
 - All logical operators
 - All string operators
 - All regex operators
-- Type-safe query builder (TypedColumn)
+- Type-safe query builder (Column)
 - Type-safe query methods (findAll/findOne accept typed query builder functions)
 - Connection pooling
 - Multiple database support (PostgreSQL, MySQL, MariaDB)

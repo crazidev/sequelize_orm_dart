@@ -3,15 +3,17 @@
 // Load environment variables if .env file exists
 require('dotenv').config();
 
-const { Sequelize } = require('@sequelize/core');
-const { convertAttributes } = require('./utils/dataTypeConverter');
-const { convertQueryOptions } = require('./utils/queryConverter');
-const { selectDialect } = require('./utils/dialectSelector');
 const { formatError } = require('./utils/errorFormatter');
+const { getSequelize } = require('./utils/state');
 
-// Global state
-let sequelize = null;
-const models = new Map();
+// Import handlers
+const { handleReady } = require('./handlers/ready');
+const { handleConnect } = require('./handlers/connect');
+const { handleDefineModel } = require('./handlers/defineModel');
+const { handleFindAll } = require('./handlers/findAll');
+const { handleFindOne } = require('./handlers/findOne');
+const { handleCreate } = require('./handlers/create');
+const { handleClose } = require('./handlers/close');
 
 /**
  * Handle JSON-RPC requests
@@ -24,117 +26,31 @@ async function handleRequest(request) {
 
     switch (method) {
       case 'ready':
-        result = { ready: true };
+        result = await handleReady();
         break;
 
       case 'connect':
-        const config = params.config;
-        const { logging, dialect, pool, ...sequelizeConfig } = config;
-
-        // Build pool configuration (only include defined values)
-        const poolConfig = {};
-
-        if (pool) {
-          // Only include pool options that are explicitly set
-          if (pool.max !== undefined && pool.max !== null) poolConfig.max = pool.max;
-          if (pool.min !== undefined && pool.min !== null) poolConfig.min = pool.min;
-          if (pool.idle !== undefined && pool.idle !== null) poolConfig.idle = pool.idle;
-          if (pool.acquire !== undefined && pool.acquire !== null) poolConfig.acquire = pool.acquire;
-          if (pool.evict !== undefined && pool.evict !== null) poolConfig.evict = pool.evict;
-        }
-
-        const sequelizeOptions = {
-          ...sequelizeConfig,
-          dialect: selectDialect(dialect),
-          logging: logging ? console.error : false, // Use stderr for logging (not stdout)
-        };
-
-        // Only add pool config if it has values
-        if (Object.keys(poolConfig).length > 0) {
-          sequelizeOptions.pool = poolConfig;
-        }
-
-        sequelize = new Sequelize(sequelizeOptions);
-
-        // Test connection
-        await sequelize.authenticate();
-
-        result = { connected: true };
+        result = await handleConnect(params);
         break;
 
       case 'defineModel':
-        if (!sequelize) {
-          throw new Error('Not connected. Call connect first.');
-        }
-
-        const { name, attributes, options } = params;
-        const sequelizeAttributes = convertAttributes(attributes);
-
-        const model = sequelize.define(name, sequelizeAttributes, options || {});
-        models.set(name, model);
-
-        result = { defined: true };
+        result = await handleDefineModel(params);
         break;
 
       case 'findAll':
-        if (!sequelize) {
-          throw new Error('Not connected. Call connect first.');
-        }
-
-        const findAllModelName = params.model;
-        const findAllOptions = convertQueryOptions(params.options || {});
-        const findAllModel = models.get(findAllModelName);
-
-        if (!findAllModel) {
-          throw new Error(`Model "${findAllModelName}" not found. Define it first.`);
-        }
-
-        const findAllResults = await findAllModel.findAll(findAllOptions);
-        result = findAllResults.map(row => row.toJSON());
+        result = await handleFindAll(params);
         break;
 
       case 'findOne':
-        if (!sequelize) {
-          throw new Error('Not connected. Call connect first.');
-        }
-
-        const findOneModelName = params.model;
-        const findOneOptions = convertQueryOptions(params.options || {});
-        const findOneModel = models.get(findOneModelName);
-
-        if (!findOneModel) {
-          throw new Error(`Model "${findOneModelName}" not found. Define it first.`);
-        }
-
-        const findOneResult = await findOneModel.findOne(findOneOptions);
-        result = findOneResult ? findOneResult.toJSON() : null;
+        result = await handleFindOne(params);
         break;
 
       case 'create':
-        if (!sequelize) {
-          throw new Error('Not connected. Call connect first.');
-        }
-
-
-        const createModelName = params.model;
-        const createData = params.data || {};
-        const createModel = models.get(createModelName);
-
-        if (!createModel) {
-          throw new Error(`Model "${createModelName}" not found. Define it first.`);
-        }
-
-        const createResult = await createModel.create(createData);
-        result = createResult.toJSON();
+        result = await handleCreate(params);
         break;
 
       case 'close':
-        if (sequelize) {
-          await sequelize.close();
-          sequelize = null;
-          models.clear();
-        }
-        result = { closed: true };
+        result = await handleClose();
         break;
 
       default:
@@ -195,25 +111,28 @@ process.stdin.on('data', (chunk) => {
   }
 });
 
-process.stdin.on('end', () => {
+process.stdin.on('end', async () => {
   // Cleanup on exit
+  const sequelize = getSequelize();
   if (sequelize) {
-    sequelize.close();
+    await sequelize.close();
   }
   process.exit(0);
 });
 
 // Handle process termination
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
+  const sequelize = getSequelize();
   if (sequelize) {
-    sequelize.close();
+    await sequelize.close();
   }
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
+  const sequelize = getSequelize();
   if (sequelize) {
-    sequelize.close();
+    await sequelize.close();
   }
   process.exit(0);
 });

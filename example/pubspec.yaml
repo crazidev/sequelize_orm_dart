@@ -3,7 +3,7 @@ description: Example project demonstrating sequelize_dart usage.
 version: 1.0.0
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.10.0
 
 dependencies:
   sequelize_dart:

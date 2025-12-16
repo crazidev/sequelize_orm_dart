@@ -303,7 +303,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     for (var field in fields) {
       final dartType = _getDartTypeForQuery(field.dataType);
       buffer.writeln(
-        "  final ${field.fieldName} = TypedColumn<$dartType>('${field.name}', DataType.${field.dataType});",
+        "  final ${field.fieldName} = Column<$dartType>('${field.name}', DataType.${field.dataType});",
       );
     }
 
