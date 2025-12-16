@@ -1,7 +1,6 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-
-import 'models/users.model.dart';
-import 'queries.dart';
+import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/queries.dart';
 
 const connectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';
@@ -21,6 +20,7 @@ Future<void> main() async {
         evict: 1000, // Check for idle connections (ms)
       ),
     ),
+    models: [],
   );
 
   // Authenticate and register models

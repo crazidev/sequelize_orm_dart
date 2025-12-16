@@ -1,6 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-
-import '../lib/models/users.model.dart';
+import 'package:sequelize_dart_example/models/users.model.dart';
 
 /// Connection string for test database
 const testConnectionString =

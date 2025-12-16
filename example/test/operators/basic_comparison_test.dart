@@ -1,7 +1,7 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:test/test.dart';
 
-import '../../lib/models/users.model.dart';
 import '../test_helper.dart';
 
 /// Tests for basic comparison operators: eq, ne
