@@ -17,6 +17,9 @@ class Users {
   @ModelAttributes(
     name: 'email',
     type: DataType.STRING,
+    validate: ValidateOption(
+      isEmail: IsEmail(),
+    ),
   )
   dynamic email;
 
