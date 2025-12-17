@@ -11,7 +11,13 @@ Future<void> runQueries() async {
   final users = await measureQuery(
     'Find users by IDs',
     () => Users.instance.findAll(
-      (users) => Query(where: users.id.eq(1), include: []),
+      (users) => Query(
+        where: users.id.eq(1),
+        include: {
+          'all': true,
+          'nested': true,
+        },
+      ),
     ),
   );
 

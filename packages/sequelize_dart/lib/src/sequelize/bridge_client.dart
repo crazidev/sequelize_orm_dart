@@ -122,7 +122,6 @@ class BridgeClient {
         .listen(
           (data) {
             stderrBuffer.writeln(data);
-            print('[BridgeClient] stderr: $data');
           },
           onDone: () {
             stderrCompleter.complete();

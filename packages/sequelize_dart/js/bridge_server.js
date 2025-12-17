@@ -10,6 +10,7 @@ const { getSequelize } = require('./utils/state');
 const { handleReady } = require('./handlers/ready');
 const { handleConnect } = require('./handlers/connect');
 const { handleDefineModel } = require('./handlers/defineModel');
+const { handleAssociateModel } = require('./handlers/associateModel');
 const { handleFindAll } = require('./handlers/findAll');
 const { handleFindOne } = require('./handlers/findOne');
 const { handleCreate } = require('./handlers/create');
@@ -35,6 +36,10 @@ async function handleRequest(request) {
 
       case 'defineModel':
         result = await handleDefineModel(params);
+        break;
+
+      case 'associateModel':
+        result = await handleAssociateModel(params);
         break;
 
       case 'findAll':

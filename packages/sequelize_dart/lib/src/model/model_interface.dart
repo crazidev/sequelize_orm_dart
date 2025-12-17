@@ -1,3 +1,4 @@
+import 'package:sequelize_dart/src/association/association_model.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
@@ -10,14 +11,18 @@ abstract class ModelInterface<T> {
   /// Define the model in Sequelize
   ModelInterface<T> define(String modelName, Object sequelize);
 
-  void hasOne(
+  /// Associate models - called after all models are defined
+  /// Override in generated models to set up associations
+  Future<void> associateModel();
+
+  Future<Association> hasOne(
     ModelInterface model, {
     String? foreignKey,
     String? as,
     String? sourceKey,
   });
 
-  void hasMany(
+  Future<Association> hasMany(
     ModelInterface model, {
     String? foreignKey,
     String? as,

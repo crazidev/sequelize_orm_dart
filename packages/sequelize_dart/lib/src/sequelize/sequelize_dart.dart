@@ -5,6 +5,7 @@ import 'package:sequelize_dart/src/sequelize/sequelize_interface.dart';
 class Sequelize extends SequelizeInterface {
   final BridgeClient _bridge = BridgeClient.instance;
   final Map<String, Model> _models = {};
+  Map<String, dynamic>? _connectionConfig;
 
   @override
   Future<void> authenticate() async {
@@ -20,10 +21,7 @@ class Sequelize extends SequelizeInterface {
   }
 
   @override
-  SequelizeInterface createInstance(
-    SequelizeCoreOptions input, {
-    List<Model>? models,
-  }) {
+  SequelizeInterface createInstance(SequelizeCoreOptions input) {
     // Convert connection options to JSON, removing logging function
     final Map<String, dynamic> config = Map<String, dynamic>.from(
       input.toJson(),
@@ -55,48 +53,69 @@ class Sequelize extends SequelizeInterface {
       config.removeWhere((key, value) => keysToRemove.contains(key));
     }
 
-    // Start bridge and connect asynchronously
-    // Note: This is fire-and-forget, connection happens in background
-    // Users should call authenticate() to verify connection
-    _bridge
-        .start(connectionConfig: config)
-        .then((_) {
-          // Register models after connection
-          if (models != null) {
-            addModels(models);
-          }
-        })
-        .catchError((error) {
-          print('[Sequelize] Failed to start bridge');
-          if (error is BridgeException) {
-            if (error.message.isNotEmpty) {
-              print('[Sequelize] Error: ${error.message}');
-            }
-            if (error.code != null) {
-              print('[Sequelize] Error code: ${error.code}');
-            }
-            if (error.stack != null && error.stack!.isNotEmpty) {
-              print('[Sequelize] Stack trace:\n${error.stack}');
-            }
-          } else {
-            print('[Sequelize] Error: ${error.toString()}');
-            if (error is Error) {
-              print('[Sequelize] Stack trace:\n${error.stackTrace}');
-            }
-          }
-        });
+    // Store config for later use in initialize()
+    _connectionConfig = config;
 
     return this;
+  }
+
+  /// Initialize Sequelize with models
+  ///
+  /// This method properly sequences the initialization:
+  /// 1. Starts the bridge and connects to the database
+  /// 2. Defines all models in the bridge (awaited)
+  /// 3. Sets up all associations (awaited)
+  ///
+  /// Example:
+  /// ```dart
+  /// final sequelize = Sequelize().createInstance(config);
+  /// await sequelize.initialize(models: [Users.instance, Post.instance]);
+  /// // Now safe to run queries
+  /// ```
+  @override
+  Future<void> initialize({required List<Model> models}) async {
+    if (_connectionConfig == null) {
+      throw Exception(
+        'Connection config not set. Call createInstance() first.',
+      );
+    }
+
+    // Start bridge and wait for connection
+    await _bridge.start(connectionConfig: _connectionConfig!);
+
+    // Step 1: Define all models in the bridge first
+    print('[Sequelize] Defining ${models.length} models...');
+    for (final model in models) {
+      // Set up model references synchronously
+      model.define(model.name, this);
+      _models[model.name] = model;
+
+      // Define model in bridge and WAIT for completion
+      await _bridge.call('defineModel', {
+        'name': model.name,
+        'attributes': model.getAttributesJson(),
+        'options': model.getOptionsJson(),
+      });
+    }
+    print('[Sequelize] All models defined.');
+
+    // Step 2: Set up associations AFTER all models are defined
+    print('[Sequelize] Setting up associations...');
+    for (final model in models) {
+      await model.associateModel();
+    }
+    print('[Sequelize] All associations configured.');
   }
 
   @override
   void addModels(List<Model> models) {
     for (final model in models) {
-      // Call model.define() which sets sequelizeInstance synchronously
-      // This ensures the model is properly initialized
+      // Call model.define() FIRST to set sequelizeInstance synchronously
+      // This ensures the model is properly initialized before any queries
       model.define(model.name, this);
+      _models[model.name] = model;
 
-      // Register the model with the bridge
+      // Then register the model with the bridge asynchronously
       // Note: This is async but we can't wait here since addModels is synchronous
       // The model will be registered in the background
       _bridge
@@ -111,8 +130,6 @@ class Sequelize extends SequelizeInterface {
           .catchError((error) {
             print('[Sequelize] Failed to define model "${model.name}": $error');
           });
-
-      _models[model.name] = model;
     }
   }
 

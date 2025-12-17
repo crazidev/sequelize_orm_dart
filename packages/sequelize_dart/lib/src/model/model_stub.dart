@@ -1,5 +1,5 @@
+import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart/src/model/model_interface.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 abstract class Model<T> extends ModelInterface {
   @override
@@ -8,12 +8,27 @@ abstract class Model<T> extends ModelInterface {
   }
 
   @override
-  void hasOne(
+  Future<void> associateModel() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Association> hasOne(
     ModelInterface model, {
     String? foreignKey,
     String? as,
     String? sourceKey,
-  }) {
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Association> hasMany(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? sourceKey,
+  }) async {
     throw UnimplementedError();
   }
 

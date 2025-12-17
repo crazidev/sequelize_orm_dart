@@ -24,12 +24,17 @@ abstract class Model<T> extends ModelInterface {
   }
 
   @override
-  void hasOne(
+  Future<void> associateModel() async {
+    // Base implementation - empty, overridden by generated code
+  }
+
+  @override
+  Future<Association> hasOne(
     ModelInterface model, {
     String? foreignKey,
     String? as,
     String? sourceKey,
-  }) {
+  }) async {
     // Check if this model has been initialized
     try {
       final _ = sequelizeModel;
@@ -39,13 +44,13 @@ abstract class Model<T> extends ModelInterface {
       );
     }
 
-    // Check if the target model has been initialized
+    // Check if the target model has been initialized, if not, define it automatically
     try {
       final _ = model.sequelizeModel;
     } catch (e) {
-      throw StateError(
-        "Model '${model.name}' has not been initialized. Please call sequelize.addModels([${model.name}.instance]) before setting up associations.",
-      );
+      // Target model not initialized, define it automatically using this model's sequelize instance
+      print('⚠️  Model ${model.name} not initialized, auto-defining it...');
+      model.define(model.name, sequelizeInstance);
     }
 
     print('✅ $name hasOne ${model.name}');
@@ -58,31 +63,24 @@ abstract class Model<T> extends ModelInterface {
           }).jsify()
           as JSObject,
     );
+
+    return Association();
   }
 
   @override
-  void hasMany(
+  Future<Association> hasMany(
     ModelInterface model, {
     String? foreignKey,
     String? as,
     String? sourceKey,
-  }) {
-    // Check if this model has been initialized
-    try {
-      final _ = sequelizeModel;
-    } catch (e) {
-      throw StateError(
-        "Model '$name' has not been initialized. Please call sequelize.addModels([$name.instance]) before setting up associations.",
-      );
-    }
-
-    // Check if the target model has been initialized
+  }) async {
+    // Check if the target model has been initialized, if not, define it automatically
     try {
       final _ = model.sequelizeModel;
     } catch (e) {
-      throw StateError(
-        "Model '${model.name}' has not been initialized. Please call sequelize.addModels([${model.name}.instance]) before setting up associations.",
-      );
+      // Target model not initialized, define it automatically using this model's sequelize instance
+      print('⚠️  Model ${model.name} not initialized, auto-defining it...');
+      model.define(model.name, sequelizeInstance);
     }
 
     print('✅ $name hasMany ${model.name}');
@@ -95,6 +93,8 @@ abstract class Model<T> extends ModelInterface {
           }).jsify()
           as JSObject,
     );
+
+    return Association();
   }
 
   /// Get model attributes for Sequelize

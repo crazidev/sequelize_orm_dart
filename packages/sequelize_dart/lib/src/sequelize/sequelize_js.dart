@@ -17,10 +17,7 @@ class Sequelize extends SequelizeInterface {
   }
 
   @override
-  SequelizeInterface createInstance(
-    SequelizeCoreOptions input, {
-    List<Model>? models,
-  }) {
+  SequelizeInterface createInstance(SequelizeCoreOptions input) {
     final Map<String, dynamic> config = input.toJson();
 
     if (input.url != null) {
@@ -38,13 +35,20 @@ class Sequelize extends SequelizeInterface {
       config.jsify(),
     );
 
-    if (models != null) {
-      for (var model in models) {
-        model.define(model.name, sequelize);
-      }
+    return this;
+  }
+
+  @override
+  Future<void> initialize({required List<Model> models}) async {
+    // Define all models first
+    for (var model in models) {
+      model.define(model.name, sequelize);
     }
 
-    return this;
+    // Then set up associations
+    for (var model in models) {
+      await model.associateModel();
+    }
   }
 
   @override

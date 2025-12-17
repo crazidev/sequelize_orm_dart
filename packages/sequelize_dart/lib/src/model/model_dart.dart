@@ -1,3 +1,4 @@
+import 'package:sequelize_dart/src/association/association_model.dart';
 import 'package:sequelize_dart/src/model/model_interface.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine.dart';
@@ -20,17 +21,63 @@ abstract class Model<T> extends ModelInterface {
     // Note: This is handled in addModels, so we don't call it here
     // to avoid double registration
 
+    print('✅ Defining model: $modelName');
+
     return this;
   }
 
+  /// Base implementation of associateModel - override in generated models
+  /// Called by Sequelize.initialize() after all models are defined
   @override
-  void hasOne(
+  Future<void> associateModel() async {
+    // Base implementation does nothing
+    // Generated model classes override this to set up associations
+  }
+
+  @override
+  Future<Association> hasOne(
     ModelInterface model, {
     String? foreignKey,
     String? as,
     String? sourceKey,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    print('✅ $name hasOne ${model.name}');
+
+    await sequelize.bridge?.call('associateModel', {
+      'sourceModel': name,
+      'targetModel': model.name,
+      'associationType': 'hasOne',
+      'options': {
+        'foreignKey': foreignKey,
+        'as': as,
+        'sourceKey': sourceKey,
+      },
+    });
+
+    return Association();
+  }
+
+  @override
+  Future<Association> hasMany(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? sourceKey,
+  }) async {
+    print('✅ $name hasMany ${model.name}');
+
+    await sequelize.bridge?.call('associateModel', {
+      'sourceModel': name,
+      'targetModel': model.name,
+      'associationType': 'hasMany',
+      'options': {
+        'foreignKey': foreignKey,
+        'as': as,
+        'sourceKey': sourceKey,
+      },
+    });
+
+    return Association();
   }
 
   /// Get model attributes for Sequelize

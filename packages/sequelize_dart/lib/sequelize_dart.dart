@@ -3,6 +3,7 @@ library;
 
 export 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
+export 'src/association/association_model.dart';
 // Connection exports
 export 'src/connection/core_options.dart';
 export 'src/connection/dialects/mariadb.dart';

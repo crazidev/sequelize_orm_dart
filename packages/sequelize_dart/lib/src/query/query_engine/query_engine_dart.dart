@@ -1,8 +1,7 @@
 import 'package:sequelize_dart/src/query/query/query.dart';
-import 'package:sequelize_dart/src/sequelize/sequelize_dart.dart';
+import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
 import 'package:sequelize_dart/src/sequelize/bridge_client.dart';
-
-import 'query_engine_interface.dart';
+import 'package:sequelize_dart/src/sequelize/sequelize_dart.dart';
 
 class QueryEngine extends QueryEngineInterface {
   @override

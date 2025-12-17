@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 import 'package:source_gen/source_gen.dart';
@@ -23,6 +24,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     final timestamps = annotation.peek('timestamps')?.boolValue ?? true;
 
     final fields = _getFields(element);
+    final associations = _getAssociations(element);
     final generatedClassName = '\$$className';
     final valuesClassName = '\$${className}Values';
     final createClassName = '\$${className}Create';
@@ -34,7 +36,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       generatedClassName,
       className,
     );
-    _generateDefineMethod(buffer, generatedClassName);
+    _generateDefineMethod(buffer, generatedClassName, associations);
     _generateGetAttributesMethod(buffer, fields);
     _generateGetAttributesJsonMethod(buffer);
     _generateGetOptionsJsonMethod(
@@ -53,11 +55,21 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       className ?? 'Unknown',
       valuesClassName,
     );
+    _generateAssociateModelMethod(
+      buffer,
+      generatedClassName,
+      associations,
+    );
 
     buffer.writeln('}');
     buffer.writeln();
 
-    _generateClassValues(buffer, valuesClassName, fields);
+    _generateClassValues(
+      buffer,
+      valuesClassName,
+      fields,
+      associations,
+    );
     _generateClassCreate(buffer, createClassName, fields);
     _generateQueryBuilder(buffer, className ?? 'Unknown', fields);
 
@@ -88,12 +100,15 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
   void _generateDefineMethod(
     StringBuffer buffer,
     String generatedClassName,
+    List<_AssociationInfo> associations,
   ) {
     buffer.writeln('  @override');
     buffer.writeln(
       '  $generatedClassName define(String modelName, Object sequelize) {',
     );
     buffer.writeln('    super.define(modelName, sequelize);');
+    // Note: associateModel() is now called by Sequelize.initialize()
+    // after all models are defined, so we don't call it here
     buffer.writeln('    return this;');
     buffer.writeln('  }');
     buffer.writeln();
@@ -222,15 +237,32 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     StringBuffer buffer,
     String valuesClassName,
     List<_FieldInfo> fields,
+    List<_AssociationInfo> associations,
   ) {
     buffer.writeln('class $valuesClassName {');
     for (var field in fields) {
       buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
     }
+    // Add association fields
+    for (var assoc in associations) {
+      final modelValuesClassName = _getModelValuesClassName(
+        assoc.modelClassName,
+      );
+      if (assoc.associationType == 'hasOne') {
+        buffer.writeln('  final $modelValuesClassName? ${assoc.fieldName};');
+      } else {
+        buffer.writeln(
+          '  final List<$modelValuesClassName>? ${assoc.fieldName};',
+        );
+      }
+    }
     buffer.writeln();
     buffer.writeln('  $valuesClassName({');
     for (var field in fields) {
       buffer.writeln('    required this.${field.fieldName},');
+    }
+    for (var assoc in associations) {
+      buffer.writeln('    this.${assoc.fieldName},');
     }
     buffer.writeln('  });');
     buffer.writeln();
@@ -239,7 +271,24 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     );
     buffer.writeln('    return $valuesClassName(');
     for (var field in fields) {
-      buffer.writeln("      ${field.fieldName}: json['${field.name}'],");
+      final jsonValue = _generateJsonValueParser(field);
+      buffer.writeln('      ${field.fieldName}: $jsonValue,');
+    }
+    // Add association parsing
+    for (var assoc in associations) {
+      final modelValuesClassName = _getModelValuesClassName(
+        assoc.modelClassName,
+      );
+      final jsonKey = _getAssociationJsonKey(assoc.as, assoc.modelClassName);
+      if (assoc.associationType == 'hasOne') {
+        buffer.writeln(
+          "      ${assoc.fieldName}: json['$jsonKey'] != null ? $modelValuesClassName.fromJson(json['$jsonKey'] as Map<String, dynamic>) : null,",
+        );
+      } else {
+        buffer.writeln(
+          "      ${assoc.fieldName}: (json['$jsonKey'] as List?)?.map((e) => $modelValuesClassName.fromJson(e as Map<String, dynamic>)).toList(),",
+        );
+      }
     }
     buffer.writeln('    );');
     buffer.writeln('  }');
@@ -248,6 +297,18 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln('    return {');
     for (var field in fields) {
       buffer.writeln("      '${field.name}': ${field.fieldName},");
+    }
+    for (var assoc in associations) {
+      final jsonKey = _getAssociationJsonKey(assoc.as, assoc.modelClassName);
+      if (assoc.associationType == 'hasOne') {
+        buffer.writeln(
+          "      '$jsonKey': ${assoc.fieldName}?.toJson(),",
+        );
+      } else {
+        buffer.writeln(
+          "      '$jsonKey': ${assoc.fieldName}?.map((e) => e.toJson()).toList(),",
+        );
+      }
     }
     buffer.writeln('    };');
     buffer.writeln('  }');
@@ -334,6 +395,147 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       default:
         return 'String';
     }
+  }
+
+  void _generateAssociateModelMethod(
+    StringBuffer buffer,
+    String generatedClassName,
+    List<_AssociationInfo> associations,
+  ) {
+    // Always generate the method with @override annotation
+    buffer.writeln('  @override');
+    buffer.writeln('  Future<void> associateModel() async {');
+
+    if (associations.isEmpty) {
+      buffer.writeln('    // No associations defined');
+    } else {
+      for (var assoc in associations) {
+        final modelInstanceName = '${assoc.modelClassName}.instance';
+        if (assoc.associationType == 'hasOne') {
+          buffer.write('    await hasOne(');
+        } else {
+          buffer.write('    await hasMany(');
+        }
+        buffer.write(modelInstanceName);
+        if (assoc.foreignKey != null ||
+            assoc.as != null ||
+            assoc.sourceKey != null) {
+          buffer.write(',');
+          buffer.writeln();
+          if (assoc.foreignKey != null) {
+            buffer.writeln("      foreignKey: '${assoc.foreignKey}',");
+          }
+          if (assoc.as != null) {
+            buffer.writeln("      as: '${assoc.as}',");
+          }
+          if (assoc.sourceKey != null) {
+            buffer.writeln("      sourceKey: '${assoc.sourceKey}',");
+          }
+          buffer.write('    ');
+        }
+        buffer.writeln(');');
+      }
+    }
+
+    buffer.writeln('  }');
+    buffer.writeln();
+  }
+
+  List<_AssociationInfo> _getAssociations(ClassElement element) {
+    final associations = <_AssociationInfo>[];
+    const hasOneChecker = TypeChecker.fromUrl(
+      'package:sequelize_dart_annotations/src/has_one.dart#HasOne',
+    );
+    const hasManyChecker = TypeChecker.fromUrl(
+      'package:sequelize_dart_annotations/src/has_many.dart#HasMany',
+    );
+
+    for (var field in element.fields) {
+      if (hasOneChecker.hasAnnotationOfExact(field)) {
+        final annotation = hasOneChecker.firstAnnotationOfExact(field);
+        if (annotation != null) {
+          final reader = ConstantReader(annotation);
+          // Read the model type from the positional parameter
+          final modelType = reader.read('model').typeValue;
+          final modelClassName = _getModelClassName(modelType);
+          final fieldName = field.name ?? 'unknown_field';
+          final foreignKey = reader.peek('foreignKey')?.stringValue;
+          final as = reader.peek('as')?.stringValue;
+          final sourceKey = reader.peek('sourceKey')?.stringValue;
+
+          associations.add(
+            _AssociationInfo(
+              associationType: 'hasOne',
+              modelClassName: modelClassName,
+              fieldName: fieldName,
+              foreignKey: foreignKey,
+              as: as,
+              sourceKey: sourceKey,
+            ),
+          );
+        }
+      } else if (hasManyChecker.hasAnnotationOfExact(field)) {
+        final annotation = hasManyChecker.firstAnnotationOfExact(field);
+        if (annotation != null) {
+          final reader = ConstantReader(annotation);
+          // Read the model type from the positional parameter
+          final modelType = reader.read('model').typeValue;
+          final modelClassName = _getModelClassName(modelType);
+          final fieldName = field.name ?? 'unknown_field';
+          final foreignKey = reader.peek('foreignKey')?.stringValue;
+          final as = reader.peek('as')?.stringValue;
+          final sourceKey = reader.peek('sourceKey')?.stringValue;
+
+          associations.add(
+            _AssociationInfo(
+              associationType: 'hasMany',
+              modelClassName: modelClassName,
+              fieldName: fieldName,
+              foreignKey: foreignKey,
+              as: as,
+              sourceKey: sourceKey,
+            ),
+          );
+        }
+      }
+    }
+    return associations;
+  }
+
+  String _getModelClassName(DartType type) {
+    final element = type.element;
+    if (element is ClassElement) {
+      return element.name ?? 'Unknown';
+    }
+    return type.toString().replaceAll('*', '').trim();
+  }
+
+  String _getModelValuesClassName(String className) {
+    return '\$${className}Values';
+  }
+
+  String _getAssociationJsonKey(String? as, String modelClassName) {
+    if (as != null && as.isNotEmpty) {
+      return as;
+    }
+    return _toCamelCase(modelClassName);
+  }
+
+  String _toCamelCase(String str) {
+    if (str.isEmpty) return str;
+    return str[0].toLowerCase() + str.substring(1);
+  }
+
+  String _generateJsonValueParser(_FieldInfo field) {
+    final jsonKey = "json['${field.name}']";
+
+    // Handle DateTime fields - parse string to DateTime
+    if (field.dartType == 'DateTime') {
+      return '$jsonKey != null ? ($jsonKey is DateTime ? $jsonKey : DateTime.parse($jsonKey as String)) : null';
+    }
+
+    // For all other types, just return the JSON value directly
+    return jsonKey;
   }
 
   List<_FieldInfo> _getFields(ClassElement element) {
@@ -428,5 +630,23 @@ class _FieldInfo {
     this.autoIncrement = false,
     this.primaryKey = false,
     this.defaultValue,
+  });
+}
+
+class _AssociationInfo {
+  final String associationType; // 'hasOne' or 'hasMany'
+  final String modelClassName;
+  final String fieldName;
+  final String? foreignKey;
+  final String? as;
+  final String? sourceKey;
+
+  _AssociationInfo({
+    required this.associationType,
+    required this.modelClassName,
+    required this.fieldName,
+    this.foreignKey,
+    this.as,
+    this.sourceKey,
   });
 }

@@ -22,27 +22,22 @@ Future<void> main() async {
         evict: 1000, // Check for idle connections (ms)
       ),
     ),
-    models: [Users.instance, Post.instance],
   );
 
-  // Authenticate and register models
-  // await sequelize.authenticate();
-
-  sequelize.addModels([]);
-
-  Users.instance.hasOne(
-    Post.instance,
-    foreignKey: 'userId',
-  );
-
-  Users.instance.hasMany(
-    Post.instance,
-    foreignKey: 'userId',
+  // Initialize with models - this properly awaits:
+  // 1. Bridge connection
+  // 2. All model definitions
+  // 3. All model associations
+  await sequelize.initialize(
+    models: [
+      Users.instance,
+      Post.instance,
+    ],
   );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();
 
   // Close the connection to free up resources
-  await sequelize.close();
+  // await sequelize.close();
 }

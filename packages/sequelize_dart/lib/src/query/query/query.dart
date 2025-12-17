@@ -6,7 +6,7 @@ export 'query_attributes.dart';
 
 class Query extends QueryInterface {
   final QueryOperator? where;
-  final List<dynamic>? include;
+  final dynamic include;
   final List<List<String>>? order;
   final int? limit;
   final int? offset;
@@ -25,7 +25,7 @@ class Query extends QueryInterface {
   Map<String, dynamic> toJson() {
     return {
       'where': where?.toJson(),
-      'include': {'all': true, 'nested': true},
+      'include': include,
       'order': order,
       'limit': limit,
       'offset': offset,
