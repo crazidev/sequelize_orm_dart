@@ -30,7 +30,7 @@ function convertAttribute(attrDef) {
     type: sequelizeType,
     primaryKey: attrDef.primaryKey || false,
     autoIncrement: attrDef.autoIncrement || false,
-    allowNull: !(attrDef.notNull || false),
+    allowNull: attrDef.allowNull !== undefined ? attrDef.allowNull : true,
     defaultValue: attrDef.defaultValue,
   };
 }

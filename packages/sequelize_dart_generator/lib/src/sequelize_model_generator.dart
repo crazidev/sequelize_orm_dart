@@ -115,7 +115,10 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln('    return [');
     for (var field in fields) {
       final hasExtraProperties =
-          field.autoIncrement || field.primaryKey || field.defaultValue != null;
+          field.autoIncrement ||
+          field.primaryKey ||
+          field.allowNull != null ||
+          field.defaultValue != null;
 
       if (hasExtraProperties) {
         buffer.write('''      ModelAttributes(
@@ -124,6 +127,9 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
 ''');
         if (field.autoIncrement) buffer.writeln('        autoIncrement: true,');
         if (field.primaryKey) buffer.writeln('        primaryKey: true,');
+        if (field.allowNull != null) {
+          buffer.writeln('        allowNull: ${field.allowNull},');
+        }
         if (field.defaultValue != null) {
           buffer.writeln('        defaultValue: ${field.defaultValue},');
         }
@@ -146,7 +152,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln('      for (var item in getAttributes())');
     buffer.writeln('        item.name: {');
     buffer.writeln("          'type': item.type.name,");
-    buffer.writeln('          \'notNull\': item.notNull,');
+    buffer.writeln('          \'allowNull\': item.allowNull,');
     buffer.writeln('          \'primaryKey\': item.primaryKey,');
     buffer.writeln('          \'autoIncrement\': item.autoIncrement,');
     buffer.writeln('          \'defaultValue\': item.defaultValue,');
@@ -730,6 +736,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
           final autoIncrement =
               reader.peek('autoIncrement')?.boolValue ?? false;
           final primaryKey = reader.peek('primaryKey')?.boolValue ?? false;
+          final allowNull = reader.peek('allowNull')?.boolValue;
           final defaultValue = reader.peek('defaultValue')?.literalValue;
 
           String dartType = 'String';
@@ -769,6 +776,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
               dartType: dartType,
               autoIncrement: autoIncrement,
               primaryKey: primaryKey,
+              allowNull: allowNull,
               defaultValue: defaultValue,
             ),
           );
@@ -786,6 +794,7 @@ class _FieldInfo {
   final String dartType;
   final bool autoIncrement;
   final bool primaryKey;
+  final bool? allowNull;
   final Object? defaultValue;
 
   _FieldInfo({
@@ -795,6 +804,7 @@ class _FieldInfo {
     required this.dartType,
     this.autoIncrement = false,
     this.primaryKey = false,
+    this.allowNull,
     this.defaultValue,
   });
 }

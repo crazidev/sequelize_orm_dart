@@ -9,7 +9,7 @@ class Users {
     name: 'id',
     type: DataType.INTEGER,
     primaryKey: true,
-    notNull: false,
+    allowNull: true,
     autoIncrement: true,
   )
   dynamic id;

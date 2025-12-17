@@ -37,7 +37,7 @@ Defines a database column attribute.
   type: DataType.INTEGER,
   primaryKey: true,
   autoIncrement: true,
-  notNull: false,
+  allowNull: true,
   unique: false,
   defaultValue: null,
   references: null,
@@ -51,7 +51,7 @@ dynamic id;
 - `type` (required): The data type (from `DataType` enum)
 - `primaryKey` (optional): Whether this is a primary key (default: `false`)
 - `autoIncrement` (optional): Whether this column auto-increments (default: `false`)
-- `notNull` (optional): Whether this column is NOT NULL (default: `false`)
+- `allowNull` (optional): Whether null values are allowed (default: `true`)
 - `unique` (optional): Whether this column is unique (default: `false`)
 - `defaultValue` (optional): Default value for the column
 - `references` (optional): Foreign key reference (using `ForeignKey`)
@@ -109,7 +109,7 @@ class Users {
     name: 'email',
     type: DataType.STRING,
     unique: true,
-    notNull: true,
+    allowNull: false,
   )
   dynamic email;
 

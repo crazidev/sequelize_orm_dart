@@ -36,7 +36,7 @@ extension ModelAttributesJson on ModelAttributes {
     return {
       name: {
         'type': type.name,
-        'notNull': notNull,
+        'allowNull': allowNull,
         'primaryKey': primaryKey,
         'autoIncrement': autoIncrement,
         'defaultValue': defaultValue,
