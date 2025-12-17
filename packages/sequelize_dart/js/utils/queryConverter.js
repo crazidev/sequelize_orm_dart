@@ -159,6 +159,7 @@ function convertWhereClause(where) {
 
 /**
  * Convert query options from Dart format to Sequelize format
+ * Only includes properties that are defined (not undefined or null)
  */
 function convertQueryOptions(options) {
   if (!options) {
@@ -167,12 +168,25 @@ function convertQueryOptions(options) {
 
   const result = {};
 
-  result.where = convertWhereClause(options.where);
-  result.include = options.include;
-  result.order = options.order;
-  result.limit = options.limit;
-  result.offset = options.offset;
-  result.attributes = options.attributes;
+  // Only assign properties if they are defined (not undefined or null)
+  if (options.where !== undefined && options.where !== null) {
+    result.where = convertWhereClause(options.where);
+  }
+  if (options.include !== undefined && options.include !== null) {
+    result.include = options.include;
+  }
+  if (options.order !== undefined && options.order !== null) {
+    result.order = options.order;
+  }
+  if (options.limit !== undefined && options.limit !== null) {
+    result.limit = options.limit;
+  }
+  if (options.offset !== undefined && options.offset !== null) {
+    result.offset = options.offset;
+  }
+  if (options.attributes !== undefined && options.attributes !== null) {
+    result.attributes = options.attributes;
+  }
 
   return result;
 }

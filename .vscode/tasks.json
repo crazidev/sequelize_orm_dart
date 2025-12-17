@@ -2,48 +2,112 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start File Watcher",
+      "label": "Watch Dart Server",
       "type": "shell",
-      "command": "./tools/watch_dart_debug.sh",
+      "command": "./tools/watch_dart.sh",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "isBackground": true,
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": false,
+        "focus": true,
         "panel": "dedicated",
         "clear": true
       },
       "problemMatcher": {
         "pattern": {
-          "regexp": "^$"
+          "regexp": "^(.*):(\\d+):(\\d+): (error|warning): (.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Dart Debug File Watcher",
-          "endsPattern": "^.*Watching for file changes"
+          "beginsPattern": "^.*Watching for file changes",
+          "endsPattern": "^.*Dart server started"
         }
       }
     },
+
     {
-      "label": "Generate Models",
-      "type": "shell",
-      "command": "dart run build_runner build --delete-conflicting-outputs",
-      "options": {
-        "cwd": "${workspaceFolder}/example"
-      },
+      "label": "Watch JS Server",
+      "dependsOn": ["Watch Models", "Watch JS"],
+      "dependsOrder": "parallel",
       "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
         "focus": false,
-        "panel": "shared",
-        "clear": true
+        "panel": "shared"
       },
       "problemMatcher": []
     },
+    {
+      "label": "JS  Server",
+      "type": "shell",
+      "command": "node --watch example/build/index.js",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^Restarting",
+          "endsPattern": "."
+        }
+      }
+    },
+    {
+      "label": "Watch JS",
+      "type": "shell",
+      "command": "./tools/watch_js.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": false
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^\\[.*\\] Running initial build",
+          "endsPattern": "^\\[.*\\] Ready"
+        }
+      }
+    },
+
     {
       "label": "Watch Models",
       "type": "shell",
@@ -92,165 +156,61 @@
         "clear": true
       },
       "problemMatcher": []
-    },
-    {
-      "label": "Compile JS",
-      "type": "shell",
-      "command": "./tools/build.sh",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Compile JS with Generator",
-      "type": "shell",
-      "command": "./tools/build.sh --generate",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Build and Run",
-      "type": "shell",
-      "command": "./tools/build.sh --generate --run",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Watch JS",
-      "type": "shell",
-      "command": "./tools/watch_js.sh",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "dedicated",
-        "clear": false
-      },
-      "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "line": 2,
-          "message": 3
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^\\[.*\\] Running initial build",
-          "endsPattern": "^\\[.*\\] Ready"
-        }
-      }
-    },
-    {
-      "label": "Watch All",
-      "dependsOn": ["Watch Models", "Watch JS"],
-      "dependsOrder": "parallel",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Dev Server",
-      "type": "shell",
-      "command": "node --watch example/build/index.js",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "line": 2,
-          "message": 3
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^Restarting",
-          "endsPattern": "."
-        }
-      }
-    },
-    {
-      "label": "Watch Dart Server",
-      "type": "shell",
-      "command": "./tools/watch_dart.sh",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": {
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+): (error|warning): (.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "severity": 4,
-          "message": 5
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^.*Watching for file changes",
-          "endsPattern": "^.*Dart server started"
-        }
-      }
     }
+    // {
+    //   "label": "Compile JS",
+    //   "type": "shell",
+    //   "command": "./tools/build.sh",
+    //   "options": {
+    //     "cwd": "${workspaceFolder}"
+    //   },
+    //   "group": {
+    //     "kind": "build",
+    //     "isDefault": true
+    //   },
+    //   "presentation": {
+    //     "echo": true,
+    //     "reveal": "always",
+    //     "focus": false,
+    //     "panel": "shared",
+    //     "clear": true
+    //   },
+    //   "problemMatcher": []
+    // },
+    // {
+    //   "label": "Compile JS with Generator",
+    //   "type": "shell",
+    //   "command": "./tools/build.sh --generate",
+    //   "options": {
+    //     "cwd": "${workspaceFolder}"
+    //   },
+    //   "group": "build",
+    //   "presentation": {
+    //     "echo": true,
+    //     "reveal": "always",
+    //     "focus": false,
+    //     "panel": "shared",
+    //     "clear": true
+    //   },
+    //   "problemMatcher": []
+    // },
+
+    // {
+    //   "label": "Generate Models",
+    //   "type": "shell",
+    //   "command": "dart run build_runner build --delete-conflicting-outputs",
+    //   "options": {
+    //     "cwd": "${workspaceFolder}/example"
+    //   },
+    //   "group": "build",
+    //   "presentation": {
+    //     "echo": true,
+    //     "reveal": "always",
+    //     "focus": false,
+    //     "panel": "shared",
+    //     "clear": true
+    //   },
+    //   "problemMatcher": []
+    // },
   ]
 }

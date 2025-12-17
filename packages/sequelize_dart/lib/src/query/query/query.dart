@@ -29,7 +29,7 @@ class Query extends QueryInterface {
       'order': order,
       'limit': limit,
       'offset': offset,
-      'attributes': attributes?.toJson()['value'],
+      if (attributes != null) 'attributes': attributes!.toJson()['value'],
     };
   }
 }

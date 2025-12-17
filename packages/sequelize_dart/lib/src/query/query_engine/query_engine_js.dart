@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 
-import 'package:sequelize_dart/src/core/console.dart';
 import 'package:sequelize_dart/src/model/model_value/model_value.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
@@ -26,8 +25,6 @@ class QueryEngine extends QueryEngineInterface {
       final converted = _convertToJsonEncodable(json.dartify());
       final q = jsonDecode(jsonEncode(converted));
 
-      console.log('QueryEngine.findAll:'.toJS, value.toJSON());
-
       return q as Map<String, dynamic>;
     }).toList();
   }
@@ -47,8 +44,9 @@ class QueryEngine extends QueryEngineInterface {
     }
 
     final ModelValue data = res as ModelValue;
-    final dartified = data.dataValues.dartify();
-    final converted = _convertToJsonEncodable(dartified);
+    // Use toJSON() for consistency with findAll - includes nested associations
+    final json = data.toJSON() as JSObject;
+    final converted = _convertToJsonEncodable(json.dartify());
     return jsonDecode(jsonEncode(converted)) as Map<String, dynamic>;
   }
 

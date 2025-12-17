@@ -3,7 +3,7 @@ import 'package:sequelize_dart_example/models/post.model.dart';
 
 part 'users.model.g.dart';
 
-@Table(tableName: 'users')
+@Table(tableName: 'users', underscored: true)
 class Users {
   @ModelAttributes(
     name: 'id',

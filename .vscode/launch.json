@@ -2,16 +2,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Dart Server (with File Watcher)",
-      "type": "dart",
-      "request": "launch",
-      "program": "${workspaceFolder}/example/lib/main.dart",
-      "cwd": "${workspaceFolder}/example",
-      "preLaunchTask": "Start File Watcher",
-      "vmAdditionalArgs": ["--enable-asserts"],
-      "console": "debugConsole"
-    },
-    {
       "name": "Debug Dart Server",
       "type": "dart",
       "request": "launch",
@@ -27,6 +17,7 @@
       "program": "${workspaceFolder}/example/build/index.js",
       "cwd": "${workspaceFolder}/example",
       "sourceMaps": true,
+      "preLaunchTask": "Watch JS",
       "outFiles": ["${workspaceFolder}/example/build/**/*.js"],
       "skipFiles": ["<node_internals>/**"]
     },

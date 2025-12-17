@@ -13,10 +13,10 @@ Future<void> runQueries() async {
     () => Users.instance.findAll(
       (users) => Query(
         where: users.id.eq(1),
-        include: {
-          'all': true,
-          'nested': true,
-        },
+        include: [
+          'posts',
+          'post',
+        ],
       ),
     ),
   );

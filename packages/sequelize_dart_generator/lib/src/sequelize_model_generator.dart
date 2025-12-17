@@ -18,10 +18,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     }
 
     final className = element.name;
-    final tableName =
-        annotation.peek('tableName')?.stringValue ?? 'unknown_table';
-    final underscored = annotation.peek('underscored')?.boolValue ?? true;
-    final timestamps = annotation.peek('timestamps')?.boolValue ?? true;
+    final tableAnnotation = _extractTableAnnotation(annotation);
 
     final fields = _getFields(element);
     final associations = _getAssociations(element);
@@ -39,12 +36,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     _generateDefineMethod(buffer, generatedClassName, associations);
     _generateGetAttributesMethod(buffer, fields);
     _generateGetAttributesJsonMethod(buffer);
-    _generateGetOptionsJsonMethod(
-      buffer,
-      tableName,
-      underscored,
-      timestamps,
-    );
+    _generateGetOptionsJsonMethod(buffer, tableAnnotation);
     _generateFindAllMethod(
       buffer,
       className ?? 'Unknown',
@@ -166,17 +158,189 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln();
   }
 
+  Map<String, dynamic> _extractTableAnnotation(ConstantReader annotation) {
+    final result = <String, dynamic>{};
+
+    // Required field
+    result['tableName'] =
+        annotation.peek('tableName')?.stringValue ?? 'unknown_table';
+
+    // Optional fields
+    if (annotation.peek('omitNull')?.isNull == false) {
+      result['omitNull'] = annotation.peek('omitNull')?.boolValue;
+    }
+    if (annotation.peek('noPrimaryKey')?.isNull == false) {
+      result['noPrimaryKey'] = annotation.peek('noPrimaryKey')?.boolValue;
+    }
+    if (annotation.peek('timestamps')?.isNull == false) {
+      result['timestamps'] = annotation.peek('timestamps')?.boolValue;
+    }
+    if (annotation.peek('paranoid')?.isNull == false) {
+      result['paranoid'] = annotation.peek('paranoid')?.boolValue;
+    }
+    if (annotation.peek('underscored')?.isNull == false) {
+      result['underscored'] = annotation.peek('underscored')?.boolValue;
+    }
+    if (annotation.peek('hasTrigger')?.isNull == false) {
+      result['hasTrigger'] = annotation.peek('hasTrigger')?.boolValue;
+    }
+    if (annotation.peek('freezeTableName')?.isNull == false) {
+      result['freezeTableName'] = annotation.peek('freezeTableName')?.boolValue;
+    }
+    if (annotation.peek('modelName')?.isNull == false) {
+      result['modelName'] = annotation.peek('modelName')?.stringValue;
+    }
+    if (annotation.peek('schema')?.isNull == false) {
+      result['schema'] = annotation.peek('schema')?.stringValue;
+    }
+    if (annotation.peek('schemaDelimiter')?.isNull == false) {
+      result['schemaDelimiter'] = annotation
+          .peek('schemaDelimiter')
+          ?.stringValue;
+    }
+    if (annotation.peek('engine')?.isNull == false) {
+      result['engine'] = annotation.peek('engine')?.stringValue;
+    }
+    if (annotation.peek('charset')?.isNull == false) {
+      result['charset'] = annotation.peek('charset')?.stringValue;
+    }
+    if (annotation.peek('comment')?.isNull == false) {
+      result['comment'] = annotation.peek('comment')?.stringValue;
+    }
+    if (annotation.peek('collate')?.isNull == false) {
+      result['collate'] = annotation.peek('collate')?.stringValue;
+    }
+    if (annotation.peek('initialAutoIncrement')?.isNull == false) {
+      result['initialAutoIncrement'] = annotation
+          .peek('initialAutoIncrement')
+          ?.stringValue;
+    }
+
+    // Complex types - extract their values
+    final nameAnnotation = annotation.peek('name');
+    if (nameAnnotation != null && nameAnnotation.isNull == false) {
+      final singular = nameAnnotation.peek('singular')?.stringValue;
+      final plural = nameAnnotation.peek('plural')?.stringValue;
+      if (singular != null && plural != null) {
+        result['name'] = {'singular': singular, 'plural': plural};
+      }
+    }
+
+    final createdAtAnnotation = annotation.peek('createdAt');
+    if (createdAtAnnotation != null && createdAtAnnotation.isNull == false) {
+      final enable = createdAtAnnotation.peek('enable')?.boolValue;
+      final columnName = createdAtAnnotation.peek('columnName')?.stringValue;
+      if (enable != null || columnName != null) {
+        result['createdAt'] = {'enable': enable, 'columnName': columnName};
+      }
+    }
+
+    final deletedAtAnnotation = annotation.peek('deletedAt');
+    if (deletedAtAnnotation != null && deletedAtAnnotation.isNull == false) {
+      final enable = deletedAtAnnotation.peek('enable')?.boolValue;
+      final columnName = deletedAtAnnotation.peek('columnName')?.stringValue;
+      if (enable != null || columnName != null) {
+        result['deletedAt'] = {'enable': enable, 'columnName': columnName};
+      }
+    }
+
+    final updatedAtAnnotation = annotation.peek('updatedAt');
+    if (updatedAtAnnotation != null && updatedAtAnnotation.isNull == false) {
+      final enable = updatedAtAnnotation.peek('enable')?.boolValue;
+      final columnName = updatedAtAnnotation.peek('columnName')?.stringValue;
+      if (enable != null || columnName != null) {
+        result['updatedAt'] = {'enable': enable, 'columnName': columnName};
+      }
+    }
+
+    final versionAnnotation = annotation.peek('version');
+    if (versionAnnotation != null && versionAnnotation.isNull == false) {
+      final version = versionAnnotation.peek('version')?.stringValue;
+      if (version != null) {
+        result['version'] = {'version': version};
+      }
+    }
+
+    return result;
+  }
+
   void _generateGetOptionsJsonMethod(
     StringBuffer buffer,
-    String tableName,
-    bool underscored,
-    bool timestamps,
+    Map<String, dynamic> tableAnnotation,
   ) {
     buffer.writeln('  @override');
     buffer.writeln('  Map<String, dynamic> getOptionsJson() {');
-    buffer.writeln(
-      "    return {'tableName': '$tableName', 'underscored': $underscored, 'timestamps': $timestamps};",
-    );
+    buffer.writeln('    final table = Table(');
+
+    // Write tableName (required)
+    buffer.writeln("      tableName: '${tableAnnotation['tableName']}',");
+
+    // Write all optional parameters
+    final optionalParams = <String, dynamic>{...tableAnnotation};
+    optionalParams.remove('tableName');
+
+    for (final entry in optionalParams.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      if (value == null) continue;
+
+      if (key == 'name' && value is Map) {
+        buffer.writeln(
+          "      name: ModelNameOption(singular: '${value['singular']}', plural: '${value['plural']}'),",
+        );
+      } else if (key == 'createdAt' && value is Map) {
+        final enable = value['enable'];
+        final columnName = value['columnName'];
+        if (enable == false) {
+          buffer.writeln('      createdAt: TimestampOption.disabled(),');
+        } else if (columnName != null) {
+          buffer.writeln(
+            "      createdAt: TimestampOption.custom('$columnName'),",
+          );
+        } else if (enable == true) {
+          buffer.writeln('      createdAt: TimestampOption.enabled(),');
+        }
+      } else if (key == 'deletedAt' && value is Map) {
+        final enable = value['enable'];
+        final columnName = value['columnName'];
+        if (enable == false) {
+          buffer.writeln('      deletedAt: TimestampOption.disabled(),');
+        } else if (columnName != null) {
+          buffer.writeln(
+            "      deletedAt: TimestampOption.custom('$columnName'),",
+          );
+        } else if (enable == true) {
+          buffer.writeln('      deletedAt: TimestampOption.enabled(),');
+        }
+      } else if (key == 'updatedAt' && value is Map) {
+        final enable = value['enable'];
+        final columnName = value['columnName'];
+        if (enable == false) {
+          buffer.writeln('      updatedAt: TimestampOption.disabled(),');
+        } else if (columnName != null) {
+          buffer.writeln(
+            "      updatedAt: TimestampOption.custom('$columnName'),",
+          );
+        } else if (enable == true) {
+          buffer.writeln('      updatedAt: TimestampOption.enabled(),');
+        }
+      } else if (key == 'version' && value is Map) {
+        final version = value['version'];
+        if (version != null) {
+          buffer.writeln("      version: VersionOption.custom('$version'),");
+        } else {
+          buffer.writeln('      version: VersionOption.disabled(),');
+        }
+      } else if (value is bool) {
+        buffer.writeln('      $key: $value,');
+      } else if (value is String) {
+        buffer.writeln("      $key: '$value',");
+      }
+    }
+
+    buffer.writeln('    );');
+    buffer.writeln('    return table.toJson();');
     buffer.writeln('  }');
     buffer.writeln();
   }
@@ -259,7 +423,9 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln();
     buffer.writeln('  $valuesClassName({');
     for (var field in fields) {
-      buffer.writeln('    required this.${field.fieldName},');
+      // Nullable fields should be optional, not required
+      // This allows fromJson() to pass null when keys are missing
+      buffer.writeln('    this.${field.fieldName},');
     }
     for (var assoc in associations) {
       buffer.writeln('    this.${assoc.fieldName},');

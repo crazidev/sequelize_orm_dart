@@ -2,7 +2,7 @@ import 'package:sequelize_dart/sequelize_dart.dart';
 
 part 'post.model.g.dart';
 
-@Table(tableName: 'posts', timestamps: false)
+@Table(tableName: 'posts', timestamps: false, underscored: true)
 class Post {
   @ModelAttributes(
     name: 'id',
