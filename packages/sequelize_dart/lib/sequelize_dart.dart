@@ -20,4 +20,5 @@ export 'src/query/typed_column.dart';
 // Sequelize exports
 export 'src/sequelize/sequelize.dart';
 // Utility exports
+export 'src/utils/attribute_converter.dart';
 export 'src/utils/sql_formatter.dart';

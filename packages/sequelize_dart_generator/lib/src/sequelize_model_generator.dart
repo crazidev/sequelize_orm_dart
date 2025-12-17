@@ -118,7 +118,8 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
           field.autoIncrement ||
           field.primaryKey ||
           field.allowNull != null ||
-          field.defaultValue != null;
+          field.defaultValue != null ||
+          field.validateCode != null;
 
       if (hasExtraProperties) {
         buffer.write('''      ModelAttributes(
@@ -132,6 +133,9 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
         }
         if (field.defaultValue != null) {
           buffer.writeln('        defaultValue: ${field.defaultValue},');
+        }
+        if (field.validateCode != null) {
+          buffer.writeln('        validate: ${field.validateCode},');
         }
         buffer.writeln('      ),');
       } else {
@@ -148,18 +152,9 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
   void _generateGetAttributesJsonMethod(StringBuffer buffer) {
     buffer.writeln('  @override');
     buffer.writeln('  Map<String, Map<String, dynamic>> getAttributesJson() {');
-    buffer.writeln('    final map = {');
-    buffer.writeln('      for (var item in getAttributes())');
-    buffer.writeln('        item.name: {');
-    buffer.writeln("          'type': item.type.name,");
-    buffer.writeln('          \'allowNull\': item.allowNull,');
-    buffer.writeln('          \'primaryKey\': item.primaryKey,');
-    buffer.writeln('          \'autoIncrement\': item.autoIncrement,');
-    buffer.writeln('          \'defaultValue\': item.defaultValue,');
-    buffer.writeln('        },');
-    buffer.writeln('    };');
-    buffer.writeln();
-    buffer.writeln('    return map;');
+    buffer.writeln(
+      '    return AttributeConverter.convertAttributesToJson(getAttributes());',
+    );
     buffer.writeln('  }');
     buffer.writeln();
   }
@@ -710,6 +705,323 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     return jsonKey;
   }
 
+  /// Extracts validate option from annotation and generates code
+  String? _extractValidateCode(ConstantReader? validateReader) {
+    if (validateReader == null || validateReader.isNull) return null;
+
+    final validators = <String>[];
+
+    // Boolean validators
+    _extractBooleanValidator(validateReader, 'isEmail', 'IsEmail', validators);
+    _extractBooleanValidator(validateReader, 'isUrl', 'IsUrl', validators);
+    _extractBooleanValidator(validateReader, 'isIP', 'IsIP', validators);
+    _extractBooleanValidator(validateReader, 'isIPv4', 'IsIPv4', validators);
+    _extractBooleanValidator(validateReader, 'isIPv6', 'IsIPv6', validators);
+    _extractBooleanValidator(validateReader, 'isAlpha', 'IsAlpha', validators);
+    _extractBooleanValidator(
+      validateReader,
+      'isAlphanumeric',
+      'IsAlphanumeric',
+      validators,
+    );
+    _extractBooleanValidator(
+      validateReader,
+      'isNumeric',
+      'IsNumeric',
+      validators,
+    );
+    _extractBooleanValidator(validateReader, 'isInt', 'IsInt', validators);
+    _extractBooleanValidator(validateReader, 'isFloat', 'IsFloat', validators);
+    _extractBooleanValidator(
+      validateReader,
+      'isDecimal',
+      'IsDecimal',
+      validators,
+    );
+    _extractBooleanValidator(
+      validateReader,
+      'isLowercase',
+      'IsLowercase',
+      validators,
+    );
+    _extractBooleanValidator(
+      validateReader,
+      'isUppercase',
+      'IsUppercase',
+      validators,
+    );
+    _extractBooleanValidator(
+      validateReader,
+      'notEmpty',
+      'NotEmpty',
+      validators,
+    );
+    _extractBooleanValidator(validateReader, 'isArray', 'IsArray', validators);
+    _extractBooleanValidator(
+      validateReader,
+      'isCreditCard',
+      'IsCreditCard',
+      validators,
+    );
+    _extractBooleanValidator(validateReader, 'isDate', 'IsDate', validators);
+
+    // Pattern validators (is_, not_)
+    _extractPatternValidator(validateReader, 'is_', 'Is', validators);
+    _extractPatternValidator(validateReader, 'not_', 'Not', validators);
+
+    // String validators
+    _extractStringValidator(validateReader, 'equals', 'Equals', validators);
+    _extractStringValidator(validateReader, 'contains', 'Contains', validators);
+    _extractStringValidator(validateReader, 'isAfter', 'IsAfter', validators);
+    _extractStringValidator(validateReader, 'isBefore', 'IsBefore', validators);
+
+    // Number validators
+    _extractNumberValidator(validateReader, 'max', 'Max', validators);
+    _extractNumberValidator(validateReader, 'min', 'Min', validators);
+    _extractNumberValidator(validateReader, 'isUUID', 'IsUUID', validators);
+
+    // Range validator (len)
+    _extractLenValidator(validateReader, validators);
+
+    // List validators
+    _extractListValidator(validateReader, 'isIn', 'IsIn', validators);
+    _extractListValidator(validateReader, 'notIn', 'NotIn', validators);
+    _extractNotContainsValidator(validateReader, validators);
+
+    if (validators.isEmpty) return null;
+
+    return 'ValidateOption(${validators.join(', ')})';
+  }
+
+  void _extractBooleanValidator(
+    ConstantReader reader,
+    String fieldName,
+    String className,
+    List<String> validators,
+  ) {
+    final validatorReader = reader.peek(fieldName);
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    if (msgReader != null && !msgReader.isNull) {
+      final msg = msgReader.stringValue;
+      validators.add("$fieldName: $className.withMsg('$msg')");
+    } else {
+      validators.add('$fieldName: $className()');
+    }
+  }
+
+  void _extractPatternValidator(
+    ConstantReader reader,
+    String fieldName,
+    String className,
+    List<String> validators,
+  ) {
+    final validatorReader = reader.peek(fieldName);
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+    final patternReader = ConstantReader(obj).peek('pattern');
+    final flagsReader = ConstantReader(obj).peek('flags');
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    if (patternReader == null || patternReader.isNull) return;
+
+    final pattern = patternReader.stringValue;
+    final escapedPattern = pattern
+        .replaceAll(r'\', r'\\')
+        .replaceAll("'", r"\'");
+    final flags = flagsReader?.isNull == false
+        ? flagsReader?.stringValue
+        : null;
+    final msg = msgReader?.isNull == false ? msgReader?.stringValue : null;
+
+    if (msg != null && flags != null) {
+      validators.add(
+        "$fieldName: $className.full(r'$escapedPattern', flags: '$flags', msg: '$msg')",
+      );
+    } else if (msg != null) {
+      validators.add(
+        "$fieldName: $className.withMsg(r'$escapedPattern', msg: '$msg')",
+      );
+    } else if (flags != null) {
+      validators.add(
+        "$fieldName: $className.withFlags(r'$escapedPattern', '$flags')",
+      );
+    } else {
+      validators.add("$fieldName: $className(r'$escapedPattern')");
+    }
+  }
+
+  void _extractStringValidator(
+    ConstantReader reader,
+    String fieldName,
+    String className,
+    List<String> validators,
+  ) {
+    final validatorReader = reader.peek(fieldName);
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+
+    // Check if it has 'value' field (for Equals, Contains) or 'date' field (for IsAfter, IsBefore)
+    final valueReader = ConstantReader(obj).peek('value');
+    final dateReader = ConstantReader(obj).peek('date');
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    final stringValue = valueReader?.isNull == false
+        ? valueReader?.stringValue
+        : dateReader?.isNull == false
+        ? dateReader?.stringValue
+        : null;
+
+    if (stringValue == null) return;
+
+    final msg = msgReader?.isNull == false ? msgReader?.stringValue : null;
+
+    if (msg != null) {
+      validators.add(
+        "$fieldName: $className.withMsg('$stringValue', msg: '$msg')",
+      );
+    } else {
+      validators.add("$fieldName: $className('$stringValue')");
+    }
+  }
+
+  void _extractNumberValidator(
+    ConstantReader reader,
+    String fieldName,
+    String className,
+    List<String> validators,
+  ) {
+    final validatorReader = reader.peek(fieldName);
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+    final valueReader = ConstantReader(obj).peek('value');
+    final versionReader = ConstantReader(obj).peek('version'); // for IsUUID
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    final numValue = valueReader?.isNull == false
+        ? valueReader?.literalValue
+        : versionReader?.isNull == false
+        ? versionReader?.intValue
+        : null;
+
+    if (numValue == null) return;
+
+    final msg = msgReader?.isNull == false ? msgReader?.stringValue : null;
+
+    if (msg != null) {
+      validators.add("$fieldName: $className.withMsg($numValue, msg: '$msg')");
+    } else {
+      validators.add('$fieldName: $className($numValue)');
+    }
+  }
+
+  void _extractLenValidator(ConstantReader reader, List<String> validators) {
+    final validatorReader = reader.peek('len');
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+    final minReader = ConstantReader(obj).peek('min');
+    final maxReader = ConstantReader(obj).peek('max');
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    if (minReader == null ||
+        minReader.isNull ||
+        maxReader == null ||
+        maxReader.isNull)
+      return;
+
+    final min = minReader.intValue;
+    final max = maxReader.intValue;
+    final msg = msgReader?.isNull == false ? msgReader?.stringValue : null;
+
+    if (msg != null) {
+      validators.add("len: Len.withMsg($min, $max, msg: '$msg')");
+    } else {
+      validators.add('len: Len($min, $max)');
+    }
+  }
+
+  void _extractListValidator(
+    ConstantReader reader,
+    String fieldName,
+    String className,
+    List<String> validators,
+  ) {
+    final validatorReader = reader.peek(fieldName);
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+    final valuesReader = ConstantReader(obj).peek('values');
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    if (valuesReader == null || valuesReader.isNull) return;
+
+    final values = valuesReader.listValue;
+    final valueStrings = values
+        .map((v) {
+          final reader = ConstantReader(v);
+          if (reader.isString) return "'${reader.stringValue}'";
+          if (reader.isInt) return '${reader.intValue}';
+          if (reader.isDouble) return '${reader.doubleValue}';
+          if (reader.isBool) return '${reader.boolValue}';
+          return 'null';
+        })
+        .join(', ');
+
+    final msg = msgReader?.isNull == false ? msgReader?.stringValue : null;
+
+    if (msg != null) {
+      validators.add(
+        "$fieldName: $className.withMsg([$valueStrings], msg: '$msg')",
+      );
+    } else {
+      validators.add('$fieldName: $className([$valueStrings])');
+    }
+  }
+
+  void _extractNotContainsValidator(
+    ConstantReader reader,
+    List<String> validators,
+  ) {
+    final validatorReader = reader.peek('notContains');
+    if (validatorReader == null || validatorReader.isNull) return;
+
+    final obj = validatorReader.objectValue;
+    final valueReader = ConstantReader(obj).peek('value');
+    final msgReader = ConstantReader(obj).peek('msg');
+
+    if (valueReader == null || valueReader.isNull) return;
+
+    String valueCode;
+    if (valueReader.isString) {
+      valueCode = "'${valueReader.stringValue}'";
+    } else if (valueReader.isList) {
+      final values = valueReader.listValue;
+      final valueStrings = values
+          .map((v) => "'${ConstantReader(v).stringValue}'")
+          .join(', ');
+      valueCode = '[$valueStrings]';
+    } else {
+      return;
+    }
+
+    final msg = msgReader?.isNull == false ? msgReader?.stringValue : null;
+
+    if (msg != null) {
+      validators.add(
+        "notContains: NotContains.withMsg($valueCode, msg: '$msg')",
+      );
+    } else {
+      validators.add('notContains: NotContains($valueCode)');
+    }
+  }
+
   List<_FieldInfo> _getFields(ClassElement element) {
     final fields = <_FieldInfo>[];
     const modelAttributesChecker = TypeChecker.fromUrl(
@@ -738,6 +1050,9 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
           final primaryKey = reader.peek('primaryKey')?.boolValue ?? false;
           final allowNull = reader.peek('allowNull')?.boolValue;
           final defaultValue = reader.peek('defaultValue')?.literalValue;
+
+          // Extract validate option
+          final validateCode = _extractValidateCode(reader.peek('validate'));
 
           String dartType = 'String';
           switch (dataType) {
@@ -778,6 +1093,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
               primaryKey: primaryKey,
               allowNull: allowNull,
               defaultValue: defaultValue,
+              validateCode: validateCode,
             ),
           );
         }
@@ -796,6 +1112,7 @@ class _FieldInfo {
   final bool primaryKey;
   final bool? allowNull;
   final Object? defaultValue;
+  final String? validateCode; // Generated code for ValidateOption
 
   _FieldInfo({
     required this.fieldName,
@@ -806,6 +1123,7 @@ class _FieldInfo {
     this.primaryKey = false,
     this.allowNull,
     this.defaultValue,
+    this.validateCode,
   });
 }
 

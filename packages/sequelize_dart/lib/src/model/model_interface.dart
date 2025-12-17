@@ -30,17 +30,54 @@ abstract class ModelInterface<T> {
   });
 }
 
-/// Extension to add toJson to ModelAttributes for JS conversion
+/// Extension to add toJsonForBridge to ModelAttributes for JS conversion
+/// This wraps the attribute in a map with the column name as key
 extension ModelAttributesJson on ModelAttributes {
-  Map<String, Map<String, dynamic>> toJson() {
-    return {
-      name: {
-        'type': type.name,
-        'allowNull': allowNull,
-        'primaryKey': primaryKey,
-        'autoIncrement': autoIncrement,
-        'defaultValue': defaultValue,
-      },
+  Map<String, Map<String, dynamic>> toJsonForBridge() {
+    final attr = <String, dynamic>{
+      'type': type.name,
     };
+
+    // Column name (maps to 'field' in Sequelize)
+    if (columnName != null) attr['columnName'] = columnName;
+
+    // Null constraint
+    if (allowNull != null) attr['allowNull'] = allowNull;
+
+    // Primary key and auto increment
+    if (primaryKey != null) attr['primaryKey'] = primaryKey;
+    if (autoIncrement != null) attr['autoIncrement'] = autoIncrement;
+    if (autoIncrementIdentity != null) {
+      attr['autoIncrementIdentity'] = autoIncrementIdentity;
+    }
+
+    // Default value
+    if (defaultValue != null) attr['defaultValue'] = defaultValue;
+
+    // Unique constraint
+    if (unique != null) {
+      if (unique is bool || unique is String) {
+        attr['unique'] = unique;
+      } else if (unique is UniqueOption) {
+        attr['unique'] = (unique as UniqueOption).toJson();
+      }
+    }
+
+    // Index
+    if (index != null) {
+      if (index is bool || index is String) {
+        attr['index'] = index;
+      } else if (index is IndexOption) {
+        attr['index'] = (index as IndexOption).toJson();
+      }
+    }
+
+    // Comment
+    if (comment != null) attr['comment'] = comment;
+
+    // Validation
+    if (validate != null) attr['validate'] = validate!.toJson();
+
+    return {name: attr};
   }
 }
