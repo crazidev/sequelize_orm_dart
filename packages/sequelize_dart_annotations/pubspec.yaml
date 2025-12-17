@@ -6,7 +6,9 @@ resolution: workspace
 environment:
   sdk: ^3.9.2
 
-dependencies: {}
+dependencies:
+  sequelize_dart:
+    path: ../sequelize_dart
 
 dev_dependencies:
   lints: ^6.0.0

@@ -25,7 +25,7 @@ class Query extends QueryInterface {
   Map<String, dynamic> toJson() {
     return {
       'where': where?.toJson(),
-      'include': include,
+      'include': {'all': true, 'nested': true},
       'order': order,
       'limit': limit,
       'offset': offset,

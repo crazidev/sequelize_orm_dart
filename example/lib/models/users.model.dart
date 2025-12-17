@@ -1,4 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/models/post.model.dart';
 
 part 'users.model.g.dart';
 
@@ -30,6 +31,9 @@ class Users {
     type: DataType.STRING,
   )
   dynamic lastName;
+
+  @HasOne(Post, foreignKey: 'userId', as: 'posts')
+  Post? posts;
 
   static $Users get instance => $Users();
 }

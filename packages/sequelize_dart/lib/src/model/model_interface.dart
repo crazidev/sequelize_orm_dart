@@ -9,6 +9,8 @@ abstract class ModelInterface<T> {
 
   /// Define the model in Sequelize
   ModelInterface<T> define(String modelName, Object sequelize);
+
+  void hasOne(ModelInterface model);
 }
 
 /// Extension to add toJson to ModelAttributes for JS conversion

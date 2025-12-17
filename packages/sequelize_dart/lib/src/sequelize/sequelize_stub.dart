@@ -26,7 +26,5 @@ class Sequelize extends SequelizeInterface {
   ) {}
 
   @override
-  Future<void> close() async {
-    // No-op for stub
-  }
+  Future<void> close() async {}
 }

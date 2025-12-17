@@ -68,6 +68,10 @@ dynamic _convertToJsonEncodable(dynamic value) {
     return value.map((key, val) => MapEntry(key, _convertToJsonEncodable(val)));
   } else if (value is List) {
     return value.map((item) => _convertToJsonEncodable(item)).toList();
+  } else if (value is JSObject) {
+    final toJsJson = (value as ModelValue).toJSON();
+    final toDartJson = jsonEncode((toJsJson as JSObject).dartify());
+    return jsonDecode(toDartJson);
   }
   return value;
 }

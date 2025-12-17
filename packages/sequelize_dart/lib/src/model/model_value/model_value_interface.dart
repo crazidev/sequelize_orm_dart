@@ -3,6 +3,9 @@ abstract class ModelValueInterface {
   /// Get the data values from the model instance
   dynamic get dataValues;
 
+  /// Convert the model instance to JSON
+  dynamic toJSON();
+
   /// Check if this is a new record
   bool get isNewRecord;
 

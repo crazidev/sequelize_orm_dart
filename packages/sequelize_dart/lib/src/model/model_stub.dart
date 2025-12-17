@@ -7,6 +7,11 @@ abstract class Model<T> extends ModelInterface {
     throw UnimplementedError();
   }
 
+  @override
+  void hasOne(ModelInterface model) {
+    // TODO: implement hasOne
+  }
+
   /// Get model attributes for Sequelize
   List<ModelAttributes> getAttributes();
 

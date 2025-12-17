@@ -9,6 +9,11 @@ class ModelValue implements ModelValueInterface {
   }
 
   @override
+  dynamic toJSON() {
+    throw UnimplementedError('ModelValue is not available in this environment');
+  }
+
+  @override
   bool get isNewRecord {
     throw UnimplementedError('ModelValue is not available in this environment');
   }

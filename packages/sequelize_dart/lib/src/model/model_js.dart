@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:js_interop';
 
 import 'package:sequelize_dart/sequelize_dart.dart';
@@ -8,9 +10,9 @@ abstract class Model<T> extends ModelInterface {
   @override
   ModelInterface define(String modelName, Object sq) {
     print('✅ Defining model: $modelName');
-    var sequelize = sq as SequelizeJS;
+    final sequelize = sq as SequelizeJS;
 
-    SequelizeModel model = sequelize.define(
+    final SequelizeModel model = sequelize.define(
       modelName.toJS,
       getAttributesJson().jsify() as JSObject,
       getOptionsJson().jsify() as JSObject,
@@ -19,6 +21,18 @@ abstract class Model<T> extends ModelInterface {
     sequelizeInstance = sequelize;
     sequelizeModel = model;
     return this;
+  }
+
+  @override
+  void hasOne(ModelInterface model) {
+    print('✅ Adding hasOne relationship to: $model');
+    (sequelizeModel as SequelizeModel).hasOne(
+      model.sequelizeModel as SequelizeModel,
+      {
+            'foreignKey': 'userId',
+          }.jsify()
+          as JSObject,
+    );
   }
 
   /// Get model attributes for Sequelize

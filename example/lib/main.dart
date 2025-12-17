@@ -1,6 +1,8 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/models/post.model.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:sequelize_dart_example/queries.dart';
+import 'package:sequelize_dart_example/utils/sql_formatter.dart';
 
 const connectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';
@@ -11,7 +13,7 @@ Future<void> main() async {
   final sequelize = Sequelize().createInstance(
     PostgressConnection(
       url: connectionString,
-      logging: (String sql) => print(sql),
+      logging: (String sql) => SqlFormatter.printFormatted(sql),
       pool: SequelizePoolOptions(
         max: 10, // Maximum connections (increased to handle concurrent queries)
         min: 5, // Minimum connections
@@ -25,7 +27,9 @@ Future<void> main() async {
 
   // Authenticate and register models
   await sequelize.authenticate();
-  sequelize.addModels([Users.instance]);
+
+  sequelize.addModels([Users.instance, Post.instance]);
+  Users.instance.hasOne(Post.instance);
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

@@ -1,4 +1,3 @@
-import 'package:sequelize_dart/src/model/model_value/model_value.dart';
 import 'package:sequelize_dart/src/model/model_value/model_value_interface.dart';
 
 /// Dart VM implementation of ModelValue
@@ -6,6 +5,11 @@ import 'package:sequelize_dart/src/model/model_value/model_value_interface.dart'
 class ModelValue implements ModelValueInterface {
   @override
   dynamic get dataValues {
+    throw UnimplementedError('ModelValue is not implemented for Dart VM');
+  }
+
+  @override
+  dynamic toJSON() {
     throw UnimplementedError('ModelValue is not implemented for Dart VM');
   }
 
