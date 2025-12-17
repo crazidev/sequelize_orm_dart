@@ -2,6 +2,32 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Start File Watcher",
+      "type": "shell",
+      "command": "./tools/watch_dart_debug.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Dart Debug File Watcher",
+          "endsPattern": "^.*Watching for file changes"
+        }
+      }
+    },
+    {
       "label": "Generate Models",
       "type": "shell",
       "command": "dart run build_runner build --delete-conflicting-outputs",
