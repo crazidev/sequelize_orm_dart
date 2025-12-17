@@ -8,8 +8,13 @@ abstract class Model<T> extends ModelInterface {
   }
 
   @override
-  void hasOne(ModelInterface model) {
-    // TODO: implement hasOne
+  void hasOne(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? sourceKey,
+  }) {
+    throw UnimplementedError();
   }
 
   /// Get model attributes for Sequelize

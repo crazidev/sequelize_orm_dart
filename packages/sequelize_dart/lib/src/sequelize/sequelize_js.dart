@@ -163,4 +163,13 @@ extension type SequelizeModel._(JSObject _) implements JSObject {
 
   @JS('hasOne')
   external JSObject hasOne(SequelizeModel model, JSObject? options);
+
+  @JS('hasMany')
+  external JSObject hasMany(SequelizeModel model, JSObject? options);
+
+  @JS('belongsTo')
+  external JSObject belongsTo(SequelizeModel model, JSObject? options);
+
+  @JS('belongsToMany')
+  external JSObject belongsToMany(SequelizeModel model, JSObject? options);
 }

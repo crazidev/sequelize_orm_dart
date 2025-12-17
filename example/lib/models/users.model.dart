@@ -32,8 +32,11 @@ class Users {
   )
   dynamic lastName;
 
-  @HasOne(Post, foreignKey: 'userId', as: 'posts')
-  Post? posts;
+  @HasOne(Post, foreignKey: 'userId', as: 'post')
+  Post? post;
+
+  @HasMany(Post, foreignKey: 'userId', as: 'posts')
+  List<Post>? posts;
 
   static $Users get instance => $Users();
 }

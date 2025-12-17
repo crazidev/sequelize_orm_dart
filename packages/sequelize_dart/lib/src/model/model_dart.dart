@@ -24,7 +24,12 @@ abstract class Model<T> extends ModelInterface {
   }
 
   @override
-  void hasOne(ModelInterface model) {
+  void hasOne(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? sourceKey,
+  }) {
     throw UnimplementedError();
   }
 

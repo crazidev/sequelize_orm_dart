@@ -22,14 +22,23 @@ Future<void> main() async {
         evict: 1000, // Check for idle connections (ms)
       ),
     ),
-    models: [],
+    models: [Users.instance, Post.instance],
   );
 
   // Authenticate and register models
-  await sequelize.authenticate();
+  // await sequelize.authenticate();
 
-  sequelize.addModels([Users.instance, Post.instance]);
-  Users.instance.hasOne(Post.instance);
+  sequelize.addModels([]);
+
+  Users.instance.hasOne(
+    Post.instance,
+    foreignKey: 'userId',
+  );
+
+  Users.instance.hasMany(
+    Post.instance,
+    foreignKey: 'userId',
+  );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

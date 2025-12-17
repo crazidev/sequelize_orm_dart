@@ -24,13 +24,75 @@ abstract class Model<T> extends ModelInterface {
   }
 
   @override
-  void hasOne(ModelInterface model) {
-    print('✅ Adding hasOne relationship to: $model');
+  void hasOne(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? sourceKey,
+  }) {
+    // Check if this model has been initialized
+    try {
+      final _ = sequelizeModel;
+    } catch (e) {
+      throw StateError(
+        "Model '$name' has not been initialized. Please call sequelize.addModels([$name.instance]) before setting up associations.",
+      );
+    }
+
+    // Check if the target model has been initialized
+    try {
+      final _ = model.sequelizeModel;
+    } catch (e) {
+      throw StateError(
+        "Model '${model.name}' has not been initialized. Please call sequelize.addModels([${model.name}.instance]) before setting up associations.",
+      );
+    }
+
+    print('✅ $name hasOne ${model.name}');
     (sequelizeModel as SequelizeModel).hasOne(
       model.sequelizeModel as SequelizeModel,
-      {
-            'foreignKey': 'userId',
-          }.jsify()
+      ({
+            'foreignKey': foreignKey,
+            'as': as,
+            'sourceKey': sourceKey,
+          }).jsify()
+          as JSObject,
+    );
+  }
+
+  @override
+  void hasMany(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? sourceKey,
+  }) {
+    // Check if this model has been initialized
+    try {
+      final _ = sequelizeModel;
+    } catch (e) {
+      throw StateError(
+        "Model '$name' has not been initialized. Please call sequelize.addModels([$name.instance]) before setting up associations.",
+      );
+    }
+
+    // Check if the target model has been initialized
+    try {
+      final _ = model.sequelizeModel;
+    } catch (e) {
+      throw StateError(
+        "Model '${model.name}' has not been initialized. Please call sequelize.addModels([${model.name}.instance]) before setting up associations.",
+      );
+    }
+
+    print('✅ $name hasMany ${model.name}');
+    (sequelizeModel as SequelizeModel).hasMany(
+      model.sequelizeModel as SequelizeModel,
+      ({
+            'foreignKey': foreignKey,
+            'as': as,
+            'sourceKey': sourceKey,
+          }).jsify()
           as JSObject,
     );
   }

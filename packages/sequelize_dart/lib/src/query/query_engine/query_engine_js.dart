@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 
+import 'package:sequelize_dart/src/core/console.dart';
 import 'package:sequelize_dart/src/model/model_value/model_value.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
@@ -21,9 +22,11 @@ class QueryEngine extends QueryEngineInterface {
     final List<ModelValue> data = res.toDart as List<ModelValue>;
 
     return data.map((value) {
-      final dartified = value.dataValues.dartify();
-      final converted = _convertToJsonEncodable(dartified);
+      final json = value.toJSON() as JSObject;
+      final converted = _convertToJsonEncodable(json.dartify());
       final q = jsonDecode(jsonEncode(converted));
+
+      console.log('QueryEngine.findAll:'.toJS, value.toJSON());
 
       return q as Map<String, dynamic>;
     }).toList();
