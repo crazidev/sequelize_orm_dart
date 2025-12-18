@@ -89,3 +89,4 @@ while true; do
     # Don't auto-restart on crashes - only restart on file changes
     # This allows users to see errors and fix them before restarting
 done
+
