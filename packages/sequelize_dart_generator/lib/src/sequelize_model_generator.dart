@@ -589,30 +589,34 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln('    bool? required,');
     buffer.writeln('    bool? right,');
     buffer.writeln(
-      '    QueryOperator Function($queryBuilderClassName)? where,',
+      '    QueryOperator Function($queryBuilderClassName ${_toCamelCase(className)})? where,',
     );
     buffer.writeln('    QueryAttributes? attributes,');
     buffer.writeln('    List<List<String>>? order,');
     buffer.writeln('    int? limit,');
     buffer.writeln('    int? offset,');
     buffer.writeln(
-      '    List<IncludeBuilder> Function($queryBuilderClassName)? include,',
+      '    List<IncludeBuilder> Function($queryBuilderClassName ${_toCamelCase(className)})? include,',
     );
     buffer.writeln('    Map<String, dynamic>? through,');
     buffer.writeln('  }) {');
     buffer.writeln(
-      '    return includeWith<$queryBuilderClassName>(',
+      '    return IncludeBuilder<$className>(',
     );
+    buffer.writeln('      association: name,');
+    buffer.writeln('      model: model,');
     buffer.writeln('      separate: separate,');
     buffer.writeln('      required: required,');
     buffer.writeln('      right: right,');
-    buffer.writeln('      where: where,');
+    buffer.writeln(
+      '      where: where != null ? (dynamic qb) => where(qb as \$${className}Query) : null,',
+    );
     buffer.writeln('      attributes: attributes,');
     buffer.writeln('      order: order,');
     buffer.writeln('      limit: limit,');
     buffer.writeln('      offset: offset,');
     buffer.writeln(
-      '      include: include ?? (_) => <IncludeBuilder>[],',
+      '      include: include != null ? (dynamic qb) => include(qb as \$${className}Query) : (_) => <IncludeBuilder>[],',
     );
     buffer.writeln('      through: through,');
     buffer.writeln('    );');

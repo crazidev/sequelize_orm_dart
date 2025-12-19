@@ -1,5 +1,4 @@
 import 'package:sequelize_dart/src/model/model_interface.dart';
-import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 
 /// Type-safe reference to a model association
@@ -39,50 +38,6 @@ class AssociationReference<T> {
     return IncludeBuilder<T>(
       all: true,
       nested: nested,
-    );
-  }
-
-  /// Create an include builder with type-safe nested includes
-  ///
-  /// This method accepts a function that receives the query builder for the associated model,
-  /// allowing type-safe nested includes. The query builder type is specified via the generic parameter.
-  ///
-  /// Example:
-  /// ```dart
-  /// users.posts.includeWith<$PostQuery>(
-  ///   include: (post) => [
-  ///     post.postDetails.include(),
-  ///   ],
-  /// )
-  /// ```
-  ///
-  /// Note: For better type inference and convenience, use the generated `includeTyped` extension methods
-  /// on AssociationReference which automatically infer the query builder type.
-  IncludeBuilder<T> includeWith<QB>({
-    bool? separate,
-    bool? required,
-    bool? right,
-    QueryOperator Function(QB)? where,
-    QueryAttributes? attributes,
-    List<List<String>>? order,
-    int? limit,
-    int? offset,
-    required List<IncludeBuilder> Function(QB) include,
-    Map<String, dynamic>? through,
-  }) {
-    return IncludeBuilder<T>(
-      association: name,
-      model: model,
-      separate: separate,
-      required: required,
-      right: right,
-      where: where != null ? (dynamic qb) => where(qb as QB) : null,
-      attributes: attributes,
-      order: order,
-      limit: limit,
-      offset: offset,
-      include: (dynamic qb) => include(qb as QB),
-      through: through,
     );
   }
 
