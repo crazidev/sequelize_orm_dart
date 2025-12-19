@@ -1,6 +1,7 @@
 name: sequelize_dart_generator
 description: Code generator for sequelize_dart package.
 version: 1.0.0
+publish_to: none
 resolution: workspace
 
 environment:
