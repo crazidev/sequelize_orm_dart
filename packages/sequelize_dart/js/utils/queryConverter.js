@@ -158,6 +158,40 @@ function convertWhereClause(where) {
 }
 
 /**
+ * Convert include options from Dart format to Sequelize format
+ * Recursively handles nested includes and converts where clauses
+ */
+function convertInclude(include) {
+  if (!include) {
+    return include;
+  }
+
+  // Handle array of includes
+  if (Array.isArray(include)) {
+    return include.map(convertInclude);
+  }
+
+  // Handle single include object
+  if (typeof include === 'object' && include !== null) {
+    const converted = { ...include };
+
+    // Convert where clause if present
+    if (converted.where !== undefined && converted.where !== null) {
+      converted.where = convertWhereClause(converted.where);
+    }
+
+    // Recursively convert nested includes
+    if (converted.include !== undefined && converted.include !== null) {
+      converted.include = convertInclude(converted.include);
+    }
+
+    return converted;
+  }
+
+  return include;
+}
+
+/**
  * Convert query options from Dart format to Sequelize format
  * Only includes properties that are defined (not undefined or null)
  */
@@ -173,7 +207,7 @@ function convertQueryOptions(options) {
     result.where = convertWhereClause(options.where);
   }
   if (options.include !== undefined && options.include !== null) {
-    result.include = options.include;
+    result.include = convertInclude(options.include);
   }
   if (options.order !== undefined && options.order !== null) {
     result.order = options.order;
@@ -194,4 +228,5 @@ function convertQueryOptions(options) {
 module.exports = {
   convertQueryOptions,
   convertWhereClause,
+  convertInclude,
 };

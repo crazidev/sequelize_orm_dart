@@ -1,4 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/models/post_details.model.dart';
 
 part 'post.model.g.dart';
 
@@ -30,6 +31,9 @@ class Post {
     type: DataType.INTEGER,
   )
   dynamic userId;
+
+  @HasOne(PostDetails, foreignKey: 'postId', as: 'postDetails')
+  PostDetails? postDetails;
 
   static $Post get instance => $Post();
 }

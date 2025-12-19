@@ -1,12 +1,17 @@
+import 'package:sequelize_dart/src/query/association/include_builder.dart';
 import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
 import 'package:sequelize_dart/src/query/query/query_attributes.dart';
 import 'package:sequelize_dart/src/query/query/query_interface.dart';
+
+export 'package:sequelize_dart/src/query/association/association_reference.dart';
+export 'package:sequelize_dart/src/query/association/include_builder.dart';
 
 export 'query_attributes.dart';
 
 class Query extends QueryInterface {
   final QueryOperator? where;
-  final dynamic include;
+  final List<IncludeBuilder>?
+  include; // Type-safe includes with infinite nesting support
   final List<List<String>>? order;
   final int? limit;
   final int? offset;
@@ -23,9 +28,15 @@ class Query extends QueryInterface {
 
   @override
   Map<String, dynamic> toJson() {
+    // Convert include to JSON format
+    // Supports infinite levels of nesting through recursive IncludeBuilder.toJson()
+    final List<Map<String, dynamic>>? includeJson = include
+        ?.map((inc) => inc.toJson())
+        .toList();
+
     return {
       'where': where?.toJson(),
-      'include': include,
+      'include': includeJson,
       'order': order,
       'limit': limit,
       'offset': offset,

@@ -1,5 +1,6 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/post.model.dart';
+import 'package:sequelize_dart_example/models/post_details.model.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:sequelize_dart_example/queries.dart';
 
@@ -31,6 +32,7 @@ Future<void> main() async {
     models: [
       Users.instance,
       Post.instance,
+      PostDetails.instance,
     ],
   );
 

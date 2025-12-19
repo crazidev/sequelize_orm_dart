@@ -63,7 +63,11 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       associations,
     );
     _generateClassCreate(buffer, createClassName, fields);
-    _generateQueryBuilder(buffer, className ?? 'Unknown', fields);
+    _generateQueryBuilder(buffer, className ?? 'Unknown', fields, associations);
+    _generateIncludeExtension(
+      buffer,
+      className ?? 'Unknown',
+    );
 
     return buffer.toString();
   }
@@ -520,6 +524,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     StringBuffer buffer,
     String className,
     List<_FieldInfo> fields,
+    List<_AssociationInfo> associations,
   ) {
     final queryBuilderClassName = '\$${className}Query';
 
@@ -527,7 +532,12 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     buffer.writeln('class $queryBuilderClassName {');
     buffer.writeln('  $queryBuilderClassName();'); // Constructor
     buffer.writeln();
+    // Import ModelInterface for type casting
+    if (associations.isNotEmpty) {
+      // Note: ModelInterface is already imported via sequelize_dart package
+    }
 
+    // Generate column references
     for (var field in fields) {
       final dartType = _getDartTypeForQuery(field.dataType);
       buffer.writeln(
@@ -535,6 +545,78 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       );
     }
 
+    // Generate association references
+    if (associations.isNotEmpty) {
+      buffer.writeln();
+      for (var assoc in associations) {
+        final modelClassName = assoc.modelClassName;
+        final associationName = assoc.as ?? assoc.fieldName;
+        buffer.writeln(
+          "  final ${assoc.fieldName} = AssociationReference<$modelClassName>('$associationName', $modelClassName.instance);",
+        );
+      }
+    }
+
+    buffer.writeln();
+    buffer.writeln(
+      '  IncludeBuilder<$className> includeAll({bool nested = false}) {',
+    );
+    buffer.writeln(
+      '    return IncludeBuilder<$className>(all: true, nested: nested);',
+    );
+    buffer.writeln('  }');
+    buffer.writeln('}');
+    buffer.writeln();
+  }
+
+  void _generateIncludeExtension(
+    StringBuffer buffer,
+    String className,
+  ) {
+    final queryBuilderClassName = '\$${className}Query';
+    final extensionName = '${className}Include';
+
+    buffer.writeln('/// Type-safe include extension for $className');
+    buffer.writeln(
+      'extension $extensionName on AssociationReference<$className> {',
+    );
+    buffer.writeln('  /// Type-safe include with nested includes');
+    buffer.writeln(
+      '  /// The [include] function receives a `$queryBuilderClassName` instance for type-safe nested includes',
+    );
+    buffer.writeln('  IncludeBuilder<$className> include({');
+    buffer.writeln('    bool? separate,');
+    buffer.writeln('    bool? required,');
+    buffer.writeln('    bool? right,');
+    buffer.writeln(
+      '    QueryOperator Function($queryBuilderClassName)? where,',
+    );
+    buffer.writeln('    QueryAttributes? attributes,');
+    buffer.writeln('    List<List<String>>? order,');
+    buffer.writeln('    int? limit,');
+    buffer.writeln('    int? offset,');
+    buffer.writeln(
+      '    List<IncludeBuilder> Function($queryBuilderClassName)? include,',
+    );
+    buffer.writeln('    Map<String, dynamic>? through,');
+    buffer.writeln('  }) {');
+    buffer.writeln(
+      '    return includeWith<$queryBuilderClassName>(',
+    );
+    buffer.writeln('      separate: separate,');
+    buffer.writeln('      required: required,');
+    buffer.writeln('      right: right,');
+    buffer.writeln('      where: where,');
+    buffer.writeln('      attributes: attributes,');
+    buffer.writeln('      order: order,');
+    buffer.writeln('      limit: limit,');
+    buffer.writeln('      offset: offset,');
+    buffer.writeln(
+      '      include: include ?? (_) => <IncludeBuilder>[],',
+    );
+    buffer.writeln('      through: through,');
+    buffer.writeln('    );');
+    buffer.writeln('  }');
     buffer.writeln('}');
     buffer.writeln();
   }
