@@ -22,21 +22,4 @@ Future<void> runQueries() async {
   for (final user in users1) {
     print('User: ${user.toJson()}');
   }
-
-  // final post1 = await measureQuery(
-  //   'Find Post with postDetails (basic include)',
-  //   () => Post.instance.findAll(
-  //     (post) => Query(
-  //       where: and([post.id.eq(1)]),
-  //       include: [
-  //         post.postDetails.include(
-  //           attributes: QueryAttributes(columns: [const Column('id')]),
-  //         ),
-  //       ],
-  //     ),
-  //   ),
-  // );
-  // for (final post in post1) {
-  //   print('Post: ${post.toJson()}');
-  // }
 }
