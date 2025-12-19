@@ -19,3 +19,8 @@
 - Getter
 - Setter
 - Virtual
+
+### Include
+
+- Do not generate include.seperate for unsupported association example error (Only HasMany associations support include.separate)
+- Implement include through another model

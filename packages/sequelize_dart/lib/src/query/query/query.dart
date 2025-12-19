@@ -34,6 +34,8 @@ class Query extends QueryInterface {
         ?.map((inc) => inc.toJson())
         .toList();
 
+    print(includeJson);
+
     return {
       'where': where?.toJson(),
       'include': includeJson,

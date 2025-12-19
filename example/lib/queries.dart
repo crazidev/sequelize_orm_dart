@@ -14,7 +14,7 @@ Future<void> runQueries() async {
       (users) => Query(
         where: and([users.id.eq(1)]),
         include: [
-          users.post.include(),
+          users.posts.include(),
         ],
       ),
     ),
@@ -24,15 +24,19 @@ Future<void> runQueries() async {
   }
 
   // final post1 = await measureQuery(
-  //   'Find users with posts (basic include)',
+  //   'Find Post with postDetails (basic include)',
   //   () => Post.instance.findAll(
   //     (post) => Query(
   //       where: and([post.id.eq(1)]),
-  //       include: [post.postDetails.include()],
+  //       include: [
+  //         post.postDetails.include(
+  //           attributes: QueryAttributes(columns: [const Column('id')]),
+  //         ),
+  //       ],
   //     ),
   //   ),
   // );
-  // for (final user in users1) {
-  //   print('User: ${user.toJson()}');
+  // for (final post in post1) {
+  //   print('Post: ${post.toJson()}');
   // }
 }

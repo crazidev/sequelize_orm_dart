@@ -56,7 +56,7 @@ class IncludeBuilder<T> {
     this.model,
     this.all,
     this.nested,
-    this.separate,
+    this.separate = false,
     this.required,
     this.right,
     this.where,
