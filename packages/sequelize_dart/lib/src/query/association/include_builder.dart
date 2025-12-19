@@ -108,27 +108,18 @@ class IncludeBuilder<T> {
         // Resolve the function by getting the query builder from the model
         final whereFunction = where as QueryOperator Function(dynamic);
 
-        // Get the query builder by calling the model's findAll
-        // We use dynamic to call findAll since Model is generic
-        // Note: This will execute a query, but we only need the builder from the callback
         dynamic queryBuilder;
         bool builderCaptured = false;
 
         try {
-          // Call findAll on the model (which is a Model<T> instance)
-          // IMPORTANT: This will execute a query, but we need the query builder from the callback
-          // The callback receives the query builder before the query executes
-          // We return an empty query to minimize execution overhead
-          (model as dynamic).findAll((builder) {
-            queryBuilder = builder;
+          // Get the query builder directly from the model
+          queryBuilder = model?.getQueryBuilder();
+          if (queryBuilder != null) {
             builderCaptured = true;
-            // Return an empty query - the query will still execute but we got the builder
-            return Query();
-          });
+          }
         } catch (e) {
-          // If findAll throws during execution, we might still have captured the builder
-          // The builder is captured in the callback before the query executes
-          // So even if execution fails, we should have the builder
+          // Fallback or error handling
+          print('Warning: Failed to get query builder: $e');
         }
 
         if (builderCaptured && queryBuilder != null) {
@@ -137,7 +128,6 @@ class IncludeBuilder<T> {
         } else {
           throw StateError(
             'Failed to get query builder for association "$association". '
-            'The where function requires a query builder instance. '
             'Make sure the model has a query builder class generated and the extensions are imported.',
           );
         }
@@ -172,15 +162,13 @@ class IncludeBuilder<T> {
         bool builderCaptured = false;
 
         try {
-          // Call findAll on the model to get the query builder instance
-          (model as dynamic).findAll((builder) {
-            queryBuilder = builder;
+          // Get the query builder directly from the model
+          queryBuilder = model?.getQueryBuilder();
+          if (queryBuilder != null) {
             builderCaptured = true;
-            // Return an empty query - the query will execute but we got the builder
-            return Query();
-          });
+          }
         } catch (e) {
-          // If findAll throws during execution, we might still have the builder
+          print('Warning: Failed to get query builder: $e');
         }
 
         if (builderCaptured && queryBuilder != null) {

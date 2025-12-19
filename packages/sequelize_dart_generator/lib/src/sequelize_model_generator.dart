@@ -23,6 +23,7 @@ part 'generators/methods/_generate_find_one_method.dart';
 part 'generators/methods/_generate_get_attributes_json_method.dart';
 part 'generators/methods/_generate_get_attributes_method.dart';
 part 'generators/methods/_generate_get_options_json_method.dart';
+part 'generators/methods/_generate_get_query_builder_method.dart';
 part 'generators/methods/_generate_include_extension.dart';
 part 'generators/methods/_generate_json_value_parser.dart';
 part 'generators/methods/_generate_query_builder.dart';
@@ -64,10 +65,20 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       generatedClassName,
       className,
     );
-    _generateDefineMethod(buffer, generatedClassName, associations);
-    _generateGetAttributesMethod(buffer, fields);
+    _generateDefineMethod(
+      buffer,
+      generatedClassName,
+      associations,
+    );
+    _generateGetAttributesMethod(
+      buffer,
+      fields,
+    );
     _generateGetAttributesJsonMethod(buffer);
-    _generateGetOptionsJsonMethod(buffer, tableAnnotation);
+    _generateGetOptionsJsonMethod(
+      buffer,
+      tableAnnotation,
+    );
     _generateFindAllMethod(
       buffer,
       className ?? 'Unknown',
@@ -77,6 +88,10 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       buffer,
       className ?? 'Unknown',
       valuesClassName,
+    );
+    _generateGetQueryBuilderMethod(
+      buffer,
+      className ?? 'Unknown',
     );
     _generateAssociateModelMethod(
       buffer,
@@ -93,8 +108,17 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       fields,
       associations,
     );
-    _generateClassCreate(buffer, createClassName, fields);
-    _generateQueryBuilder(buffer, className ?? 'Unknown', fields, associations);
+    _generateClassCreate(
+      buffer,
+      createClassName,
+      fields,
+    );
+    _generateQueryBuilder(
+      buffer,
+      className ?? 'Unknown',
+      fields,
+      associations,
+    );
     _generateIncludeExtension(
       buffer,
       className ?? 'Unknown',

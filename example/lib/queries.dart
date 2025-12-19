@@ -2,6 +2,7 @@
 
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/post.model.dart';
+import 'package:sequelize_dart_example/models/post_details.model.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:sequelize_dart_example/utils/measureQuery.dart';
 
@@ -13,8 +14,17 @@ Future<void> runQueries() async {
     () => Users.instance.findAll(
       (users) => Query(
         where: and([users.id.eq(1)]),
+        order: [],
         include: [
-          users.posts.include(),
+          users.posts.include(
+            include: (post) => [
+              post.postDetails.include(
+                where: (postDetails) => and([
+                  postDetails.id.eq(1),
+                ]),
+              ),
+            ],
+          ),
         ],
       ),
     ),

@@ -221,7 +221,6 @@ JSObject _convertWhereClause(Map<String, dynamic> where) {
   return result;
 }
 
-/// Converts query options from Dart format to Sequelize format with Op symbols
 JSObject? _convertQueryOptions(Map<String, dynamic>? options) {
   if (options == null) {
     return null;
@@ -229,27 +228,34 @@ JSObject? _convertQueryOptions(Map<String, dynamic>? options) {
 
   final result = JSObject();
 
-  if (options['where'] != null && options['where'] is Map) {
-    // Cast to Map<String, dynamic> - the keys should be strings after our changes
-    final whereMap = Map<String, dynamic>.from(options['where'] as Map);
-    result['where'] = _convertWhereClause(whereMap);
-  }
+  for (final entry in options.entries) {
+    final key = entry.key;
+    final value = entry.value;
 
-  // Copy other options as-is using _toJsValue for clean JS objects
-  if (options['include'] != null) {
-    result['include'] = _toJsValue(options['include']);
-  }
-  if (options['order'] != null) {
-    result['order'] = _toJsValue(options['order']);
-  }
-  if (options['limit'] != null) {
-    result['limit'] = _toJsValue(options['limit']);
-  }
-  if (options['offset'] != null) {
-    result['offset'] = _toJsValue(options['offset']);
-  }
-  if (options['attributes'] != null) {
-    result['attributes'] = _toJsValue(options['attributes']);
+    if (key == 'where' && value is Map) {
+      result['where'] = _convertWhereClause(Map<String, dynamic>.from(value));
+    } else if (key == 'include' && value is List) {
+      final includeList = value;
+      final jsArray = JSArray<JSObject>.withLength(includeList.length);
+      for (var i = 0; i < includeList.length; i++) {
+        final item = includeList[i];
+        if (item is Map) {
+          // Recursively convert nested include options
+          final converted = _convertQueryOptions(
+            Map<String, dynamic>.from(item),
+          );
+          if (converted != null) {
+            jsArray[i] = converted;
+          }
+        } else {
+          jsArray[i] = _toJsValue(item) as JSObject;
+        }
+      }
+      result['include'] = jsArray;
+    } else {
+      // Copy other options as-is using _toJsValue
+      result[key] = _toJsValue(value);
+    }
   }
 
   return result;

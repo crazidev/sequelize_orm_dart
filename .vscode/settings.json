@@ -1,7 +1,6 @@
 {
   // File nesting patterns - groups interface/js/dart/stub files together
   "explorer.fileNesting.enabled": true,
-  "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
     // Group implementation files under interface files in same folder
     "*.interface.dart": "${capture}.js.dart, ${capture}.dart.dart, ${capture}.stub.dart",
@@ -15,7 +14,7 @@
 
   // Explorer settings
   "explorer.sortOrder": "type",
-  "explorer.compactFolders": false,
+  "explorer.compactFolders": true,
   "explorer.fileNesting.expand": false,
 
   // Hide backup folders from explorer

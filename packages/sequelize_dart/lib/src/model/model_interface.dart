@@ -28,6 +28,10 @@ abstract class ModelInterface<T> {
     String? as,
     String? sourceKey,
   });
+
+  /// Get the query builder for this model
+  /// Returns a typed query builder (generated class)
+  dynamic getQueryBuilder();
 }
 
 /// Extension to add toJsonForBridge to ModelAttributes for JS conversion
