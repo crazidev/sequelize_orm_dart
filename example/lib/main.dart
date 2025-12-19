@@ -13,13 +13,9 @@ Future<void> main() async {
   final sequelize = Sequelize().createInstance(
     PostgressConnection(
       url: connectionString,
-      logging: (String sql) => SqlFormatter.printFormatted(sql),
-      pool: SequelizePoolOptions(
-        max: 10, // Maximum connections (increased to handle concurrent queries)
-        min: 5, // Minimum connections
-        idle: 10000, // Idle timeout (ms)
-        acquire: 60000, // Max time to get connection (ms)
-        evict: 1000, // Check for idle connections (ms)
+      logging: (String sql) => SqlFormatter.printFormatted(
+        sql,
+        colorScheme: const SqlFormatterColors(),
       ),
     ),
   );

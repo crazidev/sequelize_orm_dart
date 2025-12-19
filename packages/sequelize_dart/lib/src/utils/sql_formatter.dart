@@ -1,25 +1,53 @@
 /// SQL formatter utility for pretty-printing SQL queries with syntax highlighting
 library;
 
+/// ANSI color codes for terminal output
+enum AnsiColor {
+  reset('\x1B[0m'),
+  black('\x1B[30m'),
+  red('\x1B[31m'),
+  green('\x1B[32m'),
+  yellow('\x1B[33m'),
+  blue('\x1B[34m'),
+  magenta('\x1B[35m'),
+  cyan('\x1B[36m'),
+  white('\x1B[37m'),
+  brightBlack('\x1B[90m'),
+  brightRed('\x1B[91m'),
+  brightGreen('\x1B[92m'),
+  brightYellow('\x1B[93m'),
+  brightBlue('\x1B[94m'),
+  brightMagenta('\x1B[95m'),
+  brightCyan('\x1B[96m'),
+  brightWhite('\x1B[97m'),
+  none('');
+
+  final String code;
+  const AnsiColor(this.code);
+
+  @override
+  String toString() => code;
+}
+
 /// Configuration class for SQL syntax highlighting colors
 class SqlFormatterColors {
   /// ANSI code to reset formatting
-  final String reset;
+  final AnsiColor reset;
 
   /// Color for SQL keywords (SELECT, FROM, WHERE, etc.)
-  final String keyword;
+  final AnsiColor keyword;
 
   /// Color for operators (=, <, >, etc.)
-  final String operator;
+  final AnsiColor operator;
 
   /// Color for identifiers (table/column names)
-  final String identifier;
+  final AnsiColor identifier;
 
   const SqlFormatterColors({
-    this.reset = '\x1B[0m',
-    this.keyword = '\x1B[94m', // Bright blue
-    this.operator = '\x1B[93m', // Bright yellow
-    this.identifier = '\x1B[96m', // Bright cyan
+    this.reset = AnsiColor.reset,
+    this.keyword = AnsiColor.brightBlue,
+    this.operator = AnsiColor.brightYellow,
+    this.identifier = AnsiColor.brightCyan,
   });
 
   /// Default color scheme
@@ -27,25 +55,25 @@ class SqlFormatterColors {
 
   /// No colors (plain text output)
   static const SqlFormatterColors noColors = SqlFormatterColors(
-    reset: '',
-    keyword: '',
-    operator: '',
-    identifier: '',
+    reset: AnsiColor.none,
+    keyword: AnsiColor.none,
+    operator: AnsiColor.none,
+    identifier: AnsiColor.none,
   );
 
   /// Green theme
   static const SqlFormatterColors greenTheme = SqlFormatterColors(
-    keyword: '\x1B[92m', // Bright green
+    keyword: AnsiColor.brightGreen,
   );
 
   /// Magenta theme
   static const SqlFormatterColors magentaTheme = SqlFormatterColors(
-    keyword: '\x1B[95m', // Bright magenta
+    keyword: AnsiColor.brightMagenta,
   );
 
   /// Red theme
   static const SqlFormatterColors redTheme = SqlFormatterColors(
-    keyword: '\x1B[91m', // Bright red
+    keyword: AnsiColor.brightRed,
   );
 }
 
@@ -237,9 +265,8 @@ class SqlFormatter {
   /// Adds color highlighting to SQL using the provided or default colors
   static String addColors(String sql, {SqlFormatterColors? colorScheme}) {
     final c = colorScheme ?? colors;
-    String colored = sql;
 
-    // Color SQL keywords
+    // List of keywords to highlight
     final keywords = [
       'SELECT',
       'FROM',
@@ -260,28 +287,62 @@ class SqlFormatter {
       'LIMIT',
       'OFFSET',
       'AS',
+      'IN',
+      'IS',
+      'NOT',
+      'NULL',
+      'LIKE',
+      'ILIKE',
     ];
 
-    for (final keyword in keywords) {
-      colored = colored.replaceAllMapped(
-        RegExp('\\b$keyword\\b', caseSensitive: false),
-        (match) => '${c.keyword}${match.group(0)}${c.reset}',
-      );
-    }
-
-    // Color quoted identifiers (table/column names)
-    colored = colored.replaceAllMapped(
-      RegExp(r'"([^"]+)"'),
-      (match) => '${c.identifier}"${match.group(1)}"${c.reset}',
+    // Combined regex for all tokens:
+    // 1. Quoted identifiers: "..."
+    // 2. Keywords: word boundaries
+    // 3. Operators: including arrows
+    // 4. Numbers: integer and decimal
+    final pattern = RegExp(
+      '('
+      r'"[^"]*"'
+      '|'
+      '\\b(?:${keywords.join('|')})\\b'
+      '|'
+      r'[=<>!]+'
+      '|'
+      r'\b\d+(?:\.\d+)?\b'
+      ')',
+      caseSensitive: false,
     );
 
-    // Color operators
-    colored = colored.replaceAllMapped(
-      RegExp(r'([=<>!]+)'),
-      (match) => '${c.operator}${match.group(1)}${c.reset}',
-    );
+    return sql.splitMapJoin(
+      pattern,
+      onMatch: (Match match) {
+        final token = match.group(0)!;
+        final upperToken = token.toUpperCase();
 
-    return colored;
+        // 1. Handle Quoted identifiers
+        if (token.startsWith('"')) {
+          return '${c.identifier}$token${c.reset}';
+        }
+
+        // 2. Handle Keywords
+        if (keywords.contains(upperToken)) {
+          return '${c.keyword}$token${c.reset}';
+        }
+
+        // 3. Handle Operators
+        if (RegExp(r'[=<>!]+').hasMatch(token)) {
+          return '${c.operator}$token${c.reset}';
+        }
+
+        // 4. Handle Numbers (use operator color for now or add a new one)
+        if (RegExp(r'^\d+(\.\d+)?$').hasMatch(token)) {
+          return '${c.operator}$token${c.reset}';
+        }
+
+        return token;
+      },
+      onNonMatch: (String nonMatch) => nonMatch,
+    );
   }
 
   /// Formats and prints SQL with colors
