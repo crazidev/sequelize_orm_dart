@@ -3,7 +3,7 @@ import 'package:sequelize_dart_example/models/post.model.dart';
 
 part 'users.model.g.dart';
 
-@Table(tableName: 'users', underscored: true)
+@Table(tableName: 'users', underscored: true, timestamps: false)
 class Users {
   @ModelAttributes(
     name: 'id',
@@ -24,13 +24,13 @@ class Users {
   dynamic email;
 
   @ModelAttributes(
-    name: 'firstName',
+    name: 'first_name',
     type: DataType.STRING,
   )
   dynamic firstName;
 
   @ModelAttributes(
-    name: 'lastName',
+    name: 'last_name',
     type: DataType.STRING,
   )
   dynamic lastName;

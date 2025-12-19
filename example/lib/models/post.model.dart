@@ -26,22 +26,10 @@ class Post {
   dynamic content;
 
   @ModelAttributes(
-    name: 'userId',
+    name: 'user_id',
     type: DataType.INTEGER,
   )
   dynamic userId;
-
-  @ModelAttributes(
-    name: 'createdAt',
-    type: DataType.DATE,
-  )
-  dynamic createdAt;
-
-  @ModelAttributes(
-    name: 'updatedAt',
-    type: DataType.DATE,
-  )
-  dynamic updatedAt;
 
   static $Post get instance => $Post();
 }
