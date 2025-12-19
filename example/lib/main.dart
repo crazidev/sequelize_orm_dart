@@ -15,7 +15,7 @@ Future<void> main() async {
       url: connectionString,
       logging: (String sql) => SqlFormatter.printFormatted(
         sql,
-        colorScheme: const SqlFormatterColors(),
+        colorScheme: SqlFormatterColors.redTheme,
       ),
     ),
   );

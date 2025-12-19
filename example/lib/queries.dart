@@ -13,10 +13,15 @@ Future<void> runQueries() async {
     'Find users with posts (basic include)',
     () => Users.instance.findAll(
       (users) => Query(
-        where: and([users.id.eq(1)]),
+        where: and([
+          users.id.eq(1),
+        ]),
         order: [],
         include: [
           users.posts.include(
+            where: (posts) => and([
+              posts.id.eq(1),
+            ]),
             include: (post) => [
               post.postDetails.include(
                 where: (postDetails) => and([
