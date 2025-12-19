@@ -19,16 +19,18 @@ Future<void> runQueries() async {
         order: [],
         include: [
           users.posts.include(
-            where: (posts) => and([
-              posts.id.eq(1),
-            ]),
-            include: (post) => [
-              post.postDetails.include(
-                where: (postDetails) => and([
-                  postDetails.id.eq(1),
-                ]),
-              ),
-            ],
+            (post) => IncludeQuery(
+              where: and([
+                post.id.eq(1),
+              ]),
+              include: [
+                post.postDetails.include(
+                  (postDetails) => IncludeQuery(
+                    where: postDetails.id.eq(1),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

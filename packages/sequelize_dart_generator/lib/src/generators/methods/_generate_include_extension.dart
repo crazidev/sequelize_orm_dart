@@ -13,43 +13,28 @@ void _generateIncludeExtension(
   );
   buffer.writeln('  /// Type-safe include with nested includes');
   buffer.writeln(
-    '  /// The [include] function receives a `$queryBuilderClassName` instance for type-safe nested includes',
+    '  /// The [query] function receives a `$queryBuilderClassName` instance and returns an `IncludeQuery` object',
   );
-  buffer.writeln('  IncludeBuilder<$className> include({');
-  buffer.writeln('    bool? separate,');
-  buffer.writeln('    bool? required,');
-  buffer.writeln('    bool? right,');
+  buffer.writeln('  IncludeBuilder<$className> include([');
   buffer.writeln(
-    '    QueryOperator Function($queryBuilderClassName ${_toCamelCase(className)})? where,',
+    '    IncludeQuery Function($queryBuilderClassName ${_toCamelCase(className)})? query,',
   );
-  buffer.writeln('    QueryAttributes? attributes,');
-  buffer.writeln('    List<List<String>>? order,');
-  buffer.writeln('    int? limit,');
-  buffer.writeln('    int? offset,');
+  buffer.writeln('  ]) {');
+  buffer.writeln('    if (query != null) {');
   buffer.writeln(
-    '    List<IncludeBuilder> Function($queryBuilderClassName ${_toCamelCase(className)})? include,',
+    '      return IncludeBuilder<$className>.fromQuery(',
   );
-  buffer.writeln('    Map<String, dynamic>? through,');
-  buffer.writeln('  }) {');
+  buffer.writeln('        association: name,');
+  buffer.writeln('        model: model,');
   buffer.writeln(
-    '    return IncludeBuilder<$className>(',
+    '        query: query(model.getQueryBuilder() as $queryBuilderClassName),',
   );
+  buffer.writeln('      );');
+  buffer.writeln('    }');
+  buffer.writeln();
+  buffer.writeln('    return IncludeBuilder<$className>(');
   buffer.writeln('      association: name,');
   buffer.writeln('      model: model,');
-  buffer.writeln('      separate: separate,');
-  buffer.writeln('      required: required,');
-  buffer.writeln('      right: right,');
-  buffer.writeln(
-    '      where: where != null ? (dynamic qb) => where(qb as \$${className}Query) : null,',
-  );
-  buffer.writeln('      attributes: attributes,');
-  buffer.writeln('      order: order,');
-  buffer.writeln('      limit: limit,');
-  buffer.writeln('      offset: offset,');
-  buffer.writeln(
-    '      include: include != null ? (dynamic qb) => include(qb as \$${className}Query) : (_) => <IncludeBuilder>[],',
-  );
-  buffer.writeln('      through: through,');
   buffer.writeln('    );');
   buffer.writeln('  }');
   buffer.writeln('}');

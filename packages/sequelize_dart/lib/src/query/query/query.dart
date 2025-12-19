@@ -34,15 +34,44 @@ class Query extends QueryInterface {
         ?.map((inc) => inc.toJson())
         .toList();
 
-    print(includeJson);
-
     return {
-      'where': where?.toJson(),
-      'include': includeJson,
-      'order': order,
-      'limit': limit,
-      'offset': offset,
+      if (where != null) 'where': where!.toJson(),
+      if (includeJson != null) 'include': includeJson,
+      if (order != null) 'order': order,
+      if (limit != null) 'limit': limit,
+      if (offset != null) 'offset': offset,
       if (attributes != null) 'attributes': attributes!.toJson()['value'],
     };
+  }
+}
+
+class IncludeQuery extends Query {
+  // Include-specific options
+  final bool? separate;
+  final bool? required;
+  final bool? right;
+  final Map<String, dynamic>? through;
+
+  IncludeQuery({
+    super.where,
+    super.include,
+    super.order,
+    super.limit,
+    super.offset,
+    super.attributes,
+    this.separate,
+    this.required,
+    this.right,
+    this.through,
+  });
+
+  @override
+  Map<String, dynamic> toJson() {
+    final result = super.toJson();
+    if (separate != null) result['separate'] = separate;
+    if (required != null) result['required'] = required;
+    if (right != null) result['right'] = right;
+    if (through != null) result['through'] = through;
+    return result;
   }
 }

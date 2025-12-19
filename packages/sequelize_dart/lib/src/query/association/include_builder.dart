@@ -51,6 +51,8 @@ class IncludeBuilder<T> {
   /// Options for BelongsToMany through models
   final Map<String, dynamic>? through;
 
+  final Query? query;
+
   IncludeBuilder({
     this.association,
     this.model,
@@ -66,6 +68,7 @@ class IncludeBuilder<T> {
     this.offset,
     this.include,
     this.through,
+    this.query,
   }) : assert(
          (all == true && association == null && model == null) ||
              ((all == null || all == false) &&
@@ -74,6 +77,41 @@ class IncludeBuilder<T> {
          'When all is true, association and model must be null. '
          'When all is not true, association and model are required.',
        );
+
+  factory IncludeBuilder.fromQuery({
+    required String association,
+    required ModelInterface model,
+    required Query query,
+  }) {
+    // Extract specialized include options if query is an IncludeQuery
+    bool? separate;
+    bool? required;
+    bool? right;
+    Map<String, dynamic>? through;
+
+    if (query is IncludeQuery) {
+      separate = query.separate;
+      required = query.required;
+      right = query.right;
+      through = query.through;
+    }
+
+    return IncludeBuilder(
+      association: association,
+      model: model,
+      where: query.where,
+      include: query.include,
+      order: query.order,
+      limit: query.limit,
+      offset: query.offset,
+      attributes: query.attributes,
+      separate: separate,
+      required: required,
+      right: right,
+      through: through,
+      query: query,
+    );
+  }
 
   /// Convert the include builder to JSON format for Sequelize
   Map<String, dynamic> toJson() {
