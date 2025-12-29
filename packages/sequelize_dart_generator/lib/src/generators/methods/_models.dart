@@ -31,6 +31,8 @@ class _AssociationInfo {
   final String? foreignKey;
   final String? as;
   final String? sourceKey;
+  final String? singularName;
+  final String? pluralName;
 
   _AssociationInfo({
     required this.associationType,
@@ -39,5 +41,7 @@ class _AssociationInfo {
     this.foreignKey,
     this.as,
     this.sourceKey,
+    this.singularName,
+    this.pluralName,
   });
 }

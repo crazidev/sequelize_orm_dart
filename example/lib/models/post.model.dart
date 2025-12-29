@@ -3,7 +3,11 @@ import 'package:sequelize_dart_example/models/post_details.model.dart';
 
 part 'post.model.g.dart';
 
-@Table(tableName: 'posts', timestamps: false, underscored: true)
+@Table(
+  tableName: 'posts',
+  timestamps: false,
+  underscored: true,
+)
 class Post {
   @ModelAttributes(
     name: 'id',

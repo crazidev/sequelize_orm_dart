@@ -6,15 +6,17 @@ import 'package:sequelize_dart/src/query/query/query.dart';
 /// This class provides a type-safe way to reference associations in queries.
 /// Association references are generated automatically in query builder classes.
 ///
-/// Example:
+/// Note: To include associations, use the `include` property on the query builder:
 /// ```dart
 /// Users.instance.findAll((users) => Query(
 ///   include: [
-///     users.posts.include(), // Basic include
-///     users.posts.include(separate: true), // With options
+///     users.include.posts(), // Basic include
+///     users.include.posts(separate: true), // With options
 ///   ],
 /// ));
 /// ```
+///
+/// Association references are primarily used for column references in where clauses.
 class AssociationReference<T> {
   /// The association name (as defined in the model annotation)
   final String name;
@@ -31,7 +33,7 @@ class AssociationReference<T> {
   ///
   /// Note: Sequelize only allows `nested` as an additional option with `all: true`.
   /// Other options like `separate`, `required`, `right` are not supported with `all: true`.
-  /// If you need those options, use `include()` with specific associations instead.
+  /// If you need those options, use the `include` property on the query builder with specific associations instead.
   IncludeBuilder<T> includeAll({
     bool nested = false,
   }) {

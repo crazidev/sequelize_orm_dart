@@ -3,3 +3,6 @@ targets:
     builders:
       sequelize_dart_generator|sequelize_model_builder:
         enabled: true
+        options:
+          # naming_strategy: "singular"
+          # naming_strategy: "plural"

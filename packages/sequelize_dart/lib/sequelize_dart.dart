@@ -15,6 +15,7 @@ export 'src/model/model.dart';
 // Association exports
 export 'src/query/association/association_reference.dart';
 export 'src/query/association/include_builder.dart';
+export 'src/query/association/include_helper.dart';
 export 'src/query/operators/operators.dart';
 export 'src/query/operators/operators_interface.dart';
 // Query exports

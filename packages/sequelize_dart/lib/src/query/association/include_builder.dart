@@ -105,30 +105,44 @@ class IncludeBuilder<T> {
       if (where is QueryOperator) {
         whereOperator = where as QueryOperator;
       } else if (where is Function) {
-        // Resolve the function by getting the query builder from the model
+        // Resolve the function - it should receive columns instance
+        // The include helper generator will pass the columns instance when creating IncludeBuilder
+        // For now, we try to get it from the model's query builder and extract columns
         final whereFunction = where as QueryOperator Function(dynamic);
 
-        dynamic queryBuilder;
-        bool builderCaptured = false;
+        dynamic columns;
+        bool columnsCaptured = false;
 
         try {
-          // Get the query builder directly from the model
-          queryBuilder = model?.getQueryBuilder();
+          // Get the query builder from the model and extract columns
+          // The columns will be resolved by the include helper generator
+          final queryBuilder = model?.getQueryBuilder();
           if (queryBuilder != null) {
-            builderCaptured = true;
+            // Try to get columns property if it exists (for backward compatibility)
+            // In the new API, columns will be passed directly
+            try {
+              columns = (queryBuilder as dynamic).columns;
+              if (columns != null) {
+                columnsCaptured = true;
+              }
+            } catch (_) {
+              // If columns property doesn't exist, use query builder itself for backward compatibility
+              columns = queryBuilder;
+              columnsCaptured = true;
+            }
           }
         } catch (e) {
           // Fallback or error handling
-          print('Warning: Failed to get query builder: $e');
+          print('Warning: Failed to get columns: $e');
         }
 
-        if (builderCaptured && queryBuilder != null) {
-          // Resolve the function with the query builder
-          whereOperator = whereFunction(queryBuilder);
+        if (columnsCaptured && columns != null) {
+          // Resolve the function with the columns
+          whereOperator = whereFunction(columns);
         } else {
           throw StateError(
-            'Failed to get query builder for association "$association". '
-            'Make sure the model has a query builder class generated and the extensions are imported.',
+            'Failed to get columns for association "$association". '
+            'Make sure the model has a columns class generated.',
           );
         }
       }
@@ -156,25 +170,37 @@ class IncludeBuilder<T> {
         // Already a list of IncludeBuilders
         resolvedIncludes = include as List<IncludeBuilder>;
       } else if (include is Function) {
-        // Function that takes a query builder and returns List<IncludeBuilder>
-        // Get the query builder from the model
-        dynamic queryBuilder;
-        bool builderCaptured = false;
+        // Function that takes an include helper and returns List<IncludeBuilder>
+        // The include helper will be resolved by the include helper generator
+        dynamic includeHelper;
+        bool includeHelperCaptured = false;
 
         try {
-          // Get the query builder directly from the model
-          queryBuilder = model?.getQueryBuilder();
+          // Get the query builder from the model and extract include helper
+          // The include helper will be passed directly in the new API
+          final queryBuilder = model?.getQueryBuilder();
           if (queryBuilder != null) {
-            builderCaptured = true;
+            // Try to get include property if it exists (for new API)
+            try {
+              includeHelper = (queryBuilder as dynamic).include;
+              if (includeHelper != null) {
+                includeHelperCaptured = true;
+              }
+            } catch (_) {
+              // If include property doesn't exist, this is an error in new API
+              throw StateError(
+                'Include helper not found. Make sure the model has an include helper generated.',
+              );
+            }
           }
         } catch (e) {
-          print('Warning: Failed to get query builder: $e');
+          print('Warning: Failed to get include helper: $e');
         }
 
-        if (builderCaptured && queryBuilder != null) {
-          // Call the function with the query builder to get the nested includes
+        if (includeHelperCaptured && includeHelper != null) {
+          // Call the function with the include helper to get the nested includes
           // The function returns a List that should contain IncludeBuilder instances
-          final functionResult = (include as dynamic)(queryBuilder);
+          final functionResult = (include as dynamic)(includeHelper);
           if (functionResult is List) {
             // Convert the list to List<IncludeBuilder>
             resolvedIncludes = functionResult
@@ -187,7 +213,7 @@ class IncludeBuilder<T> {
           }
         } else {
           throw StateError(
-            'Failed to get query builder for association "$association". '
+            'Failed to get include helper for association "$association". '
             'Cannot resolve nested includes function.',
           );
         }

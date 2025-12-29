@@ -5,6 +5,7 @@ import 'package:sequelize_dart/src/query/query/query_interface.dart';
 
 export 'package:sequelize_dart/src/query/association/association_reference.dart';
 export 'package:sequelize_dart/src/query/association/include_builder.dart';
+export 'package:sequelize_dart/src/query/association/include_helper.dart';
 
 export 'query_attributes.dart';
 
@@ -25,6 +26,32 @@ class Query extends QueryInterface {
     this.offset,
     this.attributes,
   });
+
+  /// Create a Query from callbacks
+  /// This is used internally by findAll/findOne to resolve callbacks
+  factory Query.fromCallbacks({
+    Function? where,
+    Function? include,
+    dynamic columns,
+    dynamic includeHelper,
+    List<List<String>>? order,
+    int? limit,
+    int? offset,
+    QueryAttributes? attributes,
+  }) {
+    return Query(
+      where: where != null && columns != null
+          ? where(columns) as QueryOperator
+          : null,
+      include: include != null && includeHelper != null
+          ? (include(includeHelper) as List).cast<IncludeBuilder>()
+          : null,
+      order: order,
+      limit: limit,
+      offset: offset,
+      attributes: attributes,
+    );
+  }
 
   @override
   Map<String, dynamic> toJson() {

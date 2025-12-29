@@ -109,9 +109,22 @@ abstract class Model<T> extends ModelInterface {
   /// Find all records matching the query
   ///
   /// Generated model classes will override this method to accept a typed query builder.
-  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
-  Future<List<T>> findAll(Query Function(dynamic) builder) {
-    final query = builder(null);
+  Future<List<T>> findAll({
+    covariant dynamic where,
+    covariant dynamic include,
+    List<List<String>>? order,
+    int? limit,
+    int? offset,
+    QueryAttributes? attributes,
+  }) {
+    final query = Query.fromCallbacks(
+      where: where,
+      include: include,
+      order: order,
+      limit: limit,
+      offset: offset,
+      attributes: attributes,
+    );
     return QueryEngine().findAll(
           modelName: name,
           query: query,
@@ -124,9 +137,18 @@ abstract class Model<T> extends ModelInterface {
   /// Find one record matching the query
   ///
   /// Generated model classes will override this method to accept a typed query builder.
-  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
-  Future<T?> findOne(Query Function(dynamic) builder) {
-    final query = builder(null);
+  Future<T?> findOne({
+    covariant dynamic where,
+    covariant dynamic include,
+    List<List<String>>? order,
+    QueryAttributes? attributes,
+  }) {
+    final query = Query.fromCallbacks(
+      where: where,
+      include: include,
+      order: order,
+      attributes: attributes,
+    );
     return QueryEngine().findOne(
           modelName: name,
           query: query,

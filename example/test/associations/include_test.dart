@@ -20,12 +20,10 @@
 
 //     test('Basic include with type-safe syntax', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.posts.include(),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.posts(),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -37,12 +35,10 @@
 
 //     test('Include with separate query', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.posts.include(separate: true),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.posts(separate: true),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -52,17 +48,15 @@
 
 //     test('Include with filtering (where clause)', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.posts.include(
-//               where: (posts) => and([
-//                 posts.title.like('%test%'),
-//               ]),
-//               separate: true,
-//             ),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.posts(
+//             where: (postColumns) => and([
+//               postColumns.title.like('%test%'),
+//             ]),
+//             separate: true,
+//           ),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -73,11 +67,9 @@
 
 //     test('Include with required (INNER JOIN)', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           include: [
-//             users.posts.include(required: true),
-//           ],
-//         ),
+//         include: (include) => [
+//           include.posts(required: true),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -88,16 +80,14 @@
 
 //     test('Include with pagination (limit and offset)', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.posts.include(
-//               separate: true,
-//               limit: 5,
-//               offset: 0,
-//             ),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.posts(
+//             separate: true,
+//             limit: 5,
+//             offset: 0,
+//           ),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -108,17 +98,15 @@
 
 //     test('Include with ordering', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.posts.include(
-//               separate: true,
-//               order: [
-//                 ['id', 'DESC'],
-//               ],
-//             ),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.posts(
+//             separate: true,
+//             order: [
+//               ['id', 'DESC'],
+//             ],
+//           ),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -129,12 +117,10 @@
 
 //     test('HasOne association include', () async {
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.post.include(),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.post(),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -144,22 +130,20 @@
 //       // Test that nested includes can be chained infinitely
 //       // This example shows the pattern (assuming Post had associations)
 //       final users = await Users.instance.findAll(
-//         (users) => Query(
-//           where: and([users.id.eq(1)]),
-//           include: [
-//             users.posts.include(
-//               separate: true,
-//               // Nested includes would be added here:
-//               // include: [
-//               //   posts.comments.include(
-//               //     include: [
-//               //       comments.replies.include(), // Can nest infinitely
-//               //     ],
-//               //   ),
-//               // ],
-//             ),
-//           ],
-//         ),
+//         where: (columns) => and([columns.id.eq(1)]),
+//         include: (include) => [
+//           include.posts(
+//             separate: true,
+//             // Nested includes would be added here:
+//             // include: (postInclude) => [
+//             //   postInclude.comments(
+//             //     include: (commentInclude) => [
+//             //       commentInclude.replies(), // Can nest infinitely
+//             //     ],
+//             //   ),
+//             // ],
+//           ),
+//         ],
 //       );
 
 //       expect(users, isNotEmpty);
@@ -169,39 +153,36 @@
 
 //     test('IncludeBuilder creation and toJson', () async {
 //       // Test that IncludeBuilder can be created with various options
-//       await Users.instance.findAll((queryBuilder) {
-//         final include = queryBuilder.posts.include(
-//           separate: true,
-//           required: false,
-//           limit: 10,
-//           offset: 0,
-//         );
-//         expect(include, isNotNull);
-//         expect(include.separate, isTrue);
-//         expect(include.required, isFalse);
-//         expect(include.limit, equals(10));
-//         expect(include.offset, equals(0));
+//       final includeHelper = const $UsersIncludeHelper();
+//       final include = includeHelper.posts(
+//         separate: true,
+//         required: false,
+//         limit: 10,
+//         offset: 0,
+//       );
+//       expect(include, isNotNull);
+//       expect(include.separate, isTrue);
+//       expect(include.required, isFalse);
+//       expect(include.limit, equals(10));
+//       expect(include.offset, equals(0));
 
-//         // Test toJson conversion
-//         final json = include.toJson();
-//         expect(json, isA<Map<String, dynamic>>());
-//         expect(json['association'], equals('posts'));
-//         expect(json['separate'], isTrue);
-//         expect(json['required'], isFalse);
-//         expect(json['limit'], equals(10));
-//         expect(json['offset'], equals(0));
-
-//         return Query();
-//       });
+//       // Test toJson conversion
+//       final json = include.toJson();
+//       expect(json, isA<Map<String, dynamic>>());
+//       expect(json['association'], equals('posts'));
+//       expect(json['separate'], isTrue);
+//       expect(json['required'], isFalse);
+//       expect(json['limit'], equals(10));
+//       expect(json['offset'], equals(0));
 //     });
 
 //     test('AssociationReference col method', () async {
 //       // Test that we can get column references from associations
-//       await Users.instance.findAll((queryBuilder) {
-//         final colRef = queryBuilder.posts.col('title');
-//         expect(colRef, equals('posts.title'));
-//         return Query();
-//       });
+//       // Note: Association references are still available on the query builder
+//       // but the new API encourages using columns/include helpers
+//       final queryBuilder = $UsersQuery();
+//       final colRef = queryBuilder.posts.col('title');
+//       expect(colRef, equals('posts.title'));
 //     });
 //   });
 // }
