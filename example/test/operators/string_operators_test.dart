@@ -23,7 +23,7 @@ void main() {
   group('String Operators', () {
     test('like produces WHERE "column" LIKE pattern', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.like('%@example.com')),
+        where: (user) => user.email.like('%@example.com'),
       );
 
       expect(
@@ -40,7 +40,7 @@ void main() {
 
     test('notLike produces WHERE "column" NOT LIKE pattern', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.notLike('%@spam.com')),
+        where: (user) => user.email.notLike('%@spam.com'),
       );
 
       expect(
@@ -52,7 +52,7 @@ void main() {
 
     test('startsWith produces WHERE "column" LIKE pattern%', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.startsWith('admin')),
+        where: (user) => user.email.startsWith('admin'),
       );
 
       expect(
@@ -64,7 +64,7 @@ void main() {
 
     test('endsWith produces WHERE "column" LIKE %pattern', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.endsWith('.com')),
+        where: (user) => user.email.endsWith('.com'),
       );
 
       expect(
@@ -76,7 +76,7 @@ void main() {
 
     test('substring produces WHERE "column" LIKE %pattern%', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.substring('example')),
+        where: (user) => user.email.substring('example'),
       );
 
       expect(
@@ -88,7 +88,7 @@ void main() {
 
     test('iLike produces WHERE "column" ILIKE pattern (PostgreSQL)', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.iLike('%@EXAMPLE.COM')),
+        where: (user) => user.email.iLike('%@EXAMPLE.COM'),
       );
 
       expect(
@@ -102,7 +102,7 @@ void main() {
       'notILike produces WHERE "column" NOT ILIKE pattern (PostgreSQL)',
       () async {
         await Users.instance.findAll(
-          (u) => Query(where: u.email.notILike('%@SPAM.COM')),
+          where: (user) => user.email.notILike('%@SPAM.COM'),
         );
 
         expect(

@@ -24,12 +24,10 @@ void main() {
   group('Logical Operators', () {
     test('AND combines conditions with AND', () async {
       await Users.instance.findAll(
-        (u) => Query(
-          where: and([
-            u.id.eq(1),
-            u.email.eq('test@example.com'),
-          ]),
-        ),
+        where: (user) => and([
+          user.id.eq(1),
+          user.email.eq('test@example.com'),
+        ]),
       );
 
       expect(
@@ -51,12 +49,10 @@ void main() {
 
     test('OR combines conditions with OR', () async {
       await Users.instance.findAll(
-        (u) => Query(
-          where: or([
-            u.id.eq(1),
-            u.id.eq(2),
-          ]),
-        ),
+        where: (user) => or([
+          user.id.eq(1),
+          user.id.eq(2),
+        ]),
       );
 
       expect(
@@ -78,11 +74,9 @@ void main() {
 
     test('NOT negates a condition', () async {
       await Users.instance.findAll(
-        (u) => Query(
-          where: not([
-            u.id.eq(1),
-          ]),
-        ),
+        where: (user) => not([
+          user.id.eq(1),
+        ]),
       );
 
       expect(
@@ -94,18 +88,16 @@ void main() {
 
     test('Nested AND inside OR', () async {
       await Users.instance.findAll(
-        (u) => Query(
-          where: or([
-            and([
-              u.id.eq(1),
-              u.email.eq('admin@example.com'),
-            ]),
-            and([
-              u.id.eq(2),
-              u.email.eq('user@example.com'),
-            ]),
+        where: (user) => or([
+          and([
+            user.id.eq(1),
+            user.email.eq('admin@example.com'),
           ]),
-        ),
+          and([
+            user.id.eq(2),
+            user.email.eq('user@example.com'),
+          ]),
+        ]),
       );
 
       expect(
@@ -122,15 +114,13 @@ void main() {
 
     test('Nested OR inside AND', () async {
       await Users.instance.findAll(
-        (u) => Query(
-          where: and([
-            or([
-              u.id.eq(1),
-              u.id.eq(2),
-            ]),
-            u.email.eq('test@example.com'),
+        where: (user) => and([
+          or([
+            user.id.eq(1),
+            user.id.eq(2),
           ]),
-        ),
+          user.email.eq('test@example.com'),
+        ]),
       );
 
       expect(

@@ -1,4 +1,6 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/models/post.model.dart';
+import 'package:sequelize_dart_example/models/post_details.model.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 
 /// Connection string for test database
@@ -34,9 +36,10 @@ Future<void> initTestEnvironment() async {
     ),
   );
 
-  // Authenticate and register models
-  await sequelize.authenticate();
-  sequelize.addModels([Users.instance]);
+  // Initialize with all models
+  await sequelize.initialize(
+    models: [Users.instance, Post.instance, PostDetails.instance],
+  );
 }
 
 /// Cleanup the test environment

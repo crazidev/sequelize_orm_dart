@@ -1,7 +1,7 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:test/test.dart';
 
-import 'package:sequelize_dart_example/models/users.model.dart';
 import '../test_helper.dart';
 
 /// Tests for list operators: in_, notIn
@@ -22,7 +22,7 @@ void main() {
 
   group('List Operators', () {
     test('in_ produces WHERE "column" IN (values)', () async {
-      await Users.instance.findAll((u) => Query(where: u.id.in_([1, 2, 3])));
+      await Users.instance.findAll(where: (user) => user.id.in_([1, 2, 3]));
 
       expect(
         lastSql,
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('notIn produces WHERE "column" NOT IN (values)', () async {
-      await Users.instance.findAll((u) => Query(where: u.id.notIn([1, 2, 3])));
+      await Users.instance.findAll(where: (user) => user.id.notIn([1, 2, 3]));
 
       expect(
         lastSql,
@@ -45,7 +45,7 @@ void main() {
       'in_ with strings produces WHERE "column" IN (string values)',
       () async {
         await Users.instance.findAll(
-          (u) => Query(where: u.email.in_(['a@test.com', 'b@test.com'])),
+          where: (user) => user.email.in_(['a@test.com', 'b@test.com']),
         );
 
         expect(

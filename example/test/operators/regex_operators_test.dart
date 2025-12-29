@@ -24,7 +24,7 @@ void main() {
   group('Regex Operators', () {
     test('regexp produces WHERE "column" ~ pattern (PostgreSQL)', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.regexp('^admin')),
+        where: (user) => user.email.regexp('^admin'),
       );
 
       expect(
@@ -36,7 +36,7 @@ void main() {
 
     test('notRegexp produces WHERE "column" !~ pattern (PostgreSQL)', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.notRegexp('^spam')),
+        where: (user) => user.email.notRegexp('^spam'),
       );
 
       expect(
@@ -48,7 +48,7 @@ void main() {
 
     test('iRegexp produces WHERE "column" ~* pattern (PostgreSQL)', () async {
       await Users.instance.findAll(
-        (u) => Query(where: u.email.iRegexp('^ADMIN')),
+        where: (user) => user.email.iRegexp('^ADMIN'),
       );
 
       expect(
@@ -62,7 +62,7 @@ void main() {
       'notIRegexp produces WHERE "column" !~* pattern (PostgreSQL)',
       () async {
         await Users.instance.findAll(
-          (u) => Query(where: u.email.notIRegexp('^SPAM')),
+          where: (user) => user.email.notIRegexp('^SPAM'),
         );
 
         expect(
