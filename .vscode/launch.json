@@ -22,12 +22,20 @@
       "skipFiles": ["<node_internals>/**"]
     },
     {
-      "name": "Run Tests",
+      "cwd": "${workspaceFolder}",
+      "console": "debugConsole",
+      "name": "Dart: Run all Tests",
       "type": "dart",
       "request": "launch",
-      "program": "${workspaceFolder}/example/.dart_tool/test.dart",
-      "cwd": "${workspaceFolder}/example",
-      "console": "debugConsole"
+      "program": "./test/"
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "console": "debugConsole",
+      "name": "Dart: Run Test",
+      "type": "dart",
+      "request": "launch",
+      "program": "./test/"
     }
   ]
 }
