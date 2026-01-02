@@ -16,7 +16,10 @@ Future<void> runQueries() async {
       include: (includeUser) => [
         includeUser.posts(
           include: (includePost) => [
-            includePost.postDetails(),
+            includePost.postDetails(
+              separate: true,
+              where: (postDetails) => postDetails.id.eq(1),
+            ),
           ],
         ),
       ],
