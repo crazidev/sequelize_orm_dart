@@ -52,7 +52,7 @@
     {
       "label": "JS  Server",
       "type": "shell",
-      "command": "/Users/crazidev/.nvm/versions/node/v22.9.0/bin/node --watch example/build/index.js",
+      "command": "node --watch example/build/index.js",
       "options": {
         "cwd": "${workspaceFolder}"
       },
