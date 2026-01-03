@@ -92,6 +92,49 @@ class IncludeBuilder<T> {
          'When all is not true, association and model are required.',
        );
 
+  /// Create a copy of this [IncludeBuilder] with the given fields replaced.
+  IncludeBuilder<T> copyWith({
+    String? association,
+    ModelInterface? model,
+    bool? all,
+    bool? nested,
+    bool? separate,
+    bool? required,
+    bool? right,
+    dynamic where,
+    QueryAttributes? attributes,
+    List<List<String>>? order,
+    int? limit,
+    int? offset,
+    dynamic include,
+    Map<String, dynamic>? through,
+    bool? duplicating,
+    dynamic on,
+    bool? or,
+    bool? subQuery,
+  }) {
+    return IncludeBuilder<T>(
+      association: association ?? this.association,
+      model: model ?? this.model,
+      all: all ?? this.all,
+      nested: nested ?? this.nested,
+      separate: separate ?? this.separate,
+      required: required ?? this.required,
+      right: right ?? this.right,
+      where: where ?? this.where,
+      attributes: attributes ?? this.attributes,
+      order: order ?? this.order,
+      limit: limit ?? this.limit,
+      offset: offset ?? this.offset,
+      include: include ?? this.include,
+      through: through ?? this.through,
+      duplicating: duplicating ?? this.duplicating,
+      on: on ?? this.on,
+      or: or ?? this.or,
+      subQuery: subQuery ?? this.subQuery,
+    );
+  }
+
   /// Convert the include builder to JSON format for Sequelize
   Map<String, dynamic> toJson() {
     final result = <String, dynamic>{};

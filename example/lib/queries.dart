@@ -25,7 +25,12 @@ Future<void> runQueries() async {
         users.id.eq(1),
       ]),
       include: (includeUser) => [
-        includePost,
+        includeUser.post().copyWith(),
+        includePost.copyWith(
+          attributes: QueryAttributes(
+            columns: [const Column('id'), const Column('title')],
+          ),
+        ),
       ],
       order: [],
     ),
