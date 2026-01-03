@@ -35,10 +35,7 @@
     },
     {
       "label": "Watch JS Server",
-      "dependsOn": [
-        "Watch Models",
-        "Watch JS"
-      ],
+      "dependsOn": ["Watch Models", "Watch JS"],
       "dependsOrder": "parallel",
       "group": "build",
       "presentation": {

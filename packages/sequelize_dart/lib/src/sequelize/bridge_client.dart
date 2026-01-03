@@ -84,7 +84,7 @@ class BridgeClient {
 
     // Start Node.js process
     _process = await Process.start(
-      nodePath ?? 'node',
+      nodePath ?? '/Users/crazidev/.nvm/versions/node/v22.9.0/bin/node',
       [serverPath],
       workingDirectory: p.dirname(serverPath),
     );

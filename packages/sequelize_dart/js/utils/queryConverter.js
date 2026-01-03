@@ -180,6 +180,11 @@ function convertInclude(include) {
       converted.where = convertWhereClause(converted.where);
     }
 
+    // Convert on clause if present (custom join condition)
+    if (converted.on !== undefined && converted.on !== null) {
+      converted.on = convertWhereClause(converted.on);
+    }
+
     // Recursively convert nested includes
     if (converted.include !== undefined && converted.include !== null) {
       converted.include = convertInclude(converted.include);

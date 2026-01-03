@@ -51,6 +51,19 @@ class IncludeBuilder<T> {
   /// Options for BelongsToMany through models
   final Map<String, dynamic>? through;
 
+  /// Mark the include as duplicating, will prevent a subquery from being used
+  final bool? duplicating;
+
+  /// Custom `ON` clause, overrides default
+  final dynamic on;
+
+  /// Whether to bind the ON and WHERE clause together by OR instead of AND
+  /// @default false
+  final bool? or;
+
+  /// Use sub queries. This should only be used if you know for sure the query does not result in a cartesian product
+  final bool? subQuery;
+
   IncludeBuilder({
     this.association,
     this.model,
@@ -66,6 +79,10 @@ class IncludeBuilder<T> {
     this.offset,
     this.include,
     this.through,
+    this.duplicating,
+    this.on,
+    this.or,
+    this.subQuery,
   }) : assert(
          (all == true && association == null && model == null) ||
              ((all == null || all == false) &&
@@ -97,6 +114,9 @@ class IncludeBuilder<T> {
     if (separate != null) result['separate'] = separate;
     if (required != null) result['required'] = required;
     if (right != null) result['right'] = right;
+    if (duplicating != null) result['duplicating'] = duplicating;
+    if (or != null) result['or'] = or;
+    if (subQuery != null) result['subQuery'] = subQuery;
 
     if (where != null && all != true) {
       // where clause only makes sense for specific associations, not for all: true
@@ -229,6 +249,51 @@ class IncludeBuilder<T> {
     }
 
     if (through != null) result['through'] = through;
+
+    // Handle 'on' clause (custom ON condition)
+    if (on != null && all != true) {
+      QueryOperator? onOperator;
+
+      if (on is QueryOperator) {
+        onOperator = on as QueryOperator;
+      } else if (on is Function) {
+        // Resolve the function - similar to where clause
+        final onFunction = on as QueryOperator Function(dynamic);
+
+        dynamic columns;
+        bool columnsCaptured = false;
+
+        try {
+          final queryBuilder = model?.getQueryBuilder();
+          if (queryBuilder != null) {
+            try {
+              columns = (queryBuilder as dynamic).columns;
+              if (columns != null) {
+                columnsCaptured = true;
+              }
+            } catch (_) {
+              columns = queryBuilder;
+              columnsCaptured = true;
+            }
+          }
+        } catch (e) {
+          print('Warning: Failed to get columns for ON clause: $e');
+        }
+
+        if (columnsCaptured && columns != null) {
+          onOperator = onFunction(columns);
+        } else {
+          throw StateError(
+            'Failed to get columns for ON clause in association "$association". '
+            'Make sure the model has a columns class generated.',
+          );
+        }
+      }
+
+      if (onOperator != null) {
+        result['on'] = onOperator.toJson();
+      }
+    }
 
     return result;
   }
