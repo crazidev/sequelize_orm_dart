@@ -9,7 +9,6 @@ part 'users.model.g.dart';
   timestamps: false,
   name: ModelNameOption(singular: 'user', plural: 'users'),
 )
-/// @docImport 'dart:async';
 class Users {
   @ModelAttributes(
     name: 'id',
