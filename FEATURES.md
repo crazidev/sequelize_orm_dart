@@ -91,6 +91,7 @@ class Users {
 ## Implementated
 
 - **Functions**: `sequelize.fn()`, `sequelize.literal()`
+- **Nested Sorting**: Support for `hoistIncludeOptions` to sort by included models
 
 ---
 
