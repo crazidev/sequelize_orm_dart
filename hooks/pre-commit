@@ -33,6 +33,11 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+echo -e "${BLUE}🔧 Building Javascript bridge bundle...${NC}\n"
+if [ -f "tools/setup_bridge.sh" ]; then
+  bash tools/setup_bridge.sh
+fi
+
 echo -e "${BLUE}🔧 Running pre-commit formatting...${NC}\n"
 
 # Run the format script
