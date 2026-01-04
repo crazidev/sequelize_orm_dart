@@ -17,7 +17,6 @@ Future<void> main() async {
         sql,
         colorScheme: SqlFormatterColors.redTheme,
       ),
-      hoistIncludeOptions: true,
     ),
   );
 
