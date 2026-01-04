@@ -31,9 +31,17 @@ class Sequelize extends SequelizeInterface {
       });
     }
 
-    sequelize = sequelizeModule.sequelizeFn.callAsConstructor(
-      config.jsify(),
-    );
+    final hoist = config['hoistIncludeOptions'] == true;
+    config.remove('hoistIncludeOptions');
+
+    sequelize =
+        sequelizeModule.sequelizeFn.callAsConstructor(
+              config.jsify(),
+            )
+            as SequelizeJS;
+
+    // Store custom bridge options on the instance for QueryEngine to access
+    sequelize.setProperty('hoistIncludeOptions'.toJS, hoist.toJS);
 
     return this;
   }

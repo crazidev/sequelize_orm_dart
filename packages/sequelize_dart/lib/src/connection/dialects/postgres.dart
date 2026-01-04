@@ -12,15 +12,16 @@ class PostgressConnection extends SequelizeCoreOptions {
     this.ssl = false,
     this.dialect = SequelizeDialects.postgres,
     super.pool,
+    super.hoistIncludeOptions,
   });
 
   @override
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(),
-      "schema": schema,
-      "ssl": ssl,
-      "dialect": dialect.value,
+      'schema': schema,
+      'ssl': ssl,
+      'dialect': dialect.value,
     };
   }
 }

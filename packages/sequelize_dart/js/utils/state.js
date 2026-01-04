@@ -5,6 +5,23 @@
 
 let sequelize = null;
 const models = new Map();
+let options = {
+  hoistIncludeOptions: false,
+};
+
+/**
+ * Get bridge options
+ */
+function getOptions() {
+  return options;
+}
+
+/**
+ * Set bridge options
+ */
+function setOptions(newOptions) {
+  options = { ...options, ...newOptions };
+}
 
 /**
  * Get the current Sequelize instance
@@ -41,6 +58,8 @@ module.exports = {
   getSequelize,
   setSequelize,
   getModels,
+  getOptions,
+  setOptions,
   clearState,
 };
 

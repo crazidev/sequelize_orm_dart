@@ -7,6 +7,9 @@ import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize_js.dart';
 
+@JS('Array.isArray')
+external bool _isJsArray(JSAny? value);
+
 class QueryEngine extends QueryEngineInterface {
   @override
   Future<List<Map<String, dynamic>>> findAll({
@@ -15,13 +18,17 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    final options = _convertQueryOptions(query?.toJson());
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
     final res = await (model as SequelizeModel).findAll(options).toDart;
 
-    final List<ModelValue> data = res.toDart as List<ModelValue>;
+    final List<dynamic> data = res.toDart;
 
     return data.map((value) {
-      final json = value.toJSON() as JSObject;
+      final modelValue = value as ModelValue;
+      final json = modelValue.toJSON() as JSObject;
       final converted = _convertToJsonEncodable(json.dartify());
       final q = jsonDecode(jsonEncode(converted));
 
@@ -36,7 +43,10 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    final options = _convertQueryOptions(query?.toJson());
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
     final res = await (model as SequelizeModel).findOne(options).toDart;
 
     if (res == null) {
@@ -122,6 +132,170 @@ JSSymbol? _getOpSymbol(String opKey) {
   };
 }
 
+@JS('Array')
+external JSFunction get _jsArray;
+
+JSObject _createPureArray() => _jsArray.callAsConstructor() as JSObject;
+
+/// Converts a SQL expression from Dart format to Sequelize format
+JSAny? _convertSqlExpression(Map<String, dynamic> expr) {
+  final type = expr['__type'];
+  if (type == null) return null;
+
+  switch (type) {
+    case 'fn':
+      final fnName = expr['fn'] as String;
+      final args = (expr['args'] as List?) ?? [];
+
+      final sqlFn = Sql.getProperty('fn'.toJS) as JSFunction;
+      final jsArgs = _createPureArray();
+      jsArgs.callMethod('push'.toJS, fnName.toJS);
+      for (final arg in args) {
+        final jsArg = _toJsValue(arg);
+        if (jsArg != null) {
+          jsArgs.callMethod('push'.toJS, jsArg);
+        }
+      }
+
+      return sqlFn.callMethod('apply'.toJS, Sql, jsArgs);
+    case 'col':
+      return Sql.col(expr['col'] as String);
+    case 'literal':
+      return Sql.literal(expr['value'] as String);
+    case 'attribute':
+      return Sql.attribute(expr['attribute'] as String);
+    case 'identifier':
+      return Sql.identifier(expr['identifier'] as String);
+    case 'cast':
+      return Sql.cast(_toJsValue(expr['expression'])!, expr['type'] as String);
+    case 'random':
+      return Sql.fn('RANDOM');
+    default:
+      return null;
+  }
+}
+
+/// Hoist order and group from joined includes to the top level
+void _hoistIncludeOptions(JSObject options) {
+  final include = options.getProperty('include'.toJS);
+  if (include == null || include.isUndefinedOrNull) return;
+
+  void walk(JSAny includeAny, List<String> path) {
+    final List<JSAny> items = _isJsArray(includeAny)
+        ? (includeAny as JSArray).toDart.cast<JSAny>()
+        : [includeAny];
+
+    for (final itemAny in items) {
+      if (itemAny is! JSObject) continue;
+      final item = itemAny;
+
+      final association =
+          (item.getProperty('as'.toJS) ?? item.getProperty('association'.toJS))
+                  ?.dartify()
+              as String?;
+      if (association == null) continue;
+
+      final currentPath = [...path, association];
+
+      // Hoist order if not separate
+      final order = item.getProperty('order'.toJS);
+      final separate = item.getProperty('separate'.toJS)?.dartify() == true;
+
+      if (order != null && !order.isUndefinedOrNull && !separate) {
+        var topOrder = options.getProperty('order'.toJS);
+        if (topOrder == null || topOrder.isUndefinedOrNull) {
+          topOrder = _createPureArray();
+          options.setProperty('order'.toJS, topOrder);
+        } else if (!_isJsArray(topOrder as JSAny?)) {
+          final existingOrder = topOrder;
+          topOrder = _createPureArray();
+          (topOrder as JSObject).callMethod('push'.toJS, existingOrder);
+          options.setProperty('order'.toJS, topOrder);
+        }
+
+        final itemOrders = _isJsArray(order)
+            ? (order as JSArray).toDart.cast<JSAny>()
+            : [order];
+
+        bool isSingleOrder = false;
+        if (_isJsArray(order)) {
+          final arr = order as JSArray;
+          if (arr.length == 2) {
+            final dir = arr.getProperty(1.toJS)?.dartify();
+            if (dir is String) {
+              final d = dir.toUpperCase();
+              if (d == 'ASC' || d == 'DESC') isSingleOrder = true;
+            }
+          }
+        }
+
+        final List<JSAny> ordersToHoist = (isSingleOrder || !_isJsArray(order))
+            ? [order]
+            : (order as JSArray).toDart.cast<JSAny>();
+
+        for (final o in ordersToHoist) {
+          final newOrder = _createPureArray();
+          for (final p in currentPath) {
+            newOrder.callMethod('push'.toJS, p.toJS);
+          }
+          if (_isJsArray(o)) {
+            final oArr = o as JSArray;
+            for (var i = 0; i < oArr.length; i++) {
+              newOrder.callMethod('push'.toJS, oArr.getProperty(i.toJS)!);
+            }
+          } else {
+            newOrder.callMethod('push'.toJS, o);
+          }
+          (topOrder as JSObject).callMethod('push'.toJS, newOrder);
+        }
+        item.delete('order'.toJS);
+      }
+
+      // Hoist group if not separate
+      final group = item.getProperty('group'.toJS);
+      if (group != null && !group.isUndefinedOrNull && !separate) {
+        var topGroup = options.getProperty('group'.toJS);
+        if (topGroup == null || topGroup.isUndefinedOrNull) {
+          topGroup = _createPureArray();
+          options.setProperty('group'.toJS, topGroup);
+        } else if (!_isJsArray(topGroup as JSAny?)) {
+          final existingGroup = topGroup;
+          topGroup = _createPureArray();
+          (topGroup as JSObject).callMethod('push'.toJS, existingGroup);
+          options.setProperty('group'.toJS, topGroup);
+        }
+
+        final itemGroups = _isJsArray(group)
+            ? (group as JSArray).toDart.cast<JSAny>()
+            : [group];
+        for (final g in itemGroups) {
+          final newGroup = _createPureArray();
+          for (final p in currentPath) {
+            newGroup.callMethod('push'.toJS, p.toJS);
+          }
+          if (_isJsArray(g)) {
+            final gArr = g as JSArray;
+            for (var i = 0; i < gArr.length; i++) {
+              newGroup.callMethod('push'.toJS, gArr.getProperty(i.toJS)!);
+            }
+          } else {
+            newGroup.callMethod('push'.toJS, g);
+          }
+          (topGroup as JSObject).callMethod('push'.toJS, newGroup);
+        }
+        item.delete('group'.toJS);
+      }
+
+      final nestedInclude = item.getProperty('include'.toJS);
+      if (nestedInclude != null && !nestedInclude.isUndefinedOrNull) {
+        walk(nestedInclude, currentPath);
+      }
+    }
+  }
+
+  walk(include, []);
+}
+
 /// Converts a Dart value to a pure JS value without identity hash
 JSAny? _toJsValue(dynamic value) {
   if (value == null) {
@@ -137,18 +311,28 @@ JSAny? _toJsValue(dynamic value) {
     return value.toJS;
   }
   if (value is List) {
-    final jsArray = JSArray<JSAny?>.withLength(value.length);
-    for (var i = 0; i < value.length; i++) {
-      jsArray[i] = _toJsValue(value[i]);
+    final jsArray = _createPureArray();
+    for (final item in value) {
+      final jsItem = _toJsValue(item);
+      if (jsItem != null) {
+        jsArray.callMethod('push'.toJS, jsItem);
+      }
     }
     return jsArray;
   }
   if (value is Map) {
+    final map = Map<String, dynamic>.from(value);
+    if (map.containsKey('__type')) {
+      final sqlExpr = _convertSqlExpression(map);
+      if (sqlExpr != null) return sqlExpr;
+    }
+
     final jsObj = JSObject();
-    for (final entry in value.entries) {
+    for (final entry in map.entries) {
       final key = entry.key;
-      if (key is String) {
-        jsObj[key] = _toJsValue(entry.value);
+      final val = _toJsValue(entry.value);
+      if (val != null) {
+        jsObj[key] = val;
       }
     }
     return jsObj;
@@ -171,16 +355,14 @@ JSObject _convertWhereClause(Map<String, dynamic> where) {
         (key == '\$and' || key == '\$or' || key == '\$not')) {
       // Logical operators contain arrays of conditions
       if (value is List) {
-        final jsArray = JSArray<JSObject>.withLength(value.length);
-        for (var i = 0; i < value.length; i++) {
-          final item = value[i];
+        final list = value.map((item) {
           if (item is Map) {
-            jsArray[i] = _convertWhereClause(Map<String, dynamic>.from(item));
+            return _convertWhereClause(Map<String, dynamic>.from(item));
           } else {
-            jsArray[i] = _toJsValue(item) as JSObject;
+            return _toJsValue(item) as JSObject;
           }
-        }
-        result.setProperty(opSymbol, jsArray);
+        }).toList();
+        result.setProperty(opSymbol, list.toJS);
       } else {
         result.setProperty(opSymbol, _toJsValue(value));
       }
@@ -201,10 +383,16 @@ JSObject _convertWhereClause(Map<String, dynamic> where) {
           final opSym = _getOpSymbol(opKey);
 
           if (opSym != null) {
-            converted.setProperty(opSym, _toJsValue(opValue));
+            final val = _toJsValue(opValue);
+            if (val != null) {
+              converted.setProperty(opSym, val);
+            }
           } else {
             // Keep unrecognized keys as-is
-            converted[opKey] = _toJsValue(opValue);
+            final val = _toJsValue(opValue);
+            if (val != null) {
+              converted[opKey] = val;
+            }
           }
         }
         result[key] = converted;
@@ -214,14 +402,20 @@ JSObject _convertWhereClause(Map<String, dynamic> where) {
       }
     } else {
       // Simple equality (primitive value)
-      result[key] = _toJsValue(value);
+      final val = _toJsValue(value);
+      if (val != null) {
+        result[key] = val;
+      }
     }
   }
 
   return result;
 }
 
-JSObject? _convertQueryOptions(Map<String, dynamic>? options) {
+JSObject? _convertQueryOptions(
+  Map<String, dynamic>? options,
+  JSObject? sequelize,
+) {
   if (options == null) {
     return null;
   }
@@ -232,29 +426,41 @@ JSObject? _convertQueryOptions(Map<String, dynamic>? options) {
     final key = entry.key;
     final value = entry.value;
 
+    if (value == null) continue;
+
     if (key == 'where' && value is Map) {
       result['where'] = _convertWhereClause(Map<String, dynamic>.from(value));
     } else if (key == 'include' && value is List) {
-      final includeList = value;
-      final jsArray = JSArray<JSObject>.withLength(includeList.length);
-      for (var i = 0; i < includeList.length; i++) {
-        final item = includeList[i];
-        if (item is Map) {
-          // Recursively convert nested include options
-          final converted = _convertQueryOptions(
-            Map<String, dynamic>.from(item),
-          );
-          if (converted != null) {
-            jsArray[i] = converted;
-          }
-        } else {
-          jsArray[i] = _toJsValue(item) as JSObject;
-        }
-      }
-      result['include'] = jsArray;
+      final jsIncludeList = value
+          .map((item) {
+            if (item is Map) {
+              return _convertQueryOptions(
+                Map<String, dynamic>.from(item),
+                null,
+              );
+            } else {
+              return _toJsValue(item) as JSObject?;
+            }
+          })
+          .where((i) => i != null)
+          .cast<JSObject>()
+          .toList();
+
+      result['include'] = jsIncludeList.toJS;
     } else {
       // Copy other options as-is using _toJsValue
-      result[key] = _toJsValue(value);
+      final val = _toJsValue(value);
+      if (val != null) {
+        result[key] = val;
+      }
+    }
+  }
+
+  if (sequelize != null) {
+    final hoist =
+        sequelize.getProperty('hoistIncludeOptions'.toJS).dartify() == true;
+    if (hoist) {
+      _hoistIncludeOptions(result);
     }
   }
 

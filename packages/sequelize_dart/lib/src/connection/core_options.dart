@@ -59,6 +59,11 @@ class SequelizeCoreOptions {
   /// Connection pool configuration
   final SequelizePoolOptions? pool;
 
+  /// Whether to hoist order and group from joined includes to the top level.
+  /// Normally Sequelize ignores 'order' and 'group' inside joined includes.
+  /// Default is false.
+  final bool hoistIncludeOptions;
+
   SequelizeCoreOptions({
     this.database,
     this.url,
@@ -68,18 +73,20 @@ class SequelizeCoreOptions {
     this.port,
     this.logging,
     this.pool,
+    this.hoistIncludeOptions = false,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      "host": host,
-      "user": user,
-      "password": password,
-      "port": port,
-      "database": database,
-      "url": url,
-      "logging": logging,
-      if (pool != null) "pool": pool!.toJson(),
+      'host': host,
+      'user': user,
+      'password': password,
+      'port': port,
+      'database': database,
+      'url': url,
+      'logging': logging,
+      'hoistIncludeOptions': hoistIncludeOptions,
+      if (pool != null) 'pool': pool!.toJson(),
     };
   }
 }

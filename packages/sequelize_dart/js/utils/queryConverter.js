@@ -366,7 +366,10 @@ function convertQueryOptions(options) {
     result.attributes = convertAttributes(options.attributes);
   }
 
-  hoistIncludeOptions(result);
+  const { getOptions } = require('./state');
+  if (getOptions().hoistIncludeOptions) {
+    hoistIncludeOptions(result);
+  }
 
   return result;
 }

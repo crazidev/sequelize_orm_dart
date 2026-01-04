@@ -41,7 +41,7 @@ Future<void> runQueries() async {
           include: (p) => [
             p.postDetails(
               order: [
-                [Sequelize.col('id'), 'DESC'],
+                [Sequelize.col('post_id'), 'DESC'],
               ],
             ),
           ],

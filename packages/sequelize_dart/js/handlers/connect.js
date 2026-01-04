@@ -8,7 +8,10 @@ const { setSequelize } = require('../utils/state');
  */
 async function handleConnect(params) {
   const config = params.config;
-  const { logging, dialect, pool, ...sequelizeConfig } = config;
+  const { logging, dialect, pool, hoistIncludeOptions, ...sequelizeConfig } = config;
+
+  const { setOptions } = require('../utils/state');
+  setOptions({ hoistIncludeOptions: !!hoistIncludeOptions });
 
   // Build pool configuration (only include defined values)
   const poolConfig = {};
