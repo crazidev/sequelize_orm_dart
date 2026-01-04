@@ -7,7 +7,7 @@ import 'package:path/path.dart' as p;
 /// Client for communicating with the Node.js Sequelize bridge server
 class BridgeClient {
   Process? _process;
-  final StreamController<String> _responseController =
+  StreamController<String> _responseController =
       StreamController<String>.broadcast();
   final Map<int, Completer<dynamic>> _pendingRequests = {};
   int _requestId = 1;
@@ -54,6 +54,11 @@ class BridgeClient {
     if (_process != null && !_isClosed) {
       await _connect(connectionConfig);
       return;
+    }
+
+    // Recreate response controller if closed
+    if (_isClosed) {
+      _responseController = StreamController<String>.broadcast();
     }
 
     // Start initialization
@@ -105,13 +110,7 @@ class BridgeClient {
           },
           onDone: () {
             if (!_isClosed) {
-              final stderr = stderrBuffer.toString();
-              if (stderr.isNotEmpty) {
-                throw BridgeException(
-                  'Bridge server process ended unexpectedly.\n'
-                  'Error output: $stderr',
-                );
-              }
+              // The process exit listener will handle unexpected terminations
             }
           },
         );
@@ -132,7 +131,9 @@ class BridgeClient {
         );
 
     // Handle process exit
+    final bridgeProcess = _process;
     _process!.exitCode.then((code) {
+      if (_process != bridgeProcess) return;
       if (!_isClosed && code != 0) {
         final stderr = stderrBuffer.toString();
         final errorMsg = stderr.isNotEmpty

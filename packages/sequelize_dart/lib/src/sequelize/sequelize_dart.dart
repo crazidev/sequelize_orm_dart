@@ -172,7 +172,12 @@ class Sequelize extends SequelizeInterface {
 
   // --- SQL Expression Builders ---
 
-  static SqlFn fn(String fn, [List<dynamic>? args]) => SqlFn(fn, args);
+  static SqlFn fn(String fn, [dynamic args]) {
+    if (args == null) return SqlFn(fn);
+    if (args is List) return SqlFn(fn, args);
+    return SqlFn(fn, [args]);
+  }
+
   static SqlCol col(String col) => SqlCol(col);
   static SqlLiteral literal(String val) => SqlLiteral(val);
   static SqlAttribute attribute(String attr) => SqlAttribute(attr);
