@@ -18,6 +18,7 @@ part 'generators/methods/_generate_class_create.dart';
 part 'generators/methods/_generate_class_definition.dart';
 part 'generators/methods/_generate_class_values.dart';
 part 'generators/methods/_generate_columns.dart';
+part 'generators/methods/_generate_count_method.dart';
 part 'generators/methods/_generate_define_method.dart';
 part 'generators/methods/_generate_find_all_method.dart';
 part 'generators/methods/_generate_find_one_method.dart';
@@ -27,7 +28,10 @@ part 'generators/methods/_generate_get_options_json_method.dart';
 part 'generators/methods/_generate_get_query_builder_method.dart';
 part 'generators/methods/_generate_include_helper.dart';
 part 'generators/methods/_generate_json_value_parser.dart';
+part 'generators/methods/_generate_max_method.dart';
+part 'generators/methods/_generate_min_method.dart';
 part 'generators/methods/_generate_query_builder.dart';
+part 'generators/methods/_generate_sum_method.dart';
 part 'generators/methods/_generator_naming_config.dart';
 part 'generators/methods/_get_association_json_key.dart';
 part 'generators/methods/_get_associations.dart';
@@ -116,6 +120,26 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       baseCallbackName,
       includeParamName,
+    );
+    _generateCountMethod(
+      buffer,
+      className,
+      baseCallbackName,
+    );
+    _generateMaxMethod(
+      buffer,
+      className,
+      baseCallbackName,
+    );
+    _generateMinMethod(
+      buffer,
+      className,
+      baseCallbackName,
+    );
+    _generateSumMethod(
+      buffer,
+      className,
+      baseCallbackName,
     );
     _generateGetQueryBuilderMethod(
       buffer,

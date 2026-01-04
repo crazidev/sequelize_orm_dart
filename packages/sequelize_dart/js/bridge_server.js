@@ -15,6 +15,10 @@ const { handleFindAll } = require('./handlers/findAll');
 const { handleFindOne } = require('./handlers/findOne');
 const { handleCreate } = require('./handlers/create');
 const { handleClose } = require('./handlers/close');
+const { handleCount } = require('./handlers/count');
+const { handleMax } = require('./handlers/max');
+const { handleMin } = require('./handlers/min');
+const { handleSum } = require('./handlers/sum');
 
 /**
  * Handle JSON-RPC requests
@@ -52,6 +56,22 @@ async function handleRequest(request) {
 
       case 'create':
         result = await handleCreate(params);
+        break;
+
+      case 'count':
+        result = await handleCount(params);
+        break;
+
+      case 'max':
+        result = await handleMax(params);
+        break;
+
+      case 'min':
+        result = await handleMin(params);
+        break;
+
+      case 'sum':
+        result = await handleSum(params);
         break;
 
       case 'close':

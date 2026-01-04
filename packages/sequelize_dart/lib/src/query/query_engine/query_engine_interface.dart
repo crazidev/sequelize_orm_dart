@@ -27,4 +27,39 @@ abstract class QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   });
+
+  /// Count records matching the query
+  Future<int> count({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Find the maximum value of a column
+  Future<num?> max({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Find the minimum value of a column
+  Future<num?> min({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Sum values of a column
+  Future<num?> sum({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
 }

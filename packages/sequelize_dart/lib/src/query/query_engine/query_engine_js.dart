@@ -69,6 +69,139 @@ class QueryEngine extends QueryEngineInterface {
   }) async {
     throw UnimplementedError();
   }
+
+  @override
+  Future<int> count({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
+    final res = await (model as SequelizeModel).count(options).toDart;
+
+    final result = res.dartify();
+    if (result is int) {
+      return result;
+    }
+    if (result is num) {
+      return result.toInt();
+    }
+    throw Exception(
+      'Invalid response format from count: expected int, got ${result.runtimeType}',
+    );
+  }
+
+  @override
+  Future<num?> max({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
+    final res = await (model as SequelizeModel)
+        .max(column.toJS, options)
+        .toDart;
+
+    if ((res as JSAny?).isUndefinedOrNull) {
+      return null;
+    }
+
+    final result = res.dartify();
+    if (result is num) {
+      return result;
+    }
+    // Handle string conversion (some databases return max as string)
+    if (result is String) {
+      final num? parsed = num.tryParse(result);
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+    throw Exception(
+      'Invalid response format from max: expected num or null, got ${result.runtimeType}',
+    );
+  }
+
+  @override
+  Future<num?> min({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
+    final res = await (model as SequelizeModel)
+        .min(column.toJS, options)
+        .toDart;
+
+    if ((res as JSAny?).isUndefinedOrNull) {
+      return null;
+    }
+
+    final result = res.dartify();
+    if (result is num) {
+      return result;
+    }
+    // Handle string conversion (some databases return min as string)
+    if (result is String) {
+      final num? parsed = num.tryParse(result);
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+    throw Exception(
+      'Invalid response format from min: expected num or null, got ${result.runtimeType}',
+    );
+  }
+
+  @override
+  Future<num?> sum({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
+    final res = await (model as SequelizeModel)
+        .sum(column.toJS, options)
+        .toDart;
+
+    if ((res as JSAny?).isUndefinedOrNull) {
+      return null;
+    }
+
+    final result = res.dartify();
+    if (result is num) {
+      return result;
+    }
+    // Handle string conversion (some databases return sum as string)
+    if (result is String) {
+      final num? parsed = num.tryParse(result);
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+    throw Exception(
+      'Invalid response format from sum: expected num or null, got ${result.runtimeType}',
+    );
+  }
 }
 
 /// Recursively converts DateTime objects to ISO strings for JSON encoding

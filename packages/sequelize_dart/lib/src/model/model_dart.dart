@@ -155,4 +155,36 @@ abstract class Model<T> extends ModelInterface {
         )
         as Future<T>;
   }
+
+  /// Count records matching the query
+  ///
+  /// Generated model classes will override this method to accept a typed query builder.
+  Future<int> count({
+    covariant dynamic where,
+  }) {
+    final query = Query.fromCallbacks(
+      where: where,
+    );
+    return QueryEngine().count(
+      modelName: name,
+      query: query,
+      sequelize: sequelizeInstance,
+      model: sequelizeModel,
+    );
+  }
+
+  /// Find the maximum value of a column
+  ///
+  /// Generated model classes must override this method to accept a typed column callback.
+  Future<num?> max(covariant dynamic columnFn, {covariant dynamic where});
+
+  /// Find the minimum value of a column
+  ///
+  /// Generated model classes must override this method to accept a typed column callback.
+  Future<num?> min(covariant dynamic columnFn, {covariant dynamic where});
+
+  /// Sum values of a column
+  ///
+  /// Generated model classes must override this method to accept a typed column callback.
+  Future<num?> sum(covariant dynamic columnFn, {covariant dynamic where});
 }
