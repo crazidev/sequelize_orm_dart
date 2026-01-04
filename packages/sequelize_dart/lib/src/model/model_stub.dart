@@ -40,4 +40,26 @@ abstract class Model<T> extends ModelInterface {
 
   /// Get model options for Sequelize
   Map<String, dynamic> getOptionsJson();
+
+  Future<List<T>> findAll({
+    covariant dynamic where,
+    covariant dynamic include,
+    dynamic order,
+    dynamic group,
+    int? limit,
+    int? offset,
+    QueryAttributes? attributes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  Future<T?> findOne({
+    covariant dynamic where,
+    covariant dynamic include,
+    dynamic order,
+    dynamic group,
+    QueryAttributes? attributes,
+  }) {
+    throw UnimplementedError();
+  }
 }

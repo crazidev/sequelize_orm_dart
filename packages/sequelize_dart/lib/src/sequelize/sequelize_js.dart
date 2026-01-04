@@ -31,9 +31,17 @@ class Sequelize extends SequelizeInterface {
       });
     }
 
-    sequelize = sequelizeModule.sequelizeFn.callAsConstructor(
-      config.jsify(),
-    );
+    final hoist = config['hoistIncludeOptions'] == true;
+    config.remove('hoistIncludeOptions');
+
+    sequelize =
+        sequelizeModule.sequelizeFn.callAsConstructor(
+              config.jsify(),
+            )
+            as SequelizeJS;
+
+    // Store custom bridge options on the instance for QueryEngine to access
+    sequelize.setProperty('hoistIncludeOptions'.toJS, hoist.toJS);
 
     return this;
   }
@@ -71,6 +79,17 @@ class Sequelize extends SequelizeInterface {
   Future<void> close() async {
     await sequelize.close().toDart;
   }
+
+  // --- SQL Expression Builders ---
+
+  static SqlFn fn(String fn, [dynamic args]) =>
+      SqlFn(fn, args is List ? args : (args == null ? null : [args]));
+  static SqlCol col(String col) => SqlCol(col);
+  static SqlLiteral literal(String val) => SqlLiteral(val);
+  static SqlAttribute attribute(String attr) => SqlAttribute(attr);
+  static SqlIdentifier identifier(String id) => SqlIdentifier(id);
+  static SqlCast cast(dynamic expr, String type) => SqlCast(expr, type);
+  static SqlRandom random() => SqlRandom();
 }
 
 SequelizeModule get sequelizeModule =>
@@ -89,6 +108,10 @@ extension type SequelizeJS._(JSObject _) implements JSObject {
     JSObject? attributes,
     JSObject? options,
   );
+
+  @JS('random')
+  @staticInterop
+  external static JSObject random();
 }
 
 extension type SequelizeModule._(JSObject _) implements JSObject {
@@ -106,6 +129,42 @@ extension type SequelizeModule._(JSObject _) implements JSObject {
 
   @JS('Op')
   external SqOp get op;
+
+  @JS('sql')
+  external SqSql get sql;
+
+  @JS('Sequelize')
+  external JSObject get sequelizeClass;
+}
+
+extension type SqSql._(JSObject _) implements JSObject {
+  @JS('fn')
+  external JSObject fn(
+    String fn, [
+    JSAny? arg1,
+    JSAny? arg2,
+    JSAny? arg3,
+    JSAny? arg4,
+    JSAny? arg5,
+  ]);
+
+  @JS('col')
+  external JSObject col(String col);
+
+  @JS('literal')
+  external JSObject literal(String val);
+
+  @JS('attribute')
+  external JSObject attribute(String attr);
+
+  @JS('identifier')
+  external JSObject identifier(String id);
+
+  @JS('cast')
+  external JSObject cast(JSAny expr, String type);
+
+  @JS('random')
+  external JSObject random();
 }
 
 extension type SqOp._(JSObject _) implements JSObject {
@@ -157,6 +216,7 @@ extension type SqOp._(JSObject _) implements JSObject {
 }
 
 SqOp get Op => sequelizeModule.op;
+SqSql get Sql => sequelizeModule.sql;
 
 extension type SequelizeModel._(JSObject _) implements JSObject {
   @JS('findAll')

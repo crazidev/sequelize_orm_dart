@@ -17,6 +17,7 @@ part 'generators/methods/_generate_associate_model_method.dart';
 part 'generators/methods/_generate_class_create.dart';
 part 'generators/methods/_generate_class_definition.dart';
 part 'generators/methods/_generate_class_values.dart';
+part 'generators/methods/_generate_columns.dart';
 part 'generators/methods/_generate_define_method.dart';
 part 'generators/methods/_generate_find_all_method.dart';
 part 'generators/methods/_generate_find_one_method.dart';
@@ -24,9 +25,10 @@ part 'generators/methods/_generate_get_attributes_json_method.dart';
 part 'generators/methods/_generate_get_attributes_method.dart';
 part 'generators/methods/_generate_get_options_json_method.dart';
 part 'generators/methods/_generate_get_query_builder_method.dart';
-part 'generators/methods/_generate_include_extension.dart';
+part 'generators/methods/_generate_include_helper.dart';
 part 'generators/methods/_generate_json_value_parser.dart';
 part 'generators/methods/_generate_query_builder.dart';
+part 'generators/methods/_generator_naming_config.dart';
 part 'generators/methods/_get_association_json_key.dart';
 part 'generators/methods/_get_associations.dart';
 part 'generators/methods/_get_dart_type_for_query.dart';
@@ -37,6 +39,10 @@ part 'generators/methods/_models.dart';
 part 'generators/methods/_to_camel_case.dart';
 
 class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
+  final BuilderOptions options;
+
+  SequelizeModelGenerator(this.options);
+
   @override
   String generateForAnnotatedElement(
     Element element,
@@ -49,7 +55,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       );
     }
 
-    final className = element.name;
+    final className = element.name ?? 'Unknown';
     final tableAnnotation = _extractTableAnnotation(annotation);
 
     final fields = _getFields(element);
@@ -79,19 +85,41 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       buffer,
       tableAnnotation,
     );
+    final namingConfig = GeneratorNamingConfig.fromOptions(options);
+
+    final singularName =
+        (tableAnnotation['name']?['singular'] as String?) ??
+        _toCamelCase(className);
+    final pluralName =
+        (tableAnnotation['name']?['plural'] as String?) ??
+        _toCamelCase(className);
+
+    final baseCallbackName = namingConfig.getWhereCallbackName(
+      singular: singularName,
+      plural: pluralName,
+    );
+    final includeParamName = namingConfig.getIncludeCallbackName(
+      singular: singularName,
+      plural: pluralName,
+    );
+
     _generateFindAllMethod(
       buffer,
-      className ?? 'Unknown',
+      className,
       valuesClassName,
+      baseCallbackName,
+      includeParamName,
     );
     _generateFindOneMethod(
       buffer,
-      className ?? 'Unknown',
+      className,
       valuesClassName,
+      baseCallbackName,
+      includeParamName,
     );
     _generateGetQueryBuilderMethod(
       buffer,
-      className ?? 'Unknown',
+      className,
     );
     _generateAssociateModelMethod(
       buffer,
@@ -113,15 +141,22 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       createClassName,
       fields,
     );
+    _generateColumns(
+      buffer,
+      className,
+      fields,
+    );
     _generateQueryBuilder(
       buffer,
-      className ?? 'Unknown',
+      className,
       fields,
       associations,
     );
-    _generateIncludeExtension(
+    _generateIncludeHelper(
       buffer,
-      className ?? 'Unknown',
+      className,
+      associations,
+      namingConfig,
     );
 
     return buffer.toString();

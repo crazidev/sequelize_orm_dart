@@ -92,16 +92,24 @@ abstract class Model<T> extends ModelInterface {
   /// Find all records matching the query
   ///
   /// Generated model classes will override this method to accept a typed query builder.
-  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
-  ///
-  /// Example usage (in generated classes):
-  /// ```dart
-  /// final users = await Users.instance.findAll((q) => Query(
-  ///   where: q.id.greaterThan(1),
-  /// ));
-  /// ```
-  Future<List<T>> findAll(Query Function(dynamic) builder) {
-    final query = builder(null);
+  Future<List<T>> findAll({
+    covariant dynamic where,
+    covariant dynamic include,
+    dynamic order,
+    dynamic group,
+    int? limit,
+    int? offset,
+    QueryAttributes? attributes,
+  }) {
+    final query = Query.fromCallbacks(
+      where: where,
+      include: include,
+      order: order,
+      group: group,
+      limit: limit,
+      offset: offset,
+      attributes: attributes,
+    );
     return QueryEngine().findAll(
           modelName: name,
           query: query,
@@ -114,16 +122,20 @@ abstract class Model<T> extends ModelInterface {
   /// Find one record matching the query
   ///
   /// Generated model classes will override this method to accept a typed query builder.
-  /// The base implementation accepts a function that takes a ModelQuery and returns a Query.
-  ///
-  /// Example usage (in generated classes):
-  /// ```dart
-  /// final user = await Users.instance.findOne((q) => Query(
-  ///   where: q.id.eq(1),
-  /// ));
-  /// ```
-  Future<T?> findOne(Query Function(dynamic) builder) {
-    final query = builder(null);
+  Future<T?> findOne({
+    covariant dynamic where,
+    covariant dynamic include,
+    dynamic order,
+    dynamic group,
+    QueryAttributes? attributes,
+  }) {
+    final query = Query.fromCallbacks(
+      where: where,
+      include: include,
+      order: order,
+      group: group,
+      attributes: attributes,
+    );
     return QueryEngine().findOne(
           modelName: name,
           query: query,

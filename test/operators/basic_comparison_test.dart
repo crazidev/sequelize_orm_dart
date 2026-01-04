@@ -24,7 +24,7 @@ void main() {
   group('Basic Comparison Operators', () {
     test('eq produces WHERE "column" = value', () async {
       // Test with integer
-      await Users.instance.findAll((u) => Query(where: u.id.eq(1)));
+      await Users.instance.findAll(where: (user) => user.id.eq(1));
       expect(
         lastSql,
         contains('"id" = 1'),
@@ -35,7 +35,7 @@ void main() {
 
       // Test with string
       await Users.instance.findAll(
-        (u) => Query(where: u.email.eq('test@example.com')),
+        where: (user) => user.email.eq('test@example.com'),
       );
       expect(
         lastSql,
@@ -46,7 +46,7 @@ void main() {
 
     test('ne produces WHERE "column" != value', () async {
       // Test with integer
-      await Users.instance.findAll((u) => Query(where: u.id.ne(1)));
+      await Users.instance.findAll(where: (user) => user.id.ne(1));
       expect(
         lastSql,
         contains('"id" != 1'),
@@ -57,7 +57,7 @@ void main() {
 
       // Test with string
       await Users.instance.findAll(
-        (u) => Query(where: u.email.ne('test@example.com')),
+        where: (user) => user.email.ne('test@example.com'),
       );
       expect(
         lastSql,
@@ -68,12 +68,10 @@ void main() {
 
     test('eq and ne combined with AND', () async {
       await Users.instance.findAll(
-        (u) => Query(
-          where: and([
-            u.id.ne(0),
-            u.email.eq('admin@example.com'),
-          ]),
-        ),
+        where: (user) => and([
+          user.id.ne(0),
+          user.email.eq('admin@example.com'),
+        ]),
       );
 
       expect(

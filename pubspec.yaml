@@ -8,3 +8,6 @@ workspace:
   - packages/sequelize_dart_annotations
   - packages/sequelize_dart_generator
   - example
+  
+dev_dependencies:
+  test: ^1.28.0

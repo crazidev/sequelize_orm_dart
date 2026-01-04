@@ -87,7 +87,11 @@ class Users {
 - **Migrations**: Schema migrations
 - **Raw queries**: `sequelize.query()`
 - **Hooks**: Lifecycle events
+
+## Implementated
+
 - **Functions**: `sequelize.fn()`, `sequelize.literal()`
+- **Nested Sorting**: Support for `hoistIncludeOptions` to sort by included models
 
 ---
 

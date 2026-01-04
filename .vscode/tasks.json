@@ -33,7 +33,6 @@
         }
       }
     },
-
     {
       "label": "Watch JS Server",
       "dependsOn": ["Watch Models", "Watch JS"],
@@ -107,7 +106,6 @@
         }
       }
     },
-
     {
       "label": "Watch Models",
       "type": "shell",
@@ -194,7 +192,6 @@
     //   },
     //   "problemMatcher": []
     // },
-
     // {
     //   "label": "Generate Models",
     //   "type": "shell",

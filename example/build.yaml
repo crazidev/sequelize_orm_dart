@@ -3,3 +3,4 @@ targets:
     builders:
       sequelize_dart_generator|sequelize_model_builder:
         enabled: true
+        options:

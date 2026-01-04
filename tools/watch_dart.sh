@@ -47,7 +47,9 @@ start_server() {
         wait $DART_PID 2>/dev/null
     fi
 
+
     echo -e "${BLUE}[$(date +%H:%M:%S)] Starting Dart server...${NC}"
+    source ~/.zshrc
     dart run example/lib/main.dart &
     DART_PID=$!
     echo -e "${GREEN}[$(date +%H:%M:%S)] Dart server started (PID: $DART_PID)${NC}"

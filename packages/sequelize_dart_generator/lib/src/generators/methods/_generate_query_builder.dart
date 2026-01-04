@@ -33,6 +33,13 @@ void _generateQueryBuilder(
     }
   }
 
+  // Generate include helper property
+  if (associations.isNotEmpty) {
+    final helperClassName = '\$${className}IncludeHelper';
+    buffer.writeln();
+    buffer.writeln('  final include = const $helperClassName();');
+  }
+
   buffer.writeln();
   buffer.writeln(
     '  IncludeBuilder<$className> includeAll({bool nested = false}) {',

@@ -3,7 +3,13 @@ import 'package:sequelize_dart_example/models/post.model.dart';
 
 part 'users.model.g.dart';
 
-@Table(tableName: 'users', underscored: true, timestamps: false)
+@Table(
+  tableName: 'users',
+  underscored: true,
+  timestamps: false,
+  name: ModelNameOption(singular: 'user', plural: 'users'),
+)
+/// @docImport 'dart:async';
 class Users {
   @ModelAttributes(
     name: 'id',
