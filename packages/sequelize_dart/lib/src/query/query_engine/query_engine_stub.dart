@@ -1,5 +1,5 @@
 import 'package:sequelize_dart/src/query/query/query.dart';
-import 'query_engine_interface.dart';
+import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
 
 class QueryEngine extends QueryEngineInterface {
   @override
@@ -26,6 +26,49 @@ class QueryEngine extends QueryEngineInterface {
   Future<Map<String, dynamic>> create({
     required String modelName,
     required Map<String, dynamic> data,
+    dynamic sequelize,
+    dynamic model,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int> count({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<num?> max({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<num?> min({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<num?> sum({
+    required String modelName,
+    required String column,
+    Query? query,
     dynamic sequelize,
     dynamic model,
   }) {
