@@ -41,7 +41,8 @@ void _generateIncludeHelper(
       '    QueryOperator Function($associatedColumnsClassName $callbackName)? where,',
     );
     buffer.writeln('    QueryAttributes? attributes,');
-    buffer.writeln('    List<List<String>>? order,');
+    buffer.writeln('    dynamic order,');
+    buffer.writeln('    dynamic group,');
     buffer.writeln('    int? limit,');
     buffer.writeln('    int? offset,');
     buffer.writeln(
@@ -72,6 +73,7 @@ void _generateIncludeHelper(
     );
     buffer.writeln('      attributes: attributes,');
     buffer.writeln('      order: order,');
+    buffer.writeln('      group: group,');
     buffer.writeln('      limit: limit,');
     buffer.writeln('      offset: offset,');
     buffer.writeln(
@@ -90,5 +92,4 @@ void _generateIncludeHelper(
   }
 
   buffer.writeln('}');
-  buffer.writeln();
 }

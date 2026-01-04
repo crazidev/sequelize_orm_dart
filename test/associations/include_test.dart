@@ -134,9 +134,9 @@ void main() {
           includeUser.posts(
             separate: true,
             // Nested includes would be added here:
-            // include: (includePost) => [
-            //   includePost.comments(),
-            // ],
+            include: (includePost) => [
+              includePost.postDetails(),
+            ],
           ),
         ],
       );

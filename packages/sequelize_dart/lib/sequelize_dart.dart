@@ -21,6 +21,7 @@ export 'src/query/operators/operators_interface.dart';
 // Query exports
 export 'src/query/query/query.dart';
 export 'src/query/query_engine/query_engine.dart';
+export 'src/query/sql.dart';
 export 'src/query/typed_column.dart';
 // Sequelize exports
 export 'src/sequelize/sequelize.dart';

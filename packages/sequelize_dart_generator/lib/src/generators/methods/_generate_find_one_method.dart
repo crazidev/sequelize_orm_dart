@@ -18,7 +18,8 @@ void _generateFindOneMethod(
   buffer.writeln(
     '    List<IncludeBuilder> Function($includeHelperClassName $includeCallbackName)? include,',
   );
-  buffer.writeln('    List<List<String>>? order,');
+  buffer.writeln('    dynamic order,');
+  buffer.writeln('    dynamic group,');
   buffer.writeln('    int? limit,');
   buffer.writeln('    int? offset,');
   buffer.writeln('    QueryAttributes? attributes,');
@@ -31,6 +32,7 @@ void _generateFindOneMethod(
   buffer.writeln('      columns: columns,');
   buffer.writeln('      includeHelper: includeHelper,');
   buffer.writeln('      order: order,');
+  buffer.writeln('      group: group,');
   buffer.writeln('      limit: limit,');
   buffer.writeln('      offset: offset,');
   buffer.writeln('      attributes: attributes,');

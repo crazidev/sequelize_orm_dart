@@ -19,4 +19,7 @@ void _generateClassDefinition(
   buffer.writeln('    return _instance;');
   buffer.writeln('  }');
   buffer.writeln();
+  buffer.writeln(
+    '  \$${className}Columns get columns => \$${className}Columns();',
+  );
 }

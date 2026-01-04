@@ -1,6 +1,7 @@
 import 'package:sequelize_dart/src/model/model_interface.dart';
 import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
+import 'package:sequelize_dart/src/query/sql.dart';
 
 /// Builder for creating type-safe include configurations
 ///
@@ -35,7 +36,10 @@ class IncludeBuilder<T> {
   final QueryAttributes? attributes;
 
   /// Order the associated records
-  final List<List<String>>? order;
+  final dynamic order;
+
+  /// Group the associated records
+  final dynamic group;
 
   /// Limit the number of associated records (requires separate: true)
   final int? limit;
@@ -75,6 +79,7 @@ class IncludeBuilder<T> {
     this.where,
     this.attributes,
     this.order,
+    this.group,
     this.limit,
     this.offset,
     this.include,
@@ -103,7 +108,8 @@ class IncludeBuilder<T> {
     bool? right,
     dynamic where,
     QueryAttributes? attributes,
-    List<List<String>>? order,
+    dynamic order,
+    dynamic group,
     int? limit,
     int? offset,
     dynamic include,
@@ -124,6 +130,7 @@ class IncludeBuilder<T> {
       where: where ?? this.where,
       attributes: attributes ?? this.attributes,
       order: order ?? this.order,
+      group: group ?? this.group,
       limit: limit ?? this.limit,
       offset: offset ?? this.offset,
       include: include ?? this.include,
@@ -133,6 +140,19 @@ class IncludeBuilder<T> {
       or: or ?? this.or,
       subQuery: subQuery ?? this.subQuery,
     );
+  }
+
+  dynamic _serializeExpression(dynamic expr) {
+    if (expr is SqlExpression) {
+      return expr.toJson();
+    } else if (expr is List) {
+      return expr.map(_serializeExpression).toList();
+    } else if (expr is Map) {
+      return expr.map(
+        (key, value) => MapEntry(key, _serializeExpression(value)),
+      );
+    }
+    return expr;
   }
 
   /// Convert the include builder to JSON format for Sequelize
@@ -220,7 +240,8 @@ class IncludeBuilder<T> {
       result['attributes'] = attrsJson['value'];
     }
 
-    if (order != null) result['order'] = order;
+    if (order != null) result['order'] = _serializeExpression(order);
+    if (group != null) result['group'] = _serializeExpression(group);
     if (limit != null) result['limit'] = limit;
     if (offset != null) result['offset'] = offset;
 

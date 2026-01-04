@@ -2,6 +2,7 @@ import 'package:sequelize_dart/src/query/association/include_builder.dart';
 import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
 import 'package:sequelize_dart/src/query/query/query_attributes.dart';
 import 'package:sequelize_dart/src/query/query/query_interface.dart';
+import 'package:sequelize_dart/src/query/sql.dart';
 
 export 'package:sequelize_dart/src/query/association/association_reference.dart';
 export 'package:sequelize_dart/src/query/association/include_builder.dart';
@@ -13,7 +14,8 @@ class Query extends QueryInterface {
   final QueryOperator? where;
   final List<IncludeBuilder>?
   include; // Type-safe includes with infinite nesting support
-  final List<List<String>>? order;
+  final dynamic order;
+  final dynamic group;
   final int? limit;
   final int? offset;
   final QueryAttributes? attributes;
@@ -22,6 +24,7 @@ class Query extends QueryInterface {
     this.where,
     this.include,
     this.order,
+    this.group,
     this.limit,
     this.offset,
     this.attributes,
@@ -34,7 +37,8 @@ class Query extends QueryInterface {
     Function? include,
     dynamic columns,
     dynamic includeHelper,
-    List<List<String>>? order,
+    dynamic order,
+    dynamic group,
     int? limit,
     int? offset,
     QueryAttributes? attributes,
@@ -47,6 +51,7 @@ class Query extends QueryInterface {
           ? (include(includeHelper) as List).cast<IncludeBuilder>()
           : null,
       order: order,
+      group: group,
       limit: limit,
       offset: offset,
       attributes: attributes,
@@ -61,15 +66,27 @@ class Query extends QueryInterface {
         ?.map((inc) => inc.toJson())
         .toList();
 
-    print(includeJson);
-
     return {
       'where': where?.toJson(),
       'include': includeJson,
-      'order': order,
+      'order': _serializeExpression(order),
+      'group': _serializeExpression(group),
       'limit': limit,
       'offset': offset,
       if (attributes != null) 'attributes': attributes!.toJson()['value'],
     };
+  }
+
+  dynamic _serializeExpression(dynamic expr) {
+    if (expr is SqlExpression) {
+      return expr.toJson();
+    } else if (expr is List) {
+      return expr.map(_serializeExpression).toList();
+    } else if (expr is Map) {
+      return expr.map(
+        (key, value) => MapEntry(key, _serializeExpression(value)),
+      );
+    }
+    return expr;
   }
 }

@@ -95,7 +95,8 @@ abstract class Model<T> extends ModelInterface {
   Future<List<T>> findAll({
     covariant dynamic where,
     covariant dynamic include,
-    List<List<String>>? order,
+    dynamic order,
+    dynamic group,
     int? limit,
     int? offset,
     QueryAttributes? attributes,
@@ -104,6 +105,7 @@ abstract class Model<T> extends ModelInterface {
       where: where,
       include: include,
       order: order,
+      group: group,
       limit: limit,
       offset: offset,
       attributes: attributes,
@@ -123,13 +125,15 @@ abstract class Model<T> extends ModelInterface {
   Future<T?> findOne({
     covariant dynamic where,
     covariant dynamic include,
-    List<List<String>>? order,
+    dynamic order,
+    dynamic group,
     QueryAttributes? attributes,
   }) {
     final query = Query.fromCallbacks(
       where: where,
       include: include,
       order: order,
+      group: group,
       attributes: attributes,
     );
     return QueryEngine().findOne(

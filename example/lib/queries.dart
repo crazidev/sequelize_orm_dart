@@ -16,26 +16,37 @@ Future<void> runQueries() async {
     ]),
   );
 
-  print(includePost.toJson());
+  // print(includePost.toJson());
 
-  final users1 = await measureQuery(
-    'Find users with posts (basic include)',
+  // final users1 = await measureQuery(
+  //   'Find users with posts (basic include)',
+  //   () => Users.instance.findAll(
+  //     where: (users) => and([
+  //       users.id.lessThan(5),
+  //     ]),
+  //     include: (includeUser) => [
+  //       includeUser.post(),
+  //     ],
+  //   ),
+  // );
+  // Nested include ordering test
+  await measureQuery(
+    'Nested include ordering',
     () => Users.instance.findAll(
-      where: (users) => and([
-        users.id.eq(1),
-      ]),
-      include: (includeUser) => [
-        includeUser.post().copyWith(),
-        includePost.copyWith(
-          attributes: QueryAttributes(
-            columns: [const Column('id'), const Column('title')],
-          ),
+      include: (u) => [
+        u.posts(
+          order: [
+            [Sequelize.col('id'), 'DESC'],
+          ],
+          include: (p) => [
+            p.postDetails(
+              order: [
+                [Sequelize.col('id'), 'DESC'],
+              ],
+            ),
+          ],
         ),
       ],
-      order: [],
     ),
   );
-  for (final user in users1) {
-    print('User: ${user.toJson()}');
-  }
 }

@@ -31,9 +31,16 @@ class Sequelize extends SequelizeInterface {
   /// Get the bridge client (for QueryEngine)
   BridgeClient? get bridge => null;
 
-  /// Get a registered model by name
-  Model? getModel(String name) => null;
-
   @override
   Future<void> close() async {}
+
+  // --- SQL Expression Builders ---
+
+  static SqlFn fn(String fn, [List<dynamic>? args]) => SqlFn(fn, args);
+  static SqlCol col(String col) => SqlCol(col);
+  static SqlLiteral literal(String val) => SqlLiteral(val);
+  static SqlAttribute attribute(String attr) => SqlAttribute(attr);
+  static SqlIdentifier identifier(String id) => SqlIdentifier(id);
+  static SqlCast cast(dynamic expr, String type) => SqlCast(expr, type);
+  static SqlRandom random() => SqlRandom();
 }
