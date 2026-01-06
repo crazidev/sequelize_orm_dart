@@ -1,3 +1,4 @@
+import { checkConnection } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 
@@ -8,9 +9,7 @@ type CountParams = {
 
 export async function handleCount(params: CountParams): Promise<number> {
   const sequelize = getSequelize();
-  if (!sequelize) {
-    throw new Error('Not connected. Call connect first.');
-  }
+  checkConnection(sequelize);
 
   const modelName = params.model;
   const options = convertQueryOptions(params.options || {});
@@ -18,10 +17,6 @@ export async function handleCount(params: CountParams): Promise<number> {
   const models = getModels();
   const model = models.get(modelName);
 
-  if (!model) {
-    throw new Error(`Model "${modelName}" not found. Define it first.`);
-  }
-
   const count = await model.count(options);
-  return count;
+  return count.at(0).count;
 }

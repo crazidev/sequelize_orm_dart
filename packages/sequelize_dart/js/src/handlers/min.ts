@@ -1,3 +1,4 @@
+import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 
@@ -9,9 +10,7 @@ type MinParams = {
 
 export async function handleMin(params: MinParams): Promise<any> {
   const sequelize = getSequelize();
-  if (!sequelize) {
-    throw new Error('Not connected. Call connect first.');
-  }
+  checkConnection(sequelize);
 
   const modelName = params.model;
   const column = params.column;
@@ -19,10 +18,7 @@ export async function handleMin(params: MinParams): Promise<any> {
 
   const models = getModels();
   const model = models.get(modelName);
-
-  if (!model) {
-    throw new Error(`Model "${modelName}" not found. Define it first.`);
-  }
+  checkModelDefinition(model, modelName);
 
   if (!column) {
     throw new Error('Column name is required for min operation');

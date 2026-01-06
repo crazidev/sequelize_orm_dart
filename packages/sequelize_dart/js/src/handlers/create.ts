@@ -1,3 +1,5 @@
+import { ModelStatic } from '@sequelize/core';
+import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { getModels, getSequelize } from '../utils/state';
 
 type CreateParams = {
@@ -7,19 +9,13 @@ type CreateParams = {
 
 export async function handleCreate(params: CreateParams): Promise<any> {
   const sequelize = getSequelize();
-  if (!sequelize) {
-    throw new Error('Not connected. Call connect first.');
-  }
+  checkConnection(sequelize);
 
   const modelName = params.model;
   const data = params.data || {};
 
-  const models = getModels();
-  const model = models.get(modelName);
-
-  if (!model) {
-    throw new Error(`Model "${modelName}" not found. Define it first.`);
-  }
+  const model = getModels().get(modelName);
+  checkModelDefinition(model, modelName);
 
   const result = await model.create(data);
   return result.toJSON();

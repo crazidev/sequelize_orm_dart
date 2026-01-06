@@ -2,13 +2,13 @@ import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 
-type MaxParams = {
+type IncrementParams = {
   model: string;
   column: string;
   options?: any;
 };
 
-export async function handleMax(params: MaxParams): Promise<any> {
+export async function handleIncrement(params: IncrementParams): Promise<any> {
   const sequelize = getSequelize();
   checkConnection(sequelize);
 
@@ -21,9 +21,9 @@ export async function handleMax(params: MaxParams): Promise<any> {
   checkModelDefinition(model, modelName);
 
   if (!column) {
-    throw new Error('Column name is required for max operation');
+    throw new Error('Column name is required for sum operation');
   }
 
-  const max = await model.max(column, options);
-  return max;
+  const sum = await model.increment(column, options);
+  return sum;
 }

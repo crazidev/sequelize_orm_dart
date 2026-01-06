@@ -1,7 +1,3 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
-
 import { formatError } from './utils/errorFormatter';
 import { getSequelize } from './utils/state';
 

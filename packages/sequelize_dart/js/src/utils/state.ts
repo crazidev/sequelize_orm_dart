@@ -1,5 +1,8 @@
-let sequelize: any = null;
-const models = new Map<string, any>();
+import Sequelize, { ModelStatic } from "@sequelize/core";
+
+let sequelize: Sequelize | null = null;
+const models = new Map<string, ModelStatic>();
+
 let options: { hoistIncludeOptions: boolean } = {
   hoistIncludeOptions: false,
 };
@@ -12,15 +15,15 @@ export function setOptions(newOptions: Partial<{ hoistIncludeOptions: boolean }>
   options = { ...options, ...newOptions };
 }
 
-export function getSequelize(): any {
+export function getSequelize(): Sequelize {
   return sequelize;
 }
 
-export function setSequelize(instance: any): void {
+export function setSequelize(instance: Sequelize): void {
   sequelize = instance;
 }
 
-export function getModels(): Map<string, any> {
+export function getModels(): Map<string, ModelStatic> {
   return models;
 }
 
