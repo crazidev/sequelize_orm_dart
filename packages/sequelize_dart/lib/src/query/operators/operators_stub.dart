@@ -5,17 +5,17 @@ import 'package:sequelize_dart/src/query/operators/operators_interface.dart';
 // ============================================================================
 
 /// AND operator: (condition1) AND (condition2) AND ...
-LogicalOperator and(List<QueryOperator> values) {
+LogicalOperator and([List<QueryOperator> values = const []]) {
   throw UnimplementedError('and operator not implemented in stub');
 }
 
 /// OR operator: (condition1) OR (condition2) OR ...
-LogicalOperator or(List<QueryOperator> values) {
+LogicalOperator or([List<QueryOperator> values = const []]) {
   throw UnimplementedError('or operator not implemented in stub');
 }
 
 /// NOT operator: NOT (condition)
-LogicalOperator not(List<QueryOperator> values) {
+LogicalOperator not([List<QueryOperator> values = const []]) {
   throw UnimplementedError('not operator not implemented in stub');
 }
 

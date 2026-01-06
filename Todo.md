@@ -27,4 +27,5 @@
 
 ### Utilities
 
-- increment and decrement method
+- increment and decrement method - done
+- Adjust sql migration file, add views column to posts table and make the default 1 or 0.

@@ -36,6 +36,13 @@ class Post {
   )
   dynamic userId;
 
+  @ModelAttributes(
+    name: 'views',
+    type: DataType.INTEGER,
+    defaultValue: 0,
+  )
+  dynamic views;
+
   @HasOne(PostDetails, foreignKey: 'postId', as: 'postDetails')
   PostDetails? postDetails;
 

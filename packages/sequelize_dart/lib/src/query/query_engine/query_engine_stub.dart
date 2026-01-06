@@ -74,4 +74,26 @@ class QueryEngine extends QueryEngineInterface {
   }) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> increment({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> decrement({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) {
+    throw UnimplementedError();
+  }
 }

@@ -2,13 +2,13 @@ import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 
-type IncrementParams = {
+type DecrementParams = {
   model: string;
   fields: Record<string, number>;
   query?: any;
 };
 
-export async function handleIncrement(params: IncrementParams): Promise<any> {
+export async function handleDecrement(params: DecrementParams): Promise<any> {
   const sequelize = getSequelize();
   checkConnection(sequelize);
 
@@ -21,10 +21,9 @@ export async function handleIncrement(params: IncrementParams): Promise<any> {
   checkModelDefinition(model, modelName);
 
   if (!fields || Object.keys(fields).length === 0) {
-    throw new Error('Fields are required for increment operation');
+    throw new Error('Fields are required for decrement operation');
   }
 
-  const result = await model.increment(fields, options);
+  const result = await model.decrement(fields, options);
   return result[0][0];
 }
-

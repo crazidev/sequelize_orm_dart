@@ -237,6 +237,18 @@ extension type SequelizeModel._(JSObject _) implements JSObject {
   @JS('sum')
   external JSPromise<JSAny> sum(JSAny column, JSObject? options);
 
+  @JS('increment')
+  external JSPromise<JSArray<JSObject>> increment(
+    JSObject fields,
+    JSObject? options,
+  );
+
+  @JS('decrement')
+  external JSPromise<JSArray<JSObject>> decrement(
+    JSObject fields,
+    JSObject? options,
+  );
+
   @JS('hasOne')
   external JSObject hasOne(SequelizeModel model, JSObject? options);
 

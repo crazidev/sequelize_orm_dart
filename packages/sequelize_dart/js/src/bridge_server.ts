@@ -13,6 +13,8 @@ import { handleCount } from './handlers/count';
 import { handleMax } from './handlers/max';
 import { handleMin } from './handlers/min';
 import { handleSum } from './handlers/sum';
+import { handleIncrement } from './handlers/increment';
+import { handleDecrement } from './handlers/decrement';
 
 type JsonRpcRequest = {
   id: unknown;
@@ -75,6 +77,14 @@ async function handleRequest(request: JsonRpcRequest): Promise<void> {
 
       case 'sum':
         result = await handleSum(params);
+        break;
+
+      case 'increment':
+        result = await handleIncrement(params);
+        break;
+
+      case 'decrement':
+        result = await handleDecrement(params);
         break;
 
       case 'close':

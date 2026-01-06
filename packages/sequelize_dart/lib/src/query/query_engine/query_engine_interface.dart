@@ -62,4 +62,22 @@ abstract class QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   });
+
+  /// Increment numeric column values
+  Future<List<Map<String, dynamic>>> increment({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Decrement numeric column values
+  Future<List<Map<String, dynamic>>> decrement({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
 }

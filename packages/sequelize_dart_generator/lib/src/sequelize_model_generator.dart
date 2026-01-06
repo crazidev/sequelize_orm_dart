@@ -27,6 +27,7 @@ part 'generators/methods/_generate_get_attributes_method.dart';
 part 'generators/methods/_generate_get_options_json_method.dart';
 part 'generators/methods/_generate_get_query_builder_method.dart';
 part 'generators/methods/_generate_include_helper.dart';
+part 'generators/methods/_generate_increment_method.dart';
 part 'generators/methods/_generate_json_value_parser.dart';
 part 'generators/methods/_generate_max_method.dart';
 part 'generators/methods/_generate_min_method.dart';
@@ -140,6 +141,20 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       buffer,
       className,
       baseCallbackName,
+    );
+    _generateIncrementMethod(
+      buffer,
+      className,
+      valuesClassName,
+      baseCallbackName,
+      fields,
+    );
+    _generateDecrementMethod(
+      buffer,
+      className,
+      valuesClassName,
+      baseCallbackName,
+      fields,
     );
     _generateGetQueryBuilderMethod(
       buffer,

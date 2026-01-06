@@ -54,7 +54,6 @@ class QueryEngine extends QueryEngineInterface {
     }
 
     final ModelValue data = res as ModelValue;
-    // Use toJSON() for consistency with findAll - includes nested associations
     final json = data.toJSON() as JSObject;
     final converted = _convertToJsonEncodable(json.dartify());
     return jsonDecode(jsonEncode(converted)) as Map<String, dynamic>;
@@ -201,6 +200,81 @@ class QueryEngine extends QueryEngineInterface {
     throw Exception(
       'Invalid response format from sum: expected num or null, got ${result.runtimeType}',
     );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> increment({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    return await _executeNumericOperation(
+      modelName: modelName,
+      fields: fields,
+      query: query,
+      sequelize: sequelize,
+      model: model,
+      operation: 'increment',
+    );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> decrement({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    return await _executeNumericOperation(
+      modelName: modelName,
+      fields: fields,
+      query: query,
+      sequelize: sequelize,
+      model: model,
+      operation: 'decrement',
+    );
+  }
+
+  /// Shared method for both increment and decrement operations
+  Future<List<Map<String, dynamic>>> _executeNumericOperation({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+    required String operation,
+  }) async {
+    final options = _convertQueryOptions(
+      query?.toJson(),
+      sequelize as JSObject?,
+    );
+
+    // Convert fields map to JS object using _toJsValue helper
+    final fieldsJS = JSObject();
+    for (final entry in fields.entries) {
+      fieldsJS.setProperty(entry.key.toJS, _toJsValue(entry.value)!);
+    }
+
+    // Call the appropriate method on the model
+    final res = switch (operation) {
+      'increment' =>
+        (model as SequelizeModel).increment(fieldsJS, options).toDart,
+      'decrement' =>
+        (model as SequelizeModel).decrement(fieldsJS, options).toDart,
+      _ => throw ArgumentError('Invalid operation: $operation'),
+    };
+
+    // Convert the result back to Dart format
+    final converted = _convertToJsonEncodable((await res).dartify());
+    final JSArray<JSArray?>? result = converted?[0]?[0] ?? [];
+
+    final List<dynamic> data = jsonDecode(jsonEncode(result)) as List<dynamic>;
+    return data.map((row) {
+      return row as Map<String, dynamic>;
+    }).toList();
   }
 }
 

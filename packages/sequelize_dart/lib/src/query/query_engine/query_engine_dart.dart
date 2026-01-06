@@ -4,13 +4,7 @@ import 'package:sequelize_dart/src/sequelize/bridge_client.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize_dart.dart';
 
 class QueryEngine extends QueryEngineInterface {
-  @override
-  Future<List<Map<String, dynamic>>> findAll({
-    required String modelName,
-    Query? query,
-    dynamic sequelize,
-    dynamic model,
-  }) async {
+  BridgeClient getBridge(dynamic sequelize) {
     if (sequelize == null) {
       throw Exception('Sequelize instance is required');
     }
@@ -25,8 +19,18 @@ class QueryEngine extends QueryEngineInterface {
       throw Exception('Bridge is not connected');
     }
 
+    return bridge;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> findAll({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
     try {
-      final result = await bridge.call('findAll', {
+      final result = await getBridge(sequelize).call('findAll', {
         'model': modelName,
         'options': query?.toJson(),
       });
@@ -51,22 +55,8 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    if (sequelize == null) {
-      throw Exception('Sequelize instance is required');
-    }
-
-    if (sequelize is! Sequelize) {
-      throw Exception('Invalid Sequelize instance type');
-    }
-
-    final bridge = sequelize.bridge;
-
-    if (!bridge.isConnected) {
-      throw Exception('Bridge is not connected');
-    }
-
     try {
-      final result = await bridge.call('findOne', {
+      final result = await getBridge(sequelize).call('findOne', {
         'model': modelName,
         'options': query?.toJson(),
       });
@@ -105,22 +95,8 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    if (sequelize == null) {
-      throw Exception('Sequelize instance is required');
-    }
-
-    if (sequelize is! Sequelize) {
-      throw Exception('Invalid Sequelize instance type');
-    }
-
-    final bridge = sequelize.bridge;
-
-    if (!bridge.isConnected) {
-      throw Exception('Bridge is not connected');
-    }
-
     try {
-      final result = await bridge.call('count', {
+      final result = await getBridge(sequelize).call('count', {
         'model': modelName,
         'options': query?.toJson(),
       });
@@ -152,22 +128,8 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    if (sequelize == null) {
-      throw Exception('Sequelize instance is required');
-    }
-
-    if (sequelize is! Sequelize) {
-      throw Exception('Invalid Sequelize instance type');
-    }
-
-    final bridge = sequelize.bridge;
-
-    if (!bridge.isConnected) {
-      throw Exception('Bridge is not connected');
-    }
-
     try {
-      final result = await bridge.call('max', {
+      final result = await getBridge(sequelize).call('max', {
         'model': modelName,
         'column': column,
         'options': query?.toJson(),
@@ -200,22 +162,8 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    if (sequelize == null) {
-      throw Exception('Sequelize instance is required');
-    }
-
-    if (sequelize is! Sequelize) {
-      throw Exception('Invalid Sequelize instance type');
-    }
-
-    final bridge = sequelize.bridge;
-
-    if (!bridge.isConnected) {
-      throw Exception('Bridge is not connected');
-    }
-
     try {
-      final result = await bridge.call('min', {
+      final result = await getBridge(sequelize).call('min', {
         'model': modelName,
         'column': column,
         'options': query?.toJson(),
@@ -248,22 +196,8 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    if (sequelize == null) {
-      throw Exception('Sequelize instance is required');
-    }
-
-    if (sequelize is! Sequelize) {
-      throw Exception('Invalid Sequelize instance type');
-    }
-
-    final bridge = sequelize.bridge;
-
-    if (!bridge.isConnected) {
-      throw Exception('Bridge is not connected');
-    }
-
     try {
-      final result = await bridge.call('sum', {
+      final result = await getBridge(sequelize).call('sum', {
         'model': modelName,
         'column': column,
         'options': query?.toJson(),
@@ -285,6 +219,71 @@ class QueryEngine extends QueryEngineInterface {
         rethrow;
       }
       throw Exception('Failed to execute sum: $e');
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> increment({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    return await _executeNumericOperation(
+      modelName: modelName,
+      fields: fields,
+      query: query,
+      sequelize: sequelize,
+      model: model,
+      operation: 'increment',
+    );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> decrement({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    return await _executeNumericOperation(
+      modelName: modelName,
+      fields: fields,
+      query: query,
+      sequelize: sequelize,
+      model: model,
+      operation: 'decrement',
+    );
+  }
+
+  /// Shared method for both increment and decrement operations
+  Future<List<Map<String, dynamic>>> _executeNumericOperation({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+    required String operation,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call(operation, {
+        'model': modelName,
+        'fields': fields,
+        'query': query?.toJson(),
+      });
+
+      if (result is List) {
+        return result.map((item) => item as Map<String, dynamic>).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      if (e is BridgeException) {
+        rethrow;
+      }
+      throw Exception('Failed to execute $operation: $e');
     }
   }
 }
