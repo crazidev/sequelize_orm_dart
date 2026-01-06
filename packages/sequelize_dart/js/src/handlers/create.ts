@@ -1,10 +1,11 @@
-const { getSequelize, getModels } = require('../utils/state');
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'create' method
- * Creates a new record
- */
-async function handleCreate(params) {
+type CreateParams = {
+  model: string;
+  data?: Record<string, any>;
+};
+
+export async function handleCreate(params: CreateParams): Promise<any> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -12,6 +13,7 @@ async function handleCreate(params) {
 
   const modelName = params.model;
   const data = params.data || {};
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -22,8 +24,3 @@ async function handleCreate(params) {
   const result = await model.create(data);
   return result.toJSON();
 }
-
-module.exports = {
-  handleCreate,
-};
-

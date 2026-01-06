@@ -1,10 +1,15 @@
-const { getModels } = require('../utils/state');
+import { getModels } from '../utils/state';
 
-/**
- * Handler for 'associateModel' method
- * Sets up associations between Sequelize models (hasOne, hasMany, etc.)
- */
-async function handleAssociateModel(params) {
+type AssociateModelParams = {
+  sourceModel: string;
+  targetModel: string;
+  associationType: string;
+  options?: any;
+};
+
+export async function handleAssociateModel(
+  params: AssociateModelParams,
+): Promise<{ associated: true }> {
   const models = getModels();
   const { sourceModel, targetModel, associationType, options } = params;
 
@@ -19,7 +24,6 @@ async function handleAssociateModel(params) {
     throw new Error(`Target model "${targetModel}" not found. Define it first.`);
   }
 
-  // Set up the association based on type
   switch (associationType) {
     case 'hasOne':
       source.hasOne(target, options || {});
@@ -31,13 +35,5 @@ async function handleAssociateModel(params) {
       throw new Error(`Unknown association type: ${associationType}`);
   }
 
-  // Note: Associations are stored in source.associations with the alias as the key
-  // If 'as' is provided, that's the key; otherwise it might be the model name
-  // We don't verify here as Sequelize handles the storage internally
-
   return { associated: true };
 }
-
-module.exports = {
-  handleAssociateModel,
-};

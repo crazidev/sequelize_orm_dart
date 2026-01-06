@@ -1,11 +1,12 @@
-const { convertQueryOptions } = require('../utils/queryConverter');
-const { getSequelize, getModels } = require('../utils/state');
+import { convertQueryOptions } from '../utils/queryConverter';
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'count' method
- * Counts records matching the query
- */
-async function handleCount(params) {
+type CountParams = {
+  model: string;
+  options?: any;
+};
+
+export async function handleCount(params: CountParams): Promise<number> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -13,6 +14,7 @@ async function handleCount(params) {
 
   const modelName = params.model;
   const options = convertQueryOptions(params.options || {});
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -23,7 +25,3 @@ async function handleCount(params) {
   const count = await model.count(options);
   return count;
 }
-
-module.exports = {
-  handleCount,
-};

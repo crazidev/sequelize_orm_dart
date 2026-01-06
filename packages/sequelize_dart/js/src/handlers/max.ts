@@ -1,11 +1,13 @@
-const { convertQueryOptions } = require('../utils/queryConverter');
-const { getSequelize, getModels } = require('../utils/state');
+import { convertQueryOptions } from '../utils/queryConverter';
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'min' method
- * Finds the minimum value of a column
- */
-async function handleMin(params) {
+type MaxParams = {
+  model: string;
+  column: string;
+  options?: any;
+};
+
+export async function handleMax(params: MaxParams): Promise<any> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -14,6 +16,7 @@ async function handleMin(params) {
   const modelName = params.model;
   const column = params.column;
   const options = convertQueryOptions(params.options || {});
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -22,13 +25,9 @@ async function handleMin(params) {
   }
 
   if (!column) {
-    throw new Error('Column name is required for min operation');
+    throw new Error('Column name is required for max operation');
   }
 
-  const min = await model.min(column, options);
-  return min;
+  const max = await model.max(column, options);
+  return max;
 }
-
-module.exports = {
-  handleMin,
-};

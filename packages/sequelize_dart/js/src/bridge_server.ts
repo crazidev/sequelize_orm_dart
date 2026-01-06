@@ -1,33 +1,40 @@
-#!/usr/bin/env node
+import dotenv from 'dotenv';
 
-// Load environment variables if .env file exists
-require('dotenv').config();
+dotenv.config();
 
-const { formatError } = require('./utils/errorFormatter');
-const { getSequelize } = require('./utils/state');
+import { formatError } from './utils/errorFormatter';
+import { getSequelize } from './utils/state';
 
-// Import handlers
-const { handleReady } = require('./handlers/ready');
-const { handleConnect } = require('./handlers/connect');
-const { handleDefineModel } = require('./handlers/defineModel');
-const { handleAssociateModel } = require('./handlers/associateModel');
-const { handleFindAll } = require('./handlers/findAll');
-const { handleFindOne } = require('./handlers/findOne');
-const { handleCreate } = require('./handlers/create');
-const { handleClose } = require('./handlers/close');
-const { handleCount } = require('./handlers/count');
-const { handleMax } = require('./handlers/max');
-const { handleMin } = require('./handlers/min');
-const { handleSum } = require('./handlers/sum');
+import { handleReady } from './handlers/ready';
+import { handleConnect } from './handlers/connect';
+import { handleDefineModel } from './handlers/defineModel';
+import { handleAssociateModel } from './handlers/associateModel';
+import { handleFindAll } from './handlers/findAll';
+import { handleFindOne } from './handlers/findOne';
+import { handleCreate } from './handlers/create';
+import { handleClose } from './handlers/close';
+import { handleCount } from './handlers/count';
+import { handleMax } from './handlers/max';
+import { handleMin } from './handlers/min';
+import { handleSum } from './handlers/sum';
 
-/**
- * Handle JSON-RPC requests
- */
-async function handleRequest(request) {
+type JsonRpcRequest = {
+  id: unknown;
+  method: string;
+  params?: any;
+};
+
+type JsonRpcResponse = {
+  id: unknown;
+  result?: any;
+  error?: any;
+};
+
+async function handleRequest(request: JsonRpcRequest): Promise<void> {
   const { id, method, params } = request;
 
   try {
-    let result;
+    let result: any;
 
     switch (method) {
       case 'ready':
@@ -82,15 +89,13 @@ async function handleRequest(request) {
         throw new Error(`Unknown method: ${method}`);
     }
 
-    // Send success response (use process.stdout.write for better concurrency)
-    const response = {
+    const response: JsonRpcResponse = {
       id,
       result,
     };
     process.stdout.write(JSON.stringify(response) + '\n');
-  } catch (error) {
-    // Send error response with detailed error information
-    const response = {
+  } catch (error: any) {
+    const response: JsonRpcResponse = {
       id,
       error: formatError(error),
     };
@@ -98,32 +103,29 @@ async function handleRequest(request) {
   }
 }
 
-// Send ready signal immediately
 process.stdout.write(JSON.stringify({ id: 0, result: { ready: true } }) + '\n');
 
-// Read from stdin line by line
 let buffer = '';
 process.stdin.setEncoding('utf8');
 
-process.stdin.on('data', (chunk) => {
+process.stdin.on('data', (chunk: string) => {
   buffer += chunk;
   const lines = buffer.split('\n');
-  buffer = lines.pop() || ''; // Keep incomplete line in buffer
+  buffer = lines.pop() || '';
 
   for (const line of lines) {
     if (line.trim()) {
       try {
-        const request = JSON.parse(line);
-        // Process requests concurrently - don't await, let them run in parallel
-        handleRequest(request).catch((error) => {
-          const errorResponse = {
-            id: request.id || null,
+        const request = JSON.parse(line) as JsonRpcRequest;
+        handleRequest(request).catch((error: any) => {
+          const errorResponse: JsonRpcResponse = {
+            id: (request as any).id || null,
             error: formatError(error),
           };
           process.stdout.write(JSON.stringify(errorResponse) + '\n');
         });
-      } catch (error) {
-        const errorResponse = {
+      } catch (error: any) {
+        const errorResponse: JsonRpcResponse = {
           id: null,
           error: {
             message: `Parse error: ${error.message}`,
@@ -136,29 +138,22 @@ process.stdin.on('data', (chunk) => {
   }
 });
 
-process.stdin.on('end', async () => {
-  // Cleanup on exit
+async function cleanupAndExit(): Promise<void> {
   const sequelize = getSequelize();
   if (sequelize) {
     await sequelize.close();
   }
   process.exit(0);
+}
+
+process.stdin.on('end', () => {
+  cleanupAndExit().catch(() => process.exit(0));
 });
 
-// Handle process termination
-process.on('SIGTERM', async () => {
-  const sequelize = getSequelize();
-  if (sequelize) {
-    await sequelize.close();
-  }
-  process.exit(0);
+process.on('SIGTERM', () => {
+  cleanupAndExit().catch(() => process.exit(0));
 });
 
-process.on('SIGINT', async () => {
-  const sequelize = getSequelize();
-  if (sequelize) {
-    await sequelize.close();
-  }
-  process.exit(0);
+process.on('SIGINT', () => {
+  cleanupAndExit().catch(() => process.exit(0));
 });
-

@@ -1,11 +1,12 @@
-const { convertQueryOptions } = require('../utils/queryConverter');
-const { getSequelize, getModels } = require('../utils/state');
+import { convertQueryOptions } from '../utils/queryConverter';
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'findAll' method
- * Finds all records matching the query
- */
-async function handleFindAll(params) {
+type FindAllParams = {
+  model: string;
+  options?: any;
+};
+
+export async function handleFindAll(params: FindAllParams): Promise<any[]> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -13,6 +14,7 @@ async function handleFindAll(params) {
 
   const modelName = params.model;
   const options = convertQueryOptions(params.options || {});
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -21,10 +23,5 @@ async function handleFindAll(params) {
   }
 
   const results = await model.findAll(options);
-  return results.map(row => row.toJSON());
+  return results.map((row: any) => row.toJSON());
 }
-
-module.exports = {
-  handleFindAll,
-};
-

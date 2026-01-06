@@ -1,11 +1,12 @@
-const { convertQueryOptions } = require('../utils/queryConverter');
-const { getSequelize, getModels } = require('../utils/state');
+import { convertQueryOptions } from '../utils/queryConverter';
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'findOne' method
- * Finds a single record matching the query
- */
-async function handleFindOne(params) {
+type FindOneParams = {
+  model: string;
+  options?: any;
+};
+
+export async function handleFindOne(params: FindOneParams): Promise<any | null> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -13,6 +14,7 @@ async function handleFindOne(params) {
 
   const modelName = params.model;
   const options = convertQueryOptions(params.options || {});
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -23,8 +25,3 @@ async function handleFindOne(params) {
   const result = await model.findOne(options);
   return result ? result.toJSON() : null;
 }
-
-module.exports = {
-  handleFindOne,
-};
-

@@ -1,11 +1,13 @@
-const { convertQueryOptions } = require('../utils/queryConverter');
-const { getSequelize, getModels } = require('../utils/state');
+import { convertQueryOptions } from '../utils/queryConverter';
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'sum' method
- * Sums values of a column
- */
-async function handleSum(params) {
+type MinParams = {
+  model: string;
+  column: string;
+  options?: any;
+};
+
+export async function handleMin(params: MinParams): Promise<any> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -14,6 +16,7 @@ async function handleSum(params) {
   const modelName = params.model;
   const column = params.column;
   const options = convertQueryOptions(params.options || {});
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -22,13 +25,9 @@ async function handleSum(params) {
   }
 
   if (!column) {
-    throw new Error('Column name is required for sum operation');
+    throw new Error('Column name is required for min operation');
   }
 
-  const sum = await model.sum(column, options);
-  return sum;
+  const min = await model.min(column, options);
+  return min;
 }
-
-module.exports = {
-  handleSum,
-};

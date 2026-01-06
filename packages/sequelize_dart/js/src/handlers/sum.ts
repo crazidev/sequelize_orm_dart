@@ -1,11 +1,13 @@
-const { convertQueryOptions } = require('../utils/queryConverter');
-const { getSequelize, getModels } = require('../utils/state');
+import { convertQueryOptions } from '../utils/queryConverter';
+import { getModels, getSequelize } from '../utils/state';
 
-/**
- * Handler for 'max' method
- * Finds the maximum value of a column
- */
-async function handleMax(params) {
+type SumParams = {
+  model: string;
+  column: string;
+  options?: any;
+};
+
+export async function handleSum(params: SumParams): Promise<any> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -14,6 +16,7 @@ async function handleMax(params) {
   const modelName = params.model;
   const column = params.column;
   const options = convertQueryOptions(params.options || {});
+
   const models = getModels();
   const model = models.get(modelName);
 
@@ -22,13 +25,9 @@ async function handleMax(params) {
   }
 
   if (!column) {
-    throw new Error('Column name is required for max operation');
+    throw new Error('Column name is required for sum operation');
   }
 
-  const max = await model.max(column, options);
-  return max;
+  const sum = await model.sum(column, options);
+  return sum;
 }
-
-module.exports = {
-  handleMax,
-};

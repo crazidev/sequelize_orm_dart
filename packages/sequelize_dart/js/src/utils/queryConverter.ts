@@ -1,18 +1,19 @@
-const { Op, sql, Sequelize } = require('@sequelize/core');
+import { Op, sql, Sequelize } from '@sequelize/core';
+import { getOptions } from './state';
 
-/**
- * Convert Dart SQL expressions to Sequelize Expressions
- */
-function convertSqlExpression(expr) {
+export function convertSqlExpression(expr: any): any {
   if (!expr || typeof expr !== 'object') {
     return expr;
   }
 
   if (expr.__type) {
-    let result;
+    let result: any;
     switch (expr.__type) {
       case 'fn':
-        result = sql.fn(expr.fn, ...(expr.args || []).map(convertSqlExpression));
+        result = sql.fn(
+          expr.fn,
+          ...(expr.args || []).map((a: any) => convertSqlExpression(a)),
+        );
         break;
       case 'col':
         result = sql.col(expr.col);
@@ -30,7 +31,10 @@ function convertSqlExpression(expr) {
         result = sql.cast(convertSqlExpression(expr.expression), expr.type);
         break;
       case 'random':
-        result = typeof Sequelize.random === 'function' ? Sequelize.random() : sql.fn('RANDOM');
+        result =
+          typeof (Sequelize as any).random === 'function'
+            ? (Sequelize as any).random()
+            : sql.fn('RANDOM');
         break;
       default:
         console.warn(`[JS Bridge] Unknown SQL expression type: ${expr.__type}`);
@@ -40,21 +44,16 @@ function convertSqlExpression(expr) {
   }
 
   if (Array.isArray(expr)) {
-    return expr.map(convertSqlExpression);
+    return expr.map((e) => convertSqlExpression(e));
   }
 
   return expr;
 }
 
-/**
- * Hoist order and group from joined includes to the top level.
- * This is necessary because Sequelize usually ignores 'order' and 'group'
- * properties inside a joined include.
- */
-function hoistIncludeOptions(options) {
+function hoistIncludeOptions(options: any): void {
   if (!options.include) return;
 
-  function walk(include, path = []) {
+  function walk(include: any, path: any[] = []): void {
     const items = Array.isArray(include) ? include : [include];
     for (const item of items) {
       if (!item || typeof item !== 'object') continue;
@@ -64,25 +63,24 @@ function hoistIncludeOptions(options) {
 
       const currentPath = [...path, association];
 
-      // Hoist order if not separate
       if (item.order && !item.separate) {
         if (!options.order) options.order = [];
         if (!Array.isArray(options.order)) options.order = [options.order];
 
         let itemOrders = item.order;
-        // Handle single order [col, dir] vs multiple orders [[col, dir], [col, dir]]
-        const isSingleOrder = Array.isArray(itemOrders) && 
-                            itemOrders.length === 2 && 
-                            typeof itemOrders[1] === 'string' && 
-                            (itemOrders[1].toUpperCase() === 'ASC' || itemOrders[1].toUpperCase() === 'DESC');
-        
+        const isSingleOrder =
+          Array.isArray(itemOrders) &&
+          itemOrders.length === 2 &&
+          typeof itemOrders[1] === 'string' &&
+          (itemOrders[1].toUpperCase() === 'ASC' ||
+            itemOrders[1].toUpperCase() === 'DESC');
+
         if (isSingleOrder || !Array.isArray(itemOrders)) {
           itemOrders = [itemOrders];
         }
 
         for (const order of itemOrders) {
           if (Array.isArray(order)) {
-            // Prepend the association path to the order array
             options.order.push([...currentPath, ...order]);
           } else {
             options.order.push([...currentPath, order]);
@@ -91,7 +89,6 @@ function hoistIncludeOptions(options) {
         delete item.order;
       }
 
-      // Hoist group if not separate
       if (item.group && !item.separate) {
         if (!options.group) options.group = [];
         if (!Array.isArray(options.group)) options.group = [options.group];
@@ -118,49 +115,46 @@ function hoistIncludeOptions(options) {
   walk(options.include);
 }
 
-/**
- * Convert Dart query operators to Sequelize Op operators
- */
-function convertWhereClause(where) {
+export function convertWhereClause(where: any): any {
   if (!where || typeof where !== 'object') {
     return where;
   }
 
-  // If it's a SQL expression, convert it
   if (where.__type) {
     return convertSqlExpression(where);
   }
 
-  // Handle logical operators ($and, $or, $not)
   if ('$and' in where) {
     return {
-      [Op.and]: where.$and.map(convertWhereClause),
+      [Op.and]: where.$and.map((w: any) => convertWhereClause(w)),
     };
   }
   if ('$or' in where) {
     return {
-      [Op.or]: where.$or.map(convertWhereClause),
+      [Op.or]: where.$or.map((w: any) => convertWhereClause(w)),
     };
   }
   if ('$not' in where) {
     return {
-      [Op.not]: where.$not.map(convertWhereClause),
+      [Op.not]: convertWhereClause(where.$not),
     };
   }
 
-  // Handle comparison operators
-  const result = {};
+  const result: any = {};
   for (const [key, value] of Object.entries(where)) {
-    if (typeof value === 'object' && value !== null && !Array.isArray(value) && !value.__type) {
-      // Check if this is an operator object like {$ne: value, $gt: value}
-      const hasOperatorKeys = Object.keys(value).some(
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !(value as any).__type
+    ) {
+      const hasOperatorKeys = Object.keys(value as any).some(
         (k) => k.startsWith('$') && k !== '$and' && k !== '$or' && k !== '$not',
       );
 
       if (hasOperatorKeys) {
-        // Convert operator keys to Sequelize Op
-        const converted = {};
-        for (const [opKey, opValue] of Object.entries(value)) {
+        const converted: any = {};
+        for (const [opKey, opValue] of Object.entries(value as any)) {
           const convertedValue = convertSqlExpression(opValue);
           switch (opKey) {
             case '$eq':
@@ -263,14 +257,11 @@ function convertWhereClause(where) {
   return result;
 }
 
-/**
- * Convert attributes from Dart format to Sequelize format
- */
-function convertAttributes(attributes) {
+export function convertAttributes(attributes: any): any {
   if (!attributes) return attributes;
 
   if (Array.isArray(attributes)) {
-    return attributes.map(attr => {
+    return attributes.map((attr) => {
       if (Array.isArray(attr) && attr.length === 2) {
         return [convertSqlExpression(attr[0]), attr[1]];
       }
@@ -279,9 +270,9 @@ function convertAttributes(attributes) {
   }
 
   if (typeof attributes === 'object' && attributes !== null) {
-    if (attributes.exclude && Array.isArray(attributes.exclude)) {
+    if ((attributes as any).exclude && Array.isArray((attributes as any).exclude)) {
       return {
-        exclude: attributes.exclude.map(convertSqlExpression)
+        exclude: (attributes as any).exclude.map((v: any) => convertSqlExpression(v)),
       };
     }
   }
@@ -289,20 +280,17 @@ function convertAttributes(attributes) {
   return attributes;
 }
 
-/**
- * Convert include options from Dart format to Sequelize format
- */
-function convertInclude(include) {
+export function convertInclude(include: any): any {
   if (!include) {
     return include;
   }
 
   if (Array.isArray(include)) {
-    return include.map(convertInclude);
+    return include.map((i) => convertInclude(i));
   }
 
   if (typeof include === 'object' && include !== null) {
-    const converted = { ...include };
+    const converted: any = { ...include };
 
     if (converted.where !== undefined && converted.where !== null) {
       converted.where = convertWhereClause(converted.where);
@@ -321,11 +309,11 @@ function convertInclude(include) {
     }
 
     if (converted.order !== undefined && converted.order !== null) {
-        converted.order = convertSqlExpression(converted.order);
+      converted.order = convertSqlExpression(converted.order);
     }
 
     if (converted.group !== undefined && converted.group !== null) {
-        converted.group = convertSqlExpression(converted.group);
+      converted.group = convertSqlExpression(converted.group);
     }
 
     return converted;
@@ -334,15 +322,12 @@ function convertInclude(include) {
   return include;
 }
 
-/**
- * Convert query options from Dart format to Sequelize format
- */
-function convertQueryOptions(options) {
+export function convertQueryOptions(options: any): any {
   if (!options) {
     return {};
   }
 
-  const result = {};
+  const result: any = {};
 
   if (options.where !== undefined && options.where !== null) {
     result.where = convertWhereClause(options.where);
@@ -366,18 +351,9 @@ function convertQueryOptions(options) {
     result.attributes = convertAttributes(options.attributes);
   }
 
-  const { getOptions } = require('./state');
   if (getOptions().hoistIncludeOptions) {
     hoistIncludeOptions(result);
   }
 
   return result;
 }
-
-module.exports = {
-  convertQueryOptions,
-  convertWhereClause,
-  convertInclude,
-  convertSqlExpression,
-  convertAttributes,
-};
