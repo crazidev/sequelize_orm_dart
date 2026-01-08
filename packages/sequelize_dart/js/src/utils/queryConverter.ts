@@ -136,7 +136,7 @@ export function convertWhereClause(where: any): any {
   }
   if ('$not' in where) {
     return {
-      [Op.not]: convertWhereClause(where.$not),
+      [Op.not]: where.$not.map((w: any) => convertWhereClause(w)),
     };
   }
 

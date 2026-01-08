@@ -18,5 +18,6 @@ export async function handleCount(params: CountParams): Promise<number> {
   const model = models.get(modelName);
 
   const count = await model.count(options);
+  if(typeof count === "number") return count;
   return count.at(0).count;
 }

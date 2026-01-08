@@ -24,6 +24,10 @@ Future<void> initTestEnvironment() async {
     PostgressConnection(
       url: testConnectionString,
       logging: (String sql) {
+        // SqlFormatter.printFormatted(
+        //   sql,
+        //   colorScheme: SqlFormatterColors.defaultColors,
+        // );
         capturedSql.add(sql);
       },
       pool: SequelizePoolOptions(
