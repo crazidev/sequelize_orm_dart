@@ -2,14 +2,15 @@
 
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/post.model.dart';
+import 'package:sequelize_dart_example/utils/measureQuery.dart';
 
 /// Run all query examples
 /// This function is called from main.dart after the database connection is established
 Future<void> runQueries() async {
   // Test increment functionality
-  final posts = await Post.instance.findAll(
-    where: (post) => post.id.lessThan(3),
-    limit: 1,
+  final posts = await measureQuery(
+    'findAll',
+    () => Post.instance.findAll(),
   );
 
   if (posts.isNotEmpty) {

@@ -1,0 +1,169 @@
+# Sequelize Dart - AI Agent Rules
+
+## Project Overview
+
+Sequelize Dart is a Dart ORM that wraps Sequelize.js with dual platform support:
+- **Dart VM**: Uses a Node.js bridge process (JSON-RPC over stdin/stdout)
+- **dart2js**: Uses direct JS interop (`dart:js_interop`)
+
+## Core Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          User Model (users.model.dart)                  │
+│                    @Table + @ModelAttributes annotations                │
+└───────────────────────────────┬─────────────────────────────────────────┘
+                                │ build_runner
+                                ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Generated Code (users.model.g.dart)                  │
+│         $Users, $UsersValues, $UsersColumns, $UsersIncludeHelper        │
+└───────────────────────────────┬─────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            QueryEngine                                  │
+│       query_engine_dart.dart (VM) │ query_engine_js.dart (JS)          │
+└───────────────────────────────┬─────────────────────────────────────────┘
+                                │
+              ┌─────────────────┴─────────────────┐
+              ▼                                   ▼
+┌─────────────────────────┐         ┌─────────────────────────┐
+│   BridgeClient (VM)     │         │   JS Interop (dart2js)  │
+│   JSON-RPC → Node.js    │         │   Direct Sequelize.js   │
+└───────────────┬─────────┘         └─────────────────────────┘
+                │
+                ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    bridge_server.ts (TypeScript)                        │
+│                    handlers/ → Sequelize.js operations                  │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## Key Directories
+
+| Directory | Purpose |
+|-----------|---------|
+| `packages/sequelize_dart/` | Main ORM package |
+| `packages/sequelize_dart/lib/src/query/` | Query building, operators |
+| `packages/sequelize_dart/lib/src/query/query_engine/` | Platform-specific query execution |
+| `packages/sequelize_dart/lib/src/sequelize/` | Sequelize instance management |
+| `packages/sequelize_dart/js/` | TypeScript bridge server |
+| `packages/sequelize_dart/js/src/handlers/` | Bridge RPC handlers |
+| `packages/sequelize_dart_annotations/` | Platform-independent annotations |
+| `packages/sequelize_dart_generator/` | Code generator |
+| `packages/sequelize_dart_generator/lib/src/generators/methods/` | Individual method generators |
+| `example/` | Example project with models |
+| `test/` | Integration tests |
+
+## Important Patterns
+
+### 1. Platform Conditional Exports
+Files use conditional exports for platform-specific implementations:
+```dart
+export 'model_stub.dart'
+    if (dart.library.js_interop) 'model_js.dart'
+    if (dart.library.io) 'model_dart.dart';
+```
+
+### 2. Query Operator Pattern
+Operators are extensions on `Column<T>`:
+```dart
+extension BasicComparisonExtension<T> on Column<T> {
+  ComparisonOperator eq(T value) {
+    return ComparisonOperator(
+      column: name,
+      value: {'\$eq': value},
+    );
+  }
+}
+```
+
+### 3. Generated Model Pattern
+Each model generates:
+- `$ModelName` - Main model class with query methods
+- `$ModelNameValues` - Data class with fromJson/toJson
+- `$ModelNameColumns` - Type-safe column references
+- `$ModelNameCreate` - Create DTO
+- `$ModelNameIncludeHelper` - Association include helpers
+
+### 4. Bridge Communication (Dart VM)
+JSON-RPC over stdin/stdout:
+```json
+// Request
+{"id": 1, "method": "findAll", "params": {"model": "Users", "options": {...}}}
+
+// Response
+{"id": 1, "result": [...]}
+```
+
+## Adding New Query Methods
+
+When adding a new query method (e.g., `destroy`, `update`), you need to modify:
+
+1. **QueryEngineInterface** (`query_engine_interface.dart`) - Add abstract method
+2. **QueryEngine (Dart)** (`query_engine_dart.dart`) - Implement for bridge
+3. **QueryEngine (JS)** (`query_engine_js.dart`) - Implement for JS interop
+4. **Bridge Handler** (`js/src/handlers/newMethod.ts`) - Create handler
+5. **Bridge Server** (`js/src/bridge_server.ts`) - Register handler
+6. **Generator** (`_generate_new_method.dart`) - Generate model method
+
+See `.ai/QUERY_IMPLEMENTATION.md` for detailed steps.
+
+## Testing
+
+Run tests from project root:
+```bash
+# All tests
+dart test
+
+# Specific test file
+dart test test/operators/basic_comparison_test.dart
+
+# Test pattern
+dart test test/operators/
+```
+
+Tests use SQL capture to verify query output without hitting the database.
+
+## Build Commands
+
+```bash
+# Build bridge server bundle
+./tools/setup_bridge.sh [bun|pnpm|npm]
+
+# Generate model code
+cd example && dart run build_runner build --delete-conflicting-outputs
+
+# Build dart2js output
+./tools/build.sh --generate --run
+
+# Format code
+./tools/format.sh
+```
+
+## Code Style
+
+- **Dart**: 80 char line length, trailing commas
+- **TypeScript**: Prettier, single quotes, semicolons
+- Use `final` over `var` when possible
+- Use `const` constructors when possible
+
+## Common Tasks
+
+### Add a new operator
+1. Add to `packages/sequelize_dart/lib/src/query/operators/extentions/`
+2. Add to `_getOpSymbol()` in `query_engine_js.dart`
+3. Add to `convertWhereClause()` in `js/src/utils/queryConverter.ts`
+4. Add test in `test/operators/`
+
+### Add a model annotation option
+1. Update `packages/sequelize_dart_annotations/lib/src/model_attribute.dart`
+2. Update generator in `_generate_get_attributes_method.dart`
+3. Update `js/src/utils/dataTypeConverter.ts` if needed
+
+### Add association type
+1. Create annotation in `sequelize_dart_annotations`
+2. Update `_getAssociations()` in generator
+3. Update `_generateAssociateModelMethod.dart`
+4. Update bridge handler if needed
