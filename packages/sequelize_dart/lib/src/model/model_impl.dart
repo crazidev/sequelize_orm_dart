@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:sequelize_dart/src/association/association_model.dart';
 import 'package:sequelize_dart/src/model/model_interface.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
@@ -5,24 +7,17 @@ import 'package:sequelize_dart/src/query/query_engine/query_engine.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
+/// Unified Model implementation for both Dart VM and dart2js.
+/// Both platforms now use the bridge pattern, so the implementation is identical.
 abstract class Model<T> extends ModelInterface {
   @override
   ModelInterface define(String modelName, Object sq) {
-    // Store references
     sequelizeInstance = sq;
     name = modelName;
     sequelize = sq as Sequelize;
-
-    // Set sequelizeModel to empty object for Dart VM
-    // In JS, this would be the actual Sequelize model, but in Dart we just need it initialized
     sequelizeModel = <String, dynamic>{};
 
-    // Register model with Sequelize
-    // Note: This is handled in addModels, so we don't call it here
-    // to avoid double registration
-
     print('✅ Defining model: $modelName');
-
     return this;
   }
 
@@ -43,7 +38,7 @@ abstract class Model<T> extends ModelInterface {
   }) async {
     print('✅ $name hasOne ${model.name}');
 
-    await sequelize.bridge?.call('associateModel', {
+    await sequelize.bridge.call('associateModel', {
       'sourceModel': name,
       'targetModel': model.name,
       'associationType': 'hasOne',
@@ -66,7 +61,7 @@ abstract class Model<T> extends ModelInterface {
   }) async {
     print('✅ $name hasMany ${model.name}');
 
-    await sequelize.bridge?.call('associateModel', {
+    await sequelize.bridge.call('associateModel', {
       'sourceModel': name,
       'targetModel': model.name,
       'associationType': 'hasMany',
@@ -90,8 +85,6 @@ abstract class Model<T> extends ModelInterface {
   Map<String, dynamic> getOptionsJson();
 
   /// Find all records matching the query
-  ///
-  /// Generated model classes will override this method to accept a typed query builder.
   Future<List<T>> findAll({
     covariant dynamic where,
     covariant dynamic include,
@@ -120,8 +113,6 @@ abstract class Model<T> extends ModelInterface {
   }
 
   /// Find one record matching the query
-  ///
-  /// Generated model classes will override this method to accept a typed query builder.
   Future<T?> findOne({
     covariant dynamic where,
     covariant dynamic include,
@@ -157,14 +148,8 @@ abstract class Model<T> extends ModelInterface {
   }
 
   /// Count records matching the query
-  ///
-  /// Generated model classes will override this method to accept a typed query builder.
-  Future<int> count({
-    covariant dynamic where,
-  }) {
-    final query = Query.fromCallbacks(
-      where: where,
-    );
+  Future<int> count({covariant dynamic where}) {
+    final query = Query.fromCallbacks(where: where);
     return QueryEngine().count(
       modelName: name,
       query: query,
@@ -174,17 +159,11 @@ abstract class Model<T> extends ModelInterface {
   }
 
   /// Find the maximum value of a column
-  ///
-  /// Generated model classes must override this method to accept a typed column callback.
   Future<num?> max(covariant dynamic columnFn, {covariant dynamic where});
 
   /// Find the minimum value of a column
-  ///
-  /// Generated model classes must override this method to accept a typed column callback.
   Future<num?> min(covariant dynamic columnFn, {covariant dynamic where});
 
   /// Sum values of a column
-  ///
-  /// Generated model classes must override this method to accept a typed column callback.
   Future<num?> sum(covariant dynamic columnFn, {covariant dynamic where});
 }

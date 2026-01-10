@@ -1,3 +1,3 @@
-export 'sequelize_stub.dart'
-    if (dart.library.js_interop) 'sequelize_js.dart'
-    if (dart.library.io) 'sequelize_dart.dart';
+// Unified Sequelize implementation - no longer needs platform-specific code
+// Both Dart VM and dart2js use the same bridge pattern
+export 'sequelize_impl.dart';

@@ -1,8 +1,10 @@
 {
   "version": "2.0.0",
   "tasks": [
+    // ==================== Development Tasks ====================
     {
       "label": "Watch Dart Server",
+      "detail": "Run Dart VM server with hot reload on file changes",
       "type": "shell",
       "command": "./tools/watch_dart.sh",
       "options": {
@@ -34,50 +36,8 @@
       }
     },
     {
-      "label": "Watch JS Server",
-      "dependsOn": ["Watch Models", "Watch JS"],
-      "dependsOrder": "parallel",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "JS  Server",
-      "type": "shell",
-      "command": "node --watch example/build/index.js",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "line": 2,
-          "message": 3
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^Restarting",
-          "endsPattern": "."
-        }
-      }
-    },
-    {
-      "label": "Watch JS",
+      "label": "Watch JS (dart2js)",
+      "detail": "Compile to JS and run with Node.js hot reload",
       "type": "shell",
       "command": "./tools/watch_js.sh",
       "options": {
@@ -90,7 +50,7 @@
         "reveal": "always",
         "focus": false,
         "panel": "dedicated",
-        "clear": false
+        "clear": true
       },
       "problemMatcher": {
         "pattern": {
@@ -108,6 +68,7 @@
     },
     {
       "label": "Watch Models",
+      "detail": "Watch for model changes and regenerate code",
       "type": "shell",
       "command": "dart run build_runner watch --delete-conflicting-outputs",
       "options": {
@@ -138,8 +99,10 @@
         }
       }
     },
+    // ==================== Build Tasks ====================
     {
       "label": "Build Bridge Server",
+      "detail": "Install dependencies and build both stdio and worker bundles",
       "type": "shell",
       "command": "./tools/setup_bridge.sh",
       "options": {
@@ -154,60 +117,163 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Build JS (main.dart)",
+      "detail": "Compile example/lib/main.dart to JavaScript",
+      "type": "shell",
+      "command": "./tools/build.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build JS (benchmark.dart)",
+      "detail": "Compile benchmark to JavaScript",
+      "type": "shell",
+      "command": "./tools/build.sh --input=example/lib/benchmark.dart --output=benchmark",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Generate Models",
+      "detail": "Run build_runner to generate model code",
+      "type": "shell",
+      "command": "dart run build_runner build --delete-conflicting-outputs",
+      "options": {
+        "cwd": "${workspaceFolder}/example"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ==================== Run Tasks ====================
+    {
+      "label": "Run Dart Server",
+      "detail": "Run example with Dart VM (requires bridge)",
+      "type": "shell",
+      "command": "dart run example/lib/main.dart",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run JS Server",
+      "detail": "Run compiled JS with Node.js",
+      "type": "shell",
+      "command": "node example/build/index.js",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Benchmark (Dart VM)",
+      "detail": "Run performance benchmark with Dart VM",
+      "type": "shell",
+      "command": "dart run example/lib/benchmark.dart",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Benchmark (dart2js)",
+      "detail": "Build and run performance benchmark with Node.js",
+      "type": "shell",
+      "command": "./tools/build.sh --input=example/lib/benchmark.dart --output=benchmark && node example/build/benchmark.js",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ==================== Compound Tasks ====================
+    {
+      "label": "Full Build",
+      "detail": "Build bridge, generate models, and compile to JS",
+      "dependsOn": ["Build Bridge Server", "Generate Models", "Build JS (main.dart)"],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Watch All",
+      "detail": "Watch models and JS compilation in parallel",
+      "dependsOn": ["Watch Models", "Watch JS (dart2js)"],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
     }
-    // {
-    //   "label": "Compile JS",
-    //   "type": "shell",
-    //   "command": "./tools/build.sh",
-    //   "options": {
-    //     "cwd": "${workspaceFolder}"
-    //   },
-    //   "group": {
-    //     "kind": "build",
-    //     "isDefault": true
-    //   },
-    //   "presentation": {
-    //     "echo": true,
-    //     "reveal": "always",
-    //     "focus": false,
-    //     "panel": "shared",
-    //     "clear": true
-    //   },
-    //   "problemMatcher": []
-    // },
-    // {
-    //   "label": "Compile JS with Generator",
-    //   "type": "shell",
-    //   "command": "./tools/build.sh --generate",
-    //   "options": {
-    //     "cwd": "${workspaceFolder}"
-    //   },
-    //   "group": "build",
-    //   "presentation": {
-    //     "echo": true,
-    //     "reveal": "always",
-    //     "focus": false,
-    //     "panel": "shared",
-    //     "clear": true
-    //   },
-    //   "problemMatcher": []
-    // },
-    // {
-    //   "label": "Generate Models",
-    //   "type": "shell",
-    //   "command": "dart run build_runner build --delete-conflicting-outputs",
-    //   "options": {
-    //     "cwd": "${workspaceFolder}/example"
-    //   },
-    //   "group": "build",
-    //   "presentation": {
-    //     "echo": true,
-    //     "reveal": "always",
-    //     "focus": false,
-    //     "panel": "shared",
-    //     "clear": true
-    //   },
-    //   "problemMatcher": []
-    // },
   ]
 }

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Build script for compiling Dart to JavaScript
+# Includes Node.js preamble for dart2js compatibility
+
 # Exit on error
 set -e
 
@@ -37,27 +40,37 @@ run_generator() {
 
 # Function to compile Dart to JS
 compile_js() {
-    echo -e "${BLUE}Compiling Dart to JS...${NC}"
-    dart compile js example/lib/main.dart -o example/build/temp.js
+    local INPUT_FILE="${1:-example/lib/main.dart}"
+    local OUTPUT_NAME="${2:-index}"
     
+    echo -e "${BLUE}Compiling Dart to JS...${NC}"
+    echo -e "${BLUE}  Input: $INPUT_FILE${NC}"
+    
+    # Compile to temporary file
+    dart compile js "$INPUT_FILE" -o "example/build/temp.js"
+    
+    # Add Node.js preamble for dart2js compatibility
     echo -e "${BLUE}Adding Node.js preamble...${NC}"
-    cat preamble.js example/build/temp.js > example/build/index.js
+    cat preamble.js example/build/temp.js > "example/build/${OUTPUT_NAME}.js"
     rm example/build/temp.js
     
-    echo -e "${GREEN}Build complete: example/build/index.js${NC}"
+    echo -e "${GREEN}Build complete: example/build/${OUTPUT_NAME}.js${NC}"
 }
 
 # Function to run the compiled JS
 run_js() {
+    local OUTPUT_NAME="${1:-index}"
     echo -e "${YELLOW}Running...${NC}"
     echo ""
-    node example/build/index.js
+    node "example/build/${OUTPUT_NAME}.js"
 }
 
 # Parse arguments
 WATCH=false
 RUN=false
 GENERATE=false
+INPUT_FILE="example/lib/main.dart"
+OUTPUT_NAME="index"
 
 for arg in "$@"; do
     case $arg in
@@ -70,14 +83,27 @@ for arg in "$@"; do
         --generate)
             GENERATE=true
             ;;
+        --input=*)
+            INPUT_FILE="${arg#*=}"
+            ;;
+        --output=*)
+            OUTPUT_NAME="${arg#*=}"
+            ;;
         --help)
             echo "Usage: ./tools/build.sh [options]"
             echo ""
             echo "Options:"
-            echo "  --generate  Run code generator before building"
-            echo "  --run       Run the compiled JS after building"
-            echo "  --watch     Watch for file changes and rebuild"
-            echo "  --help      Show this help message"
+            echo "  --generate      Run code generator before building"
+            echo "  --run           Run the compiled JS after building"
+            echo "  --watch         Watch for file changes and rebuild"
+            echo "  --input=FILE    Specify input Dart file (default: example/lib/main.dart)"
+            echo "  --output=NAME   Specify output name (default: index)"
+            echo "  --help          Show this help message"
+            echo ""
+            echo "Examples:"
+            echo "  ./tools/build.sh                            # Build main.dart to index.js"
+            echo "  ./tools/build.sh --generate --run           # Generate models, build, and run"
+            echo "  ./tools/build.sh --input=example/lib/benchmark.dart --output=benchmark"
             exit 0
             ;;
     esac
@@ -88,10 +114,10 @@ if [ "$GENERATE" = true ]; then
     run_generator
 fi
 
-compile_js
+compile_js "$INPUT_FILE" "$OUTPUT_NAME"
 
 if [ "$RUN" = true ]; then
-    run_js
+    run_js "$OUTPUT_NAME"
 fi
 
 # Watch mode is handled by VS Code tasks or external watcher

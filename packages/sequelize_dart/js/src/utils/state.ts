@@ -7,6 +7,20 @@ let options: { hoistIncludeOptions: boolean } = {
   hoistIncludeOptions: false,
 };
 
+// Notification callback for SQL logging
+// Set by bridge_server.ts (stdio) or bridge_server_worker.ts (Worker Thread)
+let notificationCallback: ((notification: any) => void) | null = null;
+
+export function setNotificationCallback(callback: (notification: any) => void): void {
+  notificationCallback = callback;
+}
+
+export function sendNotification(notification: any): void {
+  if (notificationCallback) {
+    notificationCallback(notification);
+  }
+}
+
 export function getOptions(): { hoistIncludeOptions: boolean } {
   return options;
 }

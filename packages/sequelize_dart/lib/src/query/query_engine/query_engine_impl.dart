@@ -1,8 +1,26 @@
+import 'package:sequelize_dart/src/bridge/bridge_client.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
-import 'package:sequelize_dart/src/sequelize/bridge_client.dart';
-import 'package:sequelize_dart/src/sequelize/sequelize_dart.dart';
+import 'package:sequelize_dart/src/sequelize/sequelize.dart';
 
+/// Deeply converts a value from JS types (JsLinkedHashMap) to Dart types.
+/// This is needed for dart2js where dartify() returns JsLinkedHashMap.
+/// In Dart VM, this is essentially a no-op but ensures type safety.
+dynamic _deepConvert(dynamic value) {
+  if (value is Map) {
+    return Map<String, dynamic>.fromEntries(
+      value.entries.map(
+        (e) => MapEntry(e.key.toString(), _deepConvert(e.value)),
+      ),
+    );
+  } else if (value is List) {
+    return value.map((e) => _deepConvert(e)).toList();
+  }
+  return value;
+}
+
+/// Unified QueryEngine implementation for both Dart VM and dart2js.
+/// Both platforms use the bridge pattern for database operations.
 class QueryEngine extends QueryEngineInterface {
   BridgeClient getBridge(dynamic sequelize) {
     if (sequelize == null) {
@@ -36,14 +54,14 @@ class QueryEngine extends QueryEngineInterface {
       });
 
       if (result is List) {
-        return result.map((item) => item as Map<String, dynamic>).toList();
+        return result
+            .map((item) => _deepConvert(item) as Map<String, dynamic>)
+            .toList();
       }
 
       throw Exception('Invalid response format from bridge');
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute findAll: $e');
     }
   }
@@ -61,19 +79,10 @@ class QueryEngine extends QueryEngineInterface {
         'options': query?.toJson(),
       });
 
-      if (result == null) {
-        return null;
-      }
-
-      if (result is Map) {
-        return result as Map<String, dynamic>;
-      }
-
-      throw Exception('Invalid response format from bridge');
+      if (result == null) return null;
+      return _deepConvert(result) as Map<String, dynamic>;
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute findOne: $e');
     }
   }
@@ -85,7 +94,17 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    throw UnimplementedError();
+    try {
+      final result = await getBridge(sequelize).call('create', {
+        'model': modelName,
+        'data': data,
+      });
+
+      return _deepConvert(result) as Map<String, dynamic>;
+    } catch (e) {
+      if (e is BridgeException) rethrow;
+      throw Exception('Failed to execute create: $e');
+    }
   }
 
   @override
@@ -101,21 +120,14 @@ class QueryEngine extends QueryEngineInterface {
         'options': query?.toJson(),
       });
 
-      if (result is int) {
-        return result;
-      }
-
-      if (result is num) {
-        return result.toInt();
-      }
+      if (result is int) return result;
+      if (result is num) return result.toInt();
 
       throw Exception(
-        'Invalid response format from bridge: expected int, got ${result.runtimeType}',
+        'Invalid response format: expected int, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute count: $e');
     }
   }
@@ -135,21 +147,14 @@ class QueryEngine extends QueryEngineInterface {
         'options': query?.toJson(),
       });
 
-      if (result == null) {
-        return null;
-      }
-
-      if (result is num) {
-        return result;
-      }
+      if (result == null) return null;
+      if (result is num) return result;
 
       throw Exception(
-        'Invalid response format from bridge: expected num or null, got ${result.runtimeType}',
+        'Invalid response format: expected num, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute max: $e');
     }
   }
@@ -169,21 +174,14 @@ class QueryEngine extends QueryEngineInterface {
         'options': query?.toJson(),
       });
 
-      if (result == null) {
-        return null;
-      }
-
-      if (result is num) {
-        return result;
-      }
+      if (result == null) return null;
+      if (result is num) return result;
 
       throw Exception(
-        'Invalid response format from bridge: expected num or null, got ${result.runtimeType}',
+        'Invalid response format: expected num, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute min: $e');
     }
   }
@@ -203,21 +201,14 @@ class QueryEngine extends QueryEngineInterface {
         'options': query?.toJson(),
       });
 
-      if (result == null) {
-        return null;
-      }
-
-      if (result is num) {
-        return result;
-      }
+      if (result == null) return null;
+      if (result is num) return result;
 
       throw Exception(
-        'Invalid response format from bridge: expected num or null, got ${result.runtimeType}',
+        'Invalid response format: expected num, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute sum: $e');
     }
   }
@@ -230,12 +221,11 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    return await _executeNumericOperation(
+    return _executeNumericOperation(
       modelName: modelName,
       fields: fields,
       query: query,
       sequelize: sequelize,
-      model: model,
       operation: 'increment',
     );
   }
@@ -248,23 +238,20 @@ class QueryEngine extends QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   }) async {
-    return await _executeNumericOperation(
+    return _executeNumericOperation(
       modelName: modelName,
       fields: fields,
       query: query,
       sequelize: sequelize,
-      model: model,
       operation: 'decrement',
     );
   }
 
-  /// Shared method for both increment and decrement operations
   Future<List<Map<String, dynamic>>> _executeNumericOperation({
     required String modelName,
     required Map<String, dynamic> fields,
     Query? query,
     dynamic sequelize,
-    dynamic model,
     required String operation,
   }) async {
     try {
@@ -275,14 +262,13 @@ class QueryEngine extends QueryEngineInterface {
       });
 
       if (result is List) {
-        return result.map((item) => item as Map<String, dynamic>).toList();
-      } else {
-        return [];
+        return result
+            .map((item) => _deepConvert(item) as Map<String, dynamic>)
+            .toList();
       }
+      return [];
     } catch (e) {
-      if (e is BridgeException) {
-        rethrow;
-      }
+      if (e is BridgeException) rethrow;
       throw Exception('Failed to execute $operation: $e');
     }
   }

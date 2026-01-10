@@ -3,9 +3,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:sequelize_dart/src/bridge/bridge_client_interface.dart';
+import 'package:sequelize_dart/src/bridge/bridge_exception.dart';
 
-/// Client for communicating with the Node.js Sequelize bridge server
-class BridgeClient {
+/// Client for communicating with the Node.js Sequelize bridge server.
+/// Uses stdio (stdin/stdout) for Dart VM environments.
+class BridgeClient implements BridgeClientInterface {
   Process? _process;
   StreamController<String> _responseController =
       StreamController<String>.broadcast();
@@ -21,7 +24,7 @@ class BridgeClient {
 
   BridgeClient._();
 
-  /// Set the logging callback to receive SQL queries
+  @override
   void setLoggingCallback(Function(String sql)? callback) {
     _loggingCallback = callback;
   }
@@ -34,11 +37,11 @@ class BridgeClient {
     return _instance!;
   }
 
-  /// Start the bridge server and connect to the database
+  @override
   Future<void> start({
     required Map<String, dynamic> connectionConfig,
     String? nodePath,
-    String? bridgeServerPath,
+    String? bridgePath,
   }) async {
     // If already initializing, wait for it to complete
     if (_isInitializing && _initializationCompleter != null) {
@@ -66,7 +69,7 @@ class BridgeClient {
     _initializationCompleter = Completer<void>();
 
     // Find the bridge server path
-    final serverPath = bridgeServerPath ?? _findBridgeServerPath();
+    final serverPath = bridgePath ?? _findBridgeServerPath();
 
     if (!File(serverPath).existsSync()) {
       _isInitializing = false;
@@ -89,7 +92,7 @@ class BridgeClient {
 
     // Start Node.js process
     _process = await Process.start(
-      nodePath ?? '/Users/crazidev/.nvm/versions/node/v22.9.0/bin/node',
+      nodePath ?? _findNodePath(),
       [serverPath],
       workingDirectory: p.dirname(serverPath),
     );
@@ -106,12 +109,8 @@ class BridgeClient {
             _handleResponse(line);
           },
           onError: (error) {
+            // ignore: avoid_print
             print('[BridgeClient] stdout error: $error');
-          },
-          onDone: () {
-            if (!_isClosed) {
-              // The process exit listener will handle unexpected terminations
-            }
           },
         );
 
@@ -139,10 +138,12 @@ class BridgeClient {
         final errorMsg = stderr.isNotEmpty
             ? 'Bridge server exited with code $code.\nError: $stderr'
             : 'Bridge server exited with code $code';
+        // ignore: avoid_print
         print('[BridgeClient] Process exited with code: $code');
         _cleanup();
         throw BridgeException(errorMsg);
       } else if (!_isClosed) {
+        // ignore: avoid_print
         print('[BridgeClient] Process exited with code: $code');
         _cleanup();
       }
@@ -182,9 +183,31 @@ class BridgeClient {
     }
   }
 
+  /// Find Node.js path
+  String _findNodePath() {
+    // Try common Node.js paths
+    final possiblePaths = [
+      '/usr/local/bin/node',
+      '/usr/bin/node',
+      // NVM paths
+      '${Platform.environment['HOME']}/.nvm/versions/node/v22.9.0/bin/node',
+      '${Platform.environment['HOME']}/.nvm/versions/node/v20.0.0/bin/node',
+      '${Platform.environment['HOME']}/.nvm/versions/node/v18.0.0/bin/node',
+    ];
+
+    for (final path in possiblePaths) {
+      if (File(path).existsSync()) {
+        return path;
+      }
+    }
+
+    // Fallback to just 'node' and hope it's in PATH
+    return 'node';
+  }
+
   /// Find the bridge server path relative to the package
   String _findBridgeServerPath() {
-    // Try multiple possible locations (bundled version first, then fallback)
+    // Try multiple possible locations (bundled version first)
     final possiblePaths = [
       // Bundled version (preferred - no npm install needed)
       'packages/sequelize_dart/js/bridge_server.bundle.js',
@@ -199,20 +222,6 @@ class BridgeClient {
         'sequelize_dart',
         'js',
         'bridge_server.bundle.js',
-      ),
-      // Fallback to unbundled version (requires npm install)
-      'packages/sequelize_dart/js/bridge_server.js',
-      '../packages/sequelize_dart/js/bridge_server.js',
-      'js/bridge_server.js',
-      // Absolute path fallback for unbundled version
-      p.join(
-        Platform.script.toFilePath(),
-        '..',
-        '..',
-        'packages',
-        'sequelize_dart',
-        'js',
-        'bridge_server.js',
       ),
     ];
 
@@ -325,22 +334,19 @@ class BridgeClient {
           }
 
           completer.completeError(
-            BridgeException(
-              errorMessage,
-              code: errorCode,
-              stack: errorStack,
-            ),
+            BridgeException(errorMessage, code: errorCode, stack: errorStack),
           );
         } else {
           completer.complete(response['result']);
         }
       }
     } catch (e) {
+      // ignore: avoid_print
       print('[BridgeClient] Failed to parse response: $e');
     }
   }
 
-  /// Send a JSON-RPC request
+  @override
   Future<dynamic> call(String method, Map<String, dynamic> params) async {
     if (_isClosed) {
       throw Exception('Bridge is closed');
@@ -351,11 +357,7 @@ class BridgeClient {
     }
 
     final id = _requestId++;
-    final request = jsonEncode({
-      'id': id,
-      'method': method,
-      'params': params,
-    });
+    final request = jsonEncode({'id': id, 'method': method, 'params': params});
 
     final completer = Completer<dynamic>();
     _pendingRequests[id] = completer;
@@ -371,16 +373,16 @@ class BridgeClient {
     );
   }
 
-  /// Check if connected
+  @override
   bool get isConnected => _isConnected;
 
-  /// Check if closed
+  @override
   bool get isClosed => _isClosed;
 
-  /// Check if initializing
+  @override
   bool get isInitializing => _isInitializing;
 
-  /// Wait for initialization to complete
+  @override
   Future<void> waitForInitialization() async {
     if (!_isInitializing) {
       return;
@@ -403,7 +405,7 @@ class BridgeClient {
     _responseController.close();
   }
 
-  /// Close the bridge and terminate the Node.js process
+  @override
   Future<void> close() async {
     if (_isClosed) return;
 
@@ -416,26 +418,5 @@ class BridgeClient {
     _cleanup();
     _process?.kill();
     _process = null;
-  }
-}
-
-/// Exception thrown by the bridge
-class BridgeException implements Exception {
-  final String message;
-  final int? code;
-  final String? stack;
-
-  BridgeException(this.message, {this.code, this.stack});
-
-  @override
-  String toString() {
-    final buffer = StringBuffer('BridgeException');
-    if (message.isNotEmpty) {
-      buffer.write(': $message');
-    }
-    if (code != null) {
-      buffer.write(' (code: $code)');
-    }
-    return buffer.toString();
   }
 }

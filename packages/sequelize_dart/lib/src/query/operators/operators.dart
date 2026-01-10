@@ -1,3 +1,3 @@
-export 'operators_stub.dart'
-    if (dart.library.js_interop) 'operators_js.dart'
-    if (dart.library.io) 'operators_dart.dart';
+// Export the unified operators implementation
+// No longer needs conditional exports since we use the bridge pattern for both platforms
+export 'operators_impl.dart';
