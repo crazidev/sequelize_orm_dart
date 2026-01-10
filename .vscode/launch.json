@@ -17,7 +17,7 @@
       "program": "${workspaceFolder}/example/build/index.js",
       "cwd": "${workspaceFolder}/example",
       "sourceMaps": true,
-      "preLaunchTask": "Watch JS",
+      "preLaunchTask": "Build: dart2js",
       "outFiles": ["${workspaceFolder}/example/build/**/*.js"],
       "skipFiles": ["<node_internals>/**"]
     },

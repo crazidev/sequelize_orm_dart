@@ -4,7 +4,9 @@
   "description": "Bridge server for Sequelize Dart",
   "main": "bridge_server.bundle.js",
   "scripts": {
-    "build": "esbuild src/bridge_server.ts --bundle --platform=node --target=node18 --outfile=bridge_server.bundle.js --minify --external:fsevents --external:@sequelize/mssql --external:@sequelize/sqlite3 --external:@sequelize/db2-ibmi --external:@sequelize/db2 --external:@sequelize/snowflake --format=cjs --banner:js=\"#!/usr/bin/env node\"",
+    "build": "npm run build:stdio && npm run build:worker",
+    "build:stdio": "esbuild src/bridge_server.ts --bundle --platform=node --target=node18 --outfile=bridge_server.bundle.js --minify --external:fsevents --external:@sequelize/mssql --external:@sequelize/sqlite3 --external:@sequelize/db2-ibmi --external:@sequelize/db2 --external:@sequelize/snowflake --format=cjs --banner:js=\"#!/usr/bin/env node\"",
+    "build:worker": "esbuild src/bridge_server_worker.ts --bundle --platform=node --target=node18 --outfile=bridge_server_worker.bundle.js --minify --external:fsevents --external:@sequelize/mssql --external:@sequelize/sqlite3 --external:@sequelize/db2-ibmi --external:@sequelize/db2 --external:@sequelize/snowflake --format=cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

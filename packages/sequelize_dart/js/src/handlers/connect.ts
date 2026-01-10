@@ -1,6 +1,6 @@
 import { Sequelize } from '@sequelize/core';
 import { selectDialect } from '../utils/dialectSelector';
-import { setOptions, setSequelize } from '../utils/state';
+import { setOptions, setSequelize, sendNotification } from '../utils/state';
 
 type ConnectParams = {
   config: any;
@@ -24,12 +24,11 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
 
   const loggingFn = logging
     ? (sql: any) => {
-        const notification = {
+        // Send notification via the bridge (works for both stdio and Worker Thread)
+        sendNotification({
           notification: 'sql_log',
           sql: typeof sql === 'string' ? sql : String(sql),
-        };
-        process.stdout.write(JSON.stringify(notification) + '\n');
-        console.error(sql);
+        });
       }
     : false;
 
