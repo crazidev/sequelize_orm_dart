@@ -15,7 +15,7 @@ Future<void> runQueries() async {
     print('Before increment - Post ${firstPost.id} views: ${firstPost.views}');
 
     // Increment views by 1
-    final updatedPost = await Post.instance.decrement(
+    final updatedPost = await Post.instance.increment(
       views: 1,
       where: (post) => and([
         post.id.lessThan(5),
@@ -26,10 +26,4 @@ Future<void> runQueries() async {
       'After increment - Post views updated ${updatedPost.firstOrNull?.toJson()}',
     );
   }
-
-  // Test increment with where clause
-  // final incrementResult = await Post.instance.increment(
-  //   views: 5,
-  //   where: (post) => post.id.lessThan(3),
-  // );
 }

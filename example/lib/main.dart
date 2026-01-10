@@ -36,5 +36,5 @@ Future<void> main() async {
   await runQueries();
 
   // Close the connection to free up resources
-  await sequelize.close();
+  // await sequelize.close();
 }
