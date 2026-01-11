@@ -8,7 +8,7 @@ let options: { hoistIncludeOptions: boolean } = {
 };
 
 // Notification callback for SQL logging
-// Set by bridge_server.ts (stdio) or bridge_server_worker.ts (Worker Thread)
+// Set by bridge_server.ts (unified - detects stdio or Worker Thread mode)
 let notificationCallback: ((notification: any) => void) | null = null;
 
 export function setNotificationCallback(callback: (notification: any) => void): void {

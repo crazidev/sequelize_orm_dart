@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setup script for Sequelize Dart bridge server
-# Installs dependencies and builds both the stdio and worker thread bundles
+# Installs dependencies and builds the unified bridge bundle
 
 # Exit on error
 set -e
@@ -74,8 +74,8 @@ esac
 
 echo -e "${GREEN}✓ Dependencies installed successfully!${NC}"
 
-# Build both bundles
-echo -e "${BLUE}Building bridge server bundles (minified)...${NC}"
+# Build unified bundle
+echo -e "${BLUE}Building bridge server bundle (minified)...${NC}"
 case "$PACKAGE_MANAGER" in
     bun)
         bun run build
@@ -88,18 +88,15 @@ case "$PACKAGE_MANAGER" in
         ;;
 esac
 
-# Check both bundles
-STDIO_BUNDLE="bridge_server.bundle.js"
-WORKER_BUNDLE="bridge_server_worker.bundle.js"
+# Check bundle
+BUNDLE="bridge_server.bundle.js"
 
-if [ -f "$STDIO_BUNDLE" ] && [ -f "$WORKER_BUNDLE" ]; then
-    STDIO_SIZE=$(du -h "$STDIO_BUNDLE" | cut -f1)
-    WORKER_SIZE=$(du -h "$WORKER_BUNDLE" | cut -f1)
+if [ -f "$BUNDLE" ]; then
+    BUNDLE_SIZE=$(du -h "$BUNDLE" | cut -f1)
     
-    echo -e "${GREEN}✓ Bridge server bundles built successfully!${NC}"
+    echo -e "${GREEN}✓ Bridge server bundle built successfully!${NC}"
     echo ""
-    echo -e "${GREEN}  stdio bundle (Dart VM):    $STDIO_SIZE - $BRIDGE_DIR/$STDIO_BUNDLE${NC}"
-    echo -e "${GREEN}  worker bundle (dart2js):   $WORKER_SIZE - $BRIDGE_DIR/$WORKER_BUNDLE${NC}"
+    echo -e "${GREEN}  unified bundle: $BUNDLE_SIZE - $BRIDGE_DIR/$BUNDLE${NC}"
     
     # Remove node_modules after successful build
     if [ -d "node_modules" ]; then
@@ -109,17 +106,12 @@ if [ -f "$STDIO_BUNDLE" ] && [ -f "$WORKER_BUNDLE" ]; then
     fi
     
     echo ""
-    echo -e "${GREEN}Setup complete! The bridge servers are ready to use.${NC}"
+    echo -e "${GREEN}Setup complete! The bridge server is ready to use.${NC}"
     echo ""
     echo -e "${YELLOW}Usage:${NC}"
-    echo -e "  ${BLUE}Dart VM:${NC}   Uses stdio bridge (bridge_server.bundle.js) via Process.start()"
-    echo -e "  ${BLUE}dart2js:${NC}   Uses worker bridge (bridge_server_worker.bundle.js) via Worker Threads"
+    echo -e "  ${BLUE}Dart VM:${NC}   Uses stdio mode (bridge_server.bundle.js) via Process.start()"
+    echo -e "  ${BLUE}dart2js:${NC}   Uses worker mode (bridge_server.bundle.js) via Worker Threads"
 else
-    if [ ! -f "$STDIO_BUNDLE" ]; then
-        echo -e "${RED}Error: stdio bundle not created${NC}"
-    fi
-    if [ ! -f "$WORKER_BUNDLE" ]; then
-        echo -e "${RED}Error: worker bundle not created${NC}"
-    fi
+    echo -e "${RED}Error: bridge bundle not created${NC}"
     exit 1
 fi

@@ -17,7 +17,7 @@ class BenchmarkResult {
   BenchmarkResult(this.name, this.durationMs, this.rowCount);
 
   @override
-  String toString() => '$name: ${durationMs}ms (${rowCount} rows)';
+  String toString() => '$name: ${durationMs}ms ($rowCount rows)';
 }
 
 /// Run a single benchmark
@@ -217,7 +217,7 @@ Future<void> main() async {
   print('');
 
   // Cleanup
-  await sequelize.close();
+  // await sequelize.close();
   print('Connection closed.');
 }
 

@@ -33,12 +33,12 @@ extension type _NodeProcess._(JSObject _) implements JSObject {
   external String cwd();
 }
 
-/// Resolve path to the bridge worker bundle
+/// Resolve path to the bridge bundle (works for both stdio and worker modes)
 String resolveBridgeWorkerPath() {
   final path = require('path') as _NodePath;
   final fs = require('fs') as _NodeFs;
   final cwd = process.cwd();
-  const bundleName = 'bridge_server_worker.bundle.js';
+  const bundleName = 'bridge_server.bundle.js';
 
   // Try possible paths relative to current working directory
   final possiblePaths = [
