@@ -32,12 +32,6 @@ void _generateInstanceMethods(
   final primaryKeys = fields.where((f) => f.primaryKey).toList();
   if (primaryKeys.isNotEmpty) {
     buffer.writeln('  Future<$valuesClassName?> reload() async {');
-    buffer.writeln('    if (_originalQuery == null) {');
-    buffer.writeln(
-      '      throw StateError(\'Cannot reload: instance was not created from findAll or findOne\');',
-    );
-    buffer.writeln('    }');
-    buffer.writeln();
     buffer.writeln('    // Get instance primary key WHERE clause');
     buffer.writeln('    final instanceWhereClause = this.where();');
     buffer.writeln('    if (instanceWhereClause == null) {');
@@ -58,24 +52,20 @@ void _generateInstanceMethods(
     );
     buffer.writeln();
     buffer.writeln(
-      '    // Call findOne with original query options but instance primary key WHERE',
+      '    // If _originalQuery exists, use it; otherwise use only primary key WHERE',
     );
-    buffer.writeln(
-      '    // Reconstruct include function from stored include list',
-    );
-    buffer.writeln('    final originalInclude = _originalQuery!.include;');
     buffer.writeln('    final result = await $generatedClassName().findOne(');
     buffer.writeln('      where: primaryKeyWhere,');
-    buffer.writeln('      include: originalInclude != null');
+    buffer.writeln('      include: _originalQuery?.include != null');
     buffer.writeln(
-      '          ? ($includeHelperClassName helper) => originalInclude',
+      '          ? ($includeHelperClassName helper) => _originalQuery!.include!',
     );
     buffer.writeln('          : null,');
-    buffer.writeln('      order: _originalQuery!.order,');
-    buffer.writeln('      group: _originalQuery!.group,');
-    buffer.writeln('      limit: _originalQuery!.limit,');
-    buffer.writeln('      offset: _originalQuery!.offset,');
-    buffer.writeln('      attributes: _originalQuery!.attributes,');
+    buffer.writeln('      order: _originalQuery?.order,');
+    buffer.writeln('      group: _originalQuery?.group,');
+    buffer.writeln('      limit: _originalQuery?.limit,');
+    buffer.writeln('      offset: _originalQuery?.offset,');
+    buffer.writeln('      attributes: _originalQuery?.attributes,');
     buffer.writeln('    );');
     buffer.writeln();
     buffer.writeln('    if (result == null) {');

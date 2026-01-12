@@ -24,7 +24,5 @@ Future<void> runQueries() async {
 
   print('${firstUser.firstName} post view ${firstUser.post?.views}');
   final updatedPost = await firstUser.post?.increment(views: 1);
-  // await firstUser.post?.reload();
-
   print('${firstUser.firstName} post view is ${firstUser.post?.views}');
 }
