@@ -47,9 +47,7 @@ void _generateFindOneMethod(
   buffer.writeln('        final instance = $valuesClassName.fromJson(data);');
   buffer.writeln('        instance._originalQuery = query;');
   buffer.writeln('        return instance;');
-  buffer.writeln(
-    '      })() : null',
-  );
+  buffer.writeln('      })() : null');
   buffer.writeln('    );');
   buffer.writeln('  }');
   buffer.writeln();

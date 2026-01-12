@@ -12,22 +12,6 @@ void _generateInstanceMethods(
   final whereCallbackName = _toCamelCase(className);
   final includeHelperClassName = '\$${className}IncludeHelper';
 
-  // Filter numeric fields (same as static method)
-  final numericFields = fields.where((field) {
-    final dartType = field.dartType;
-    final isNumeric =
-        dartType == 'int' || dartType == 'double' || dartType == 'num';
-    final isNotPrimaryKey = !field.primaryKey;
-    final isNotAutoIncrement = !field.autoIncrement;
-    final isNotForeignKey =
-        !field.name.toLowerCase().contains('_id') &&
-        !field.name.toLowerCase().endsWith('_id');
-    return isNumeric &&
-        isNotPrimaryKey &&
-        isNotAutoIncrement &&
-        isNotForeignKey;
-  }).toList();
-
   // Generate reload method (always available, not just for numeric fields)
   final primaryKeys = fields.where((f) => f.primaryKey).toList();
   if (primaryKeys.isNotEmpty) {
@@ -94,8 +78,24 @@ void _generateInstanceMethods(
     buffer.writeln();
   }
 
+  // Filter numeric fields (same as static method)
+  final numericFields = fields.where((field) {
+    final dartType = field.dartType;
+    final isNumeric =
+        dartType == 'int' || dartType == 'double' || dartType == 'num';
+    final isNotPrimaryKey = !field.primaryKey;
+    final isNotAutoIncrement = !field.autoIncrement;
+    final isNotForeignKey =
+        !field.name.toLowerCase().contains('_id') &&
+        !field.name.toLowerCase().endsWith('_id');
+    return isNumeric &&
+        isNotPrimaryKey &&
+        isNotAutoIncrement &&
+        isNotForeignKey;
+  }).toList();
+
   if (numericFields.isEmpty) {
-    return; // Don't generate increment/decrement if no numeric fields
+    return; // Don't generate methods if no numeric fields
   }
 
   // Generate increment method

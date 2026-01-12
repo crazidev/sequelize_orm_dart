@@ -43,15 +43,11 @@ void _generateFindAllMethod(
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');
   buffer.writeln('    ).then((data) =>');
-  buffer.writeln(
-    '      data.map((value) {',
-  );
+  buffer.writeln('      data.map((value) {');
   buffer.writeln('        final instance = $valuesClassName.fromJson(value);');
   buffer.writeln('        instance._originalQuery = query;');
   buffer.writeln('        return instance;');
-  buffer.writeln(
-    '      }).toList()',
-  );
+  buffer.writeln('      }).toList()');
   buffer.writeln('    );');
   buffer.writeln('  }');
   buffer.writeln();

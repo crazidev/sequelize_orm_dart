@@ -22,4 +22,3 @@ export async function handleFindAll(params: FindAllParams): Promise<any[]> {
   const results: Model[] = await model.findAll(options);
   return results.map((row: any) => row.toJSON());
 }
-
