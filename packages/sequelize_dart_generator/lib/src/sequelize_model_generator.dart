@@ -33,6 +33,9 @@ part 'generators/methods/_generate_max_method.dart';
 part 'generators/methods/_generate_min_method.dart';
 part 'generators/methods/_generate_query_builder.dart';
 part 'generators/methods/_generate_sum_method.dart';
+part 'generators/methods/_generate_where_method.dart';
+part 'generators/methods/_generate_merge_where_helper.dart';
+part 'generators/methods/_generate_instance_methods.dart';
 part 'generators/methods/_generator_naming_config.dart';
 part 'generators/methods/_get_association_json_key.dart';
 part 'generators/methods/_get_associations.dart';
@@ -174,6 +177,8 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       fields,
       associations,
+      className: className,
+      generatedClassName: generatedClassName,
     );
     _generateClassCreate(
       buffer,

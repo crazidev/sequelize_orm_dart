@@ -76,11 +76,17 @@ class Sequelize extends SequelizeInterface {
       model.define(model.name, this);
       _models[model.name] = model;
 
-      await _bridge.call('defineModel', {
+      final response = await _bridge.call('defineModel', {
         'name': model.name,
         'attributes': model.getAttributesJson(),
         'options': model.getOptionsJson(),
       });
+
+      // Store primary keys from response
+      final primaryKeys = response['primaryKeys'] as List?;
+      if (primaryKeys != null) {
+        model.primaryKeys = primaryKeys.cast<String>();
+      }
     }
     print('[Sequelize] All models defined.');
 

@@ -4,11 +4,13 @@ void _generateClassValues(
   StringBuffer buffer,
   String valuesClassName,
   List<_FieldInfo> fields,
-  List<_AssociationInfo> associations,
-) {
+  List<_AssociationInfo> associations, {
+  required String className,
+  required String generatedClassName,
+}) {
   buffer.writeln('class $valuesClassName {');
   for (var field in fields) {
-    buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
+    buffer.writeln('  ${field.dartType}? ${field.fieldName};');
   }
   // Add association fields
   for (var assoc in associations) {
@@ -16,13 +18,15 @@ void _generateClassValues(
       assoc.modelClassName,
     );
     if (assoc.associationType == 'hasOne') {
-      buffer.writeln('  final $modelValuesClassName? ${assoc.fieldName};');
+      buffer.writeln('  $modelValuesClassName? ${assoc.fieldName};');
     } else {
       buffer.writeln(
-        '  final List<$modelValuesClassName>? ${assoc.fieldName};',
+        '  List<$modelValuesClassName>? ${assoc.fieldName};',
       );
     }
   }
+  // Store original query for reload() method
+  buffer.writeln('  Query? _originalQuery;');
   buffer.writeln();
   buffer.writeln('  $valuesClassName({');
   for (var field in fields) {
@@ -81,6 +85,35 @@ void _generateClassValues(
   }
   buffer.writeln('    };');
   buffer.writeln('  }');
+  buffer.writeln();
+
+  // Generate where() method
+  _generateWhereMethod(buffer, className, generatedClassName);
+
+  // Get primary keys for helper method
+  final primaryKeys = fields.where((f) => f.primaryKey).toList();
+  final columnsClassName = '\$${className}Columns';
+  final whereCallbackName = _toCamelCase(className);
+
+  // Generate merge where helper method
+  _generateMergeWhereHelper(
+    buffer,
+    columnsClassName,
+    whereCallbackName,
+    generatedClassName,
+    primaryKeys,
+  );
+
+  // Generate instance methods
+  _generateInstanceMethods(
+    buffer,
+    valuesClassName,
+    className,
+    generatedClassName,
+    fields,
+    associations,
+  );
+
   buffer.writeln('}');
   buffer.writeln();
 }

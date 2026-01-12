@@ -7,6 +7,10 @@ abstract class ModelInterface<T> {
   late String name;
   late dynamic sequelizeInstance;
   late dynamic sequelizeModel;
+  List<String> primaryKeys = [];
+
+  /// Get primary key attribute names
+  List<String> getPrimaryKeys() => primaryKeys;
 
   /// Define the model in Sequelize
   ModelInterface<T> define(String modelName, Object sequelize);

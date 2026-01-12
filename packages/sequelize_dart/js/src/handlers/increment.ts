@@ -19,10 +19,6 @@ export async function handleIncrement(params: IncrementParams): Promise<any> {
   const models = getModels();
   const model = models.get(modelName);
   checkModelDefinition(model, modelName);
-  sendNotification({
-    notification: "sql_log",
-    sql: "Testing notification",
-  });
 
   if (!fields || Object.keys(fields).length === 0) {
     throw new Error('Fields are required for increment operation');

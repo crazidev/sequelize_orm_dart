@@ -12,6 +12,14 @@ class QueryAttributes {
     this.isExclude = false,
   });
 
+  factory QueryAttributes.include(List<dynamic> columns) {
+    return QueryAttributes(columns: columns);
+  }
+
+  factory QueryAttributes.exclude(List<dynamic> columns) {
+    return QueryAttributes(columns: columns, isExclude: true);
+  }
+
   Map<String, dynamic> toJson() {
     if (!isExclude) {
       return {

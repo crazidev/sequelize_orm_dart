@@ -1,3 +1,4 @@
+import { Model } from '@sequelize/core';
 import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
@@ -18,6 +19,6 @@ export async function handleFindOne(params: FindOneParams): Promise<any | null> 
   const model = models.get(modelName);
   checkModelDefinition(model, modelName);
 
-  const result = await model.findOne(options);
+  const result: Model = await model.findOne(options);
   return result ? result.toJSON() : null;
 }

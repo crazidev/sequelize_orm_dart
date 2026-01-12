@@ -7,7 +7,7 @@ type DefineModelParams = {
   options?: any;
 };
 
-export async function handleDefineModel(params: DefineModelParams): Promise<{ defined: true }> {
+export async function handleDefineModel(params: DefineModelParams): Promise<{ defined: true, primaryKeys: string[] }> {
   const sequelize = getSequelize();
   if (!sequelize) {
     throw new Error('Not connected. Call connect first.');
@@ -27,5 +27,8 @@ export async function handleDefineModel(params: DefineModelParams): Promise<{ de
   const model = sequelize.define(name, sequelizeAttributes, finalOptions);
   models.set(name, model);
 
-  return { defined: true };
+  // Extract primary key attributes from the defined model
+  const primaryKeys = model.primaryKeyAttributes || [];
+
+  return { defined: true, primaryKeys };
 }

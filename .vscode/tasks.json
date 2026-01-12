@@ -106,9 +106,9 @@
       "group": "build",
       "presentation": {
         "reveal": "always",
-        "panel": "dedicated",
-        "clear": true,
-        "group": "watch"
+        "panel": "new",
+        "clear": true
+        // "group": "watch"
       },
       "problemMatcher": {
         "pattern": {
