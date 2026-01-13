@@ -48,11 +48,7 @@ void _generateFindOneMethod(
     '        final instance = $valuesClassName.fromJson(result.data);',
   );
   buffer.writeln('        instance.originalQuery = query;');
-  // TODO: Once JS side enables previous() and changed(), these will be populated
-  // Currently these are empty {} and [] respectively until JS implementation is enabled
-  buffer.writeln('        instance.previous = result.previous;');
-  buffer.writeln('        instance.changedFields = result.changed;');
-  buffer.writeln('        instance.isNewRecord = result.isNewRecord;');
+  // TODO: Enable isNewRecord, changed & previous
   buffer.writeln('        return instance;');
   buffer.writeln('      })() : null');
   buffer.writeln('    );');

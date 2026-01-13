@@ -2,7 +2,6 @@ import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 import { toModelResponseArray, ModelResponse } from '../utils/modelResponse';
-import { printLogs } from '../utils/printLogs';
 
 type IncrementParams = {
   model: string;
@@ -46,11 +45,12 @@ export async function handleIncrement(params: IncrementParams): Promise<ModelRes
   }
   
   // Plain objects - wrap them in the response format
+  // TODO: Enable isNewRecord, changed & previous
   return rows.map((row: any) => ({
     data: row,
-    previous: {},
-    changed: false,
-    isNewRecord: false,
+    // previous: {},
+    // changed: false,
+    // isNewRecord: false,
   }));
 }
 
