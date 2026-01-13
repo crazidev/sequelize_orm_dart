@@ -7,6 +7,7 @@ part 'users.model.g.dart';
   tableName: 'users',
   underscored: true,
   timestamps: false,
+  createdAt: TimestampOption.custom('columnName'),
   name: ModelNameOption(singular: 'user', plural: 'users'),
 )
 class Users {

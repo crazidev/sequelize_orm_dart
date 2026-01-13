@@ -10,6 +10,6 @@ Future<void> runQueries() async {
   print('\n=== Testing CREATE ===');
   final newUser = await measureQuery(
     'create',
-    () => Users.instance.findAll(),
+    () => Users.instance.findAll(limit: 2),
   );
 }

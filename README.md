@@ -260,6 +260,25 @@ pool: SequelizePoolOptions(
 
 ## Documentation
 
+The documentation is built with [Docusaurus](https://docusaurus.io/) and includes comprehensive guides:
+
+- **[Get Started](./doc/get-started.md)** - Installation, database connection, and basic usage
+- **[Models & Tables](./doc/models.md)** - Model definitions and configuration
+- **[Associations](./doc/associations.md)** - Model relationships
+- **[Querying](./doc/querying.md)** - Data querying and manipulation
+
+### Building Documentation
+
+```bash
+# Build the documentation site
+./tools/generate_docs.sh
+
+# Or start the development server
+cd website && npm start
+```
+
+### Package Documentation
+
 - **[sequelize_dart](./packages/sequelize_dart/README.md)** - Main package documentation
 - **[sequelize_dart_annotations](./packages/sequelize_dart_annotations/README.md)** - Annotations reference
 - **[sequelize_dart_generator](./packages/sequelize_dart_generator/README.md)** - Code generator guide
