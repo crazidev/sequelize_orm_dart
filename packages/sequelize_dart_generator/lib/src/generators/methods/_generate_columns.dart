@@ -12,14 +12,14 @@ void _generateColumns(
     '/// Contains only column references for use in where clauses',
   );
   buffer.writeln('class $columnsClassName {');
-  buffer.writeln('  $columnsClassName();');
+  buffer.writeln('  const $columnsClassName();');
   buffer.writeln();
 
-  // Generate column references
+  // Generate column references as static const for efficiency
   for (var field in fields) {
     final dartType = _getDartTypeForQuery(field.dataType);
     buffer.writeln(
-      "  final ${field.fieldName} = Column<$dartType>('${field.name}', DataType.${field.dataType});",
+      "  final ${field.fieldName} = const Column<$dartType>('${field.name}', DataType.${field.dataType});",
     );
   }
 

@@ -180,11 +180,14 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       className: className,
       generatedClassName: generatedClassName,
     );
-    _generateClassCreate(
-      buffer,
-      createClassName,
-      fields,
-    );
+    // Conditionally generate $ModelCreate class based on config
+    if (namingConfig.generateCreateClass) {
+      _generateClassCreate(
+        buffer,
+        createClassName,
+        fields,
+      );
+    }
     _generateColumns(
       buffer,
       className,

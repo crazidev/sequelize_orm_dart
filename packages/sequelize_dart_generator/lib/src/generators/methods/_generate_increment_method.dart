@@ -107,7 +107,7 @@ void _generateNumericOperationMethod(
   buffer.writeln();
   buffer.writeln('    final query = Query.fromCallbacks(');
   buffer.writeln('      where: where,');
-  buffer.writeln('      columns: $columnsClassName(),');
+  buffer.writeln('      columns: const $columnsClassName(),');
   buffer.writeln('    );');
   buffer.writeln();
   buffer.writeln('    return QueryEngine().$operation(');

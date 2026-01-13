@@ -7,21 +7,16 @@ void _generateQueryBuilder(
   List<_AssociationInfo> associations,
 ) {
   final queryBuilderClassName = '\$${className}Query';
+  final columnsClassName = '\$${className}Columns';
 
   buffer.writeln('/// Type-safe query builder for $className');
-  buffer.writeln('class $queryBuilderClassName {');
-  buffer.writeln('  $queryBuilderClassName();'); // Constructor
-  buffer.writeln();
+  buffer.writeln(
+    '/// Extends $columnsClassName to provide column access plus associations',
+  );
+  buffer.writeln('class $queryBuilderClassName extends $columnsClassName {');
+  buffer.writeln('  const $queryBuilderClassName();');
 
-  // Generate column references
-  for (var field in fields) {
-    final dartType = _getDartTypeForQuery(field.dataType);
-    buffer.writeln(
-      "  final ${field.fieldName} = Column<$dartType>('${field.name}', DataType.${field.dataType});",
-    );
-  }
-
-  // Generate association references
+  // Generate association references (columns are inherited from $columnsClassName)
   if (associations.isNotEmpty) {
     buffer.writeln();
     for (var assoc in associations) {

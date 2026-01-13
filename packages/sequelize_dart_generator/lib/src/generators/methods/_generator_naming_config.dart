@@ -1,10 +1,18 @@
 part of '../../sequelize_model_generator.dart';
 
 class GeneratorNamingConfig {
-  const GeneratorNamingConfig();
+  /// Whether to generate $ModelCreate class (default: true)
+  final bool generateCreateClass;
+
+  const GeneratorNamingConfig({
+    this.generateCreateClass = true,
+  });
 
   factory GeneratorNamingConfig.fromOptions(BuilderOptions options) {
-    return const GeneratorNamingConfig();
+    final config = options.config;
+    return GeneratorNamingConfig(
+      generateCreateClass: config['generateCreateClass'] as bool? ?? true,
+    );
   }
 
   /// Gets the parameter name for the 'where' callback

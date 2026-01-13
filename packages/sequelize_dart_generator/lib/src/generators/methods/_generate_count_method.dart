@@ -13,7 +13,7 @@ void _generateCountMethod(
     '    QueryOperator Function($columnsClassName $whereCallbackName)? where,',
   );
   buffer.writeln('  }) {');
-  buffer.writeln('    final columns = $columnsClassName();');
+  buffer.writeln('    const columns = $columnsClassName();');
   buffer.writeln('    final query = Query.fromCallbacks(');
   buffer.writeln('      where: where,');
   buffer.writeln('      columns: columns,');

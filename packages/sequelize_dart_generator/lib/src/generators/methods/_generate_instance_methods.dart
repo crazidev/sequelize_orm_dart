@@ -9,59 +9,46 @@ void _generateInstanceMethods(
   List<_AssociationInfo> associations,
 ) {
   final columnsClassName = '\$${className}Columns';
-  final whereCallbackName = _toCamelCase(className);
   final includeHelperClassName = '\$${className}IncludeHelper';
 
   // Generate reload method (always available, not just for numeric fields)
   final primaryKeys = fields.where((f) => f.primaryKey).toList();
   if (primaryKeys.isNotEmpty) {
+    buffer.writeln('  /// Reloads this instance from the database');
     buffer.writeln('  Future<$valuesClassName?> reload() async {');
-    buffer.writeln('    // Get instance primary key WHERE clause');
-    buffer.writeln('    final instanceWhereClause = this.where();');
-    buffer.writeln('    if (instanceWhereClause == null) {');
+    buffer.writeln('    final pk = this.where();');
     buffer.writeln(
-      '      throw StateError(\'Cannot reload: instance has no primary key values\');',
+      '    if (pk == null) throw StateError(\'Cannot reload: no primary key\');',
     );
-    buffer.writeln('    }');
-    buffer.writeln();
-    buffer.writeln(
-      '    // Convert instance where() Map to QueryOperator function',
-    );
-    _generateMapToWhereClause(
-      buffer,
-      whereCallbackName,
-      primaryKeys,
-      'primaryKeyWhere',
-      columnsClassName,
-    );
-    buffer.writeln();
-    buffer.writeln(
-      '    // If _originalQuery exists, use it; otherwise use only primary key WHERE',
-    );
+
+    // Generate primary key where builder (compact)
+    if (primaryKeys.length == 1) {
+      final key = primaryKeys.first.fieldName;
+      buffer.writeln('    final pkWhere = (c) => c.$key.eq(pk[\'$key\']);');
+    } else {
+      buffer.writeln('    final pkWhere = (c) => and([');
+      for (final pk in primaryKeys) {
+        final key = pk.fieldName;
+        buffer.writeln(
+          '      if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
+        );
+      }
+      buffer.writeln('    ]);');
+    }
+
+    buffer.writeln('    final q = _originalQuery;');
     buffer.writeln('    final result = await $generatedClassName().findOne(');
-    buffer.writeln('      where: primaryKeyWhere,');
-    buffer.writeln('      include: _originalQuery?.include != null');
+    buffer.writeln('      where: pkWhere,');
     buffer.writeln(
-      '          ? ($includeHelperClassName helper) => _originalQuery!.include!',
+      '      include: q?.include != null ? ($includeHelperClassName _) => q!.include! : null,',
     );
-    buffer.writeln('          : null,');
-    buffer.writeln('      order: _originalQuery?.order,');
-    buffer.writeln('      group: _originalQuery?.group,');
-    buffer.writeln('      limit: _originalQuery?.limit,');
-    buffer.writeln('      offset: _originalQuery?.offset,');
-    buffer.writeln('      attributes: _originalQuery?.attributes,');
+    buffer.writeln(
+      '      order: q?.order, group: q?.group, limit: q?.limit, offset: q?.offset, attributes: q?.attributes,',
+    );
     buffer.writeln('    );');
-    buffer.writeln();
-    buffer.writeln('    if (result == null) {');
-    buffer.writeln('      return null;');
-    buffer.writeln('    }');
-    buffer.writeln();
+    buffer.writeln('    if (result == null) return null;');
     buffer.writeln('    _updateFields(result);');
-    buffer.writeln('    // Preserve original query for future reloads');
-    buffer.writeln(
-      '    _originalQuery = result._originalQuery ?? _originalQuery;',
-    );
-    buffer.writeln();
+    buffer.writeln('    _originalQuery = result._originalQuery ?? q;');
     buffer.writeln('    return this;');
     buffer.writeln('  }');
     buffer.writeln();
@@ -83,172 +70,82 @@ void _generateInstanceMethods(
         isNotForeignKey;
   }).toList();
 
-  if (numericFields.isEmpty) {
-    return; // Don't generate methods if no numeric fields
-  }
+  if (numericFields.isEmpty) return;
 
-  // Generate increment method
-  buffer.writeln('  Future<$valuesClassName?> increment(');
-  buffer.writeln('    {');
+  // Generate increment method (compact)
+  buffer.writeln('  /// Increments numeric fields and updates this instance');
+  buffer.write('  Future<$valuesClassName?> increment({');
   for (final field in numericFields) {
-    final fieldName = field.name;
-    final camelCaseName = _toCamelCase(fieldName);
-    buffer.writeln('      int? $camelCaseName,');
+    buffer.write('int? ${_toCamelCase(field.name)}, ');
   }
   buffer.writeln(
-    '      QueryOperator Function($columnsClassName $whereCallbackName)? where,',
+    'QueryOperator Function($columnsClassName c)? where}) async {',
   );
-  buffer.writeln('    }');
-  buffer.writeln('  ) async {');
-  buffer.writeln('    final fields = <String, dynamic>{');
-  for (final field in numericFields) {
-    final fieldName = field.name;
-    final camelCaseName = _toCamelCase(fieldName);
-    buffer.writeln(
-      '      if ($camelCaseName != null) \'$fieldName\': $camelCaseName,',
+
+  // Build fields map inline
+  buffer.write('    final fields = {');
+  for (var i = 0; i < numericFields.length; i++) {
+    final camelName = _toCamelCase(numericFields[i].name);
+    buffer.write(
+      "if ($camelName != null) '${numericFields[i].name}': $camelName",
     );
+    if (i < numericFields.length - 1) buffer.write(', ');
   }
-  buffer.writeln('    };');
-  buffer.writeln();
-  buffer.writeln('    if (fields.isEmpty) {');
+  buffer.writeln('};');
   buffer.writeln(
-    '      throw ArgumentError(\'At least one field must be provided for increment\');',
+    '    if (fields.isEmpty) throw ArgumentError(\'At least one field required\');',
   );
-  buffer.writeln('    }');
-  buffer.writeln();
-  buffer.writeln('    // Merge instance where() with optional where clause');
-  buffer.writeln('    final finalWhere = _mergeWhere(where);');
-  buffer.writeln();
-  buffer.writeln('    // Call static increment method');
-  buffer.writeln(
-    '    final result = await $generatedClassName().increment(',
-  );
-  if (numericFields.isNotEmpty) {
-    buffer.write('      ');
-    for (var i = 0; i < numericFields.length; i++) {
-      final field = numericFields[i];
-      final camelCaseName = _toCamelCase(field.name);
-      buffer.write('$camelCaseName: $camelCaseName');
-      if (i < numericFields.length - 1) {
-        buffer.write(',\n      ');
-      }
-    }
-    buffer.writeln(',');
+
+  // Call static method with all field params
+  buffer.write('    final result = await $generatedClassName().increment(');
+  for (final field in numericFields) {
+    final camelName = _toCamelCase(field.name);
+    buffer.write('$camelName: $camelName, ');
   }
-  buffer.writeln('      where: finalWhere,');
-  buffer.writeln('    );');
-  buffer.writeln();
+  buffer.writeln('where: _mergeWhere(where));');
+
   buffer.writeln('    final updated = result.firstOrNull;');
-  buffer.writeln('    if (updated == null) {');
-  buffer.writeln('      return null;');
-  buffer.writeln('    }');
-  buffer.writeln();
+  buffer.writeln('    if (updated == null) return null;');
   buffer.writeln('    _updateFields(updated);');
   buffer.writeln('    return this;');
   buffer.writeln('  }');
   buffer.writeln();
 
-  // Generate decrement method (same pattern as increment)
-  buffer.writeln('  Future<$valuesClassName?> decrement(');
-  buffer.writeln('    {');
+  // Generate decrement method (compact)
+  buffer.writeln('  /// Decrements numeric fields and updates this instance');
+  buffer.write('  Future<$valuesClassName?> decrement({');
   for (final field in numericFields) {
-    final fieldName = field.name;
-    final camelCaseName = _toCamelCase(fieldName);
-    buffer.writeln('      int? $camelCaseName,');
+    buffer.write('int? ${_toCamelCase(field.name)}, ');
   }
   buffer.writeln(
-    '      QueryOperator Function($columnsClassName $whereCallbackName)? where,',
+    'QueryOperator Function($columnsClassName c)? where}) async {',
   );
-  buffer.writeln('    }');
-  buffer.writeln('  ) async {');
-  buffer.writeln('    final fields = <String, dynamic>{');
-  for (final field in numericFields) {
-    final fieldName = field.name;
-    final camelCaseName = _toCamelCase(fieldName);
-    buffer.writeln(
-      '      if ($camelCaseName != null) \'$fieldName\': $camelCaseName,',
+
+  // Build fields map inline
+  buffer.write('    final fields = {');
+  for (var i = 0; i < numericFields.length; i++) {
+    final camelName = _toCamelCase(numericFields[i].name);
+    buffer.write(
+      "if ($camelName != null) '${numericFields[i].name}': $camelName",
     );
+    if (i < numericFields.length - 1) buffer.write(', ');
   }
-  buffer.writeln('    };');
-  buffer.writeln();
-  buffer.writeln('    if (fields.isEmpty) {');
+  buffer.writeln('};');
   buffer.writeln(
-    '      throw ArgumentError(\'At least one field must be provided for decrement\');',
+    '    if (fields.isEmpty) throw ArgumentError(\'At least one field required\');',
   );
-  buffer.writeln('    }');
-  buffer.writeln();
-  buffer.writeln('    // Merge instance where() with optional where clause');
-  buffer.writeln('    final finalWhere = _mergeWhere(where);');
-  buffer.writeln();
-  buffer.writeln('    // Call static decrement method');
-  buffer.writeln(
-    '    final result = await $generatedClassName().decrement(',
-  );
-  if (numericFields.isNotEmpty) {
-    buffer.write('      ');
-    for (var i = 0; i < numericFields.length; i++) {
-      final field = numericFields[i];
-      final camelCaseName = _toCamelCase(field.name);
-      buffer.write('$camelCaseName: $camelCaseName');
-      if (i < numericFields.length - 1) {
-        buffer.write(',\n      ');
-      }
-    }
-    buffer.writeln(',');
+
+  // Call static method with all field params
+  buffer.write('    final result = await $generatedClassName().decrement(');
+  for (final field in numericFields) {
+    final camelName = _toCamelCase(field.name);
+    buffer.write('$camelName: $camelName, ');
   }
-  buffer.writeln('      where: finalWhere,');
-  buffer.writeln('    );');
-  buffer.writeln();
+  buffer.writeln('where: _mergeWhere(where));');
+
   buffer.writeln('    final updated = result.firstOrNull;');
-  buffer.writeln('    if (updated == null) {');
-  buffer.writeln('      return null;');
-  buffer.writeln('    }');
-  buffer.writeln();
+  buffer.writeln('    if (updated == null) return null;');
   buffer.writeln('    _updateFields(updated);');
   buffer.writeln('    return this;');
   buffer.writeln('  }');
-  buffer.writeln();
-}
-
-void _generateMapToWhereClause(
-  StringBuffer buffer,
-  String whereCallbackName,
-  List<_FieldInfo> primaryKeys,
-  String variableName,
-  String columnsClassName,
-) {
-  if (primaryKeys.isEmpty) {
-    buffer.writeln(
-      '      $variableName = ($whereCallbackName) => throw ArgumentError(\'No primary keys found\');',
-    );
-    return;
-  }
-
-  buffer.writeln(
-    '      QueryOperator Function($columnsClassName $whereCallbackName) $variableName;',
-  );
-  if (primaryKeys.length == 1) {
-    final key = primaryKeys.first.fieldName;
-    buffer.writeln('      final keyValue = instanceWhereClause[\'$key\'];');
-    buffer.writeln(
-      '      $variableName = ($whereCallbackName) => $whereCallbackName.$key.eq(keyValue);',
-    );
-  } else {
-    buffer.writeln('      $variableName = ($whereCallbackName) {');
-    buffer.writeln('        final conditions = <QueryOperator>[];');
-    for (final pk in primaryKeys) {
-      final key = pk.fieldName;
-      final valueVar = '${key}Value';
-      buffer.writeln(
-        '        final $valueVar = instanceWhereClause[\'$key\'];',
-      );
-      buffer.writeln('        if ($valueVar != null) {');
-      buffer.writeln(
-        '          conditions.add($whereCallbackName.$key.eq($valueVar));',
-      );
-      buffer.writeln('        }');
-    }
-    buffer.writeln('        return and(conditions);');
-    buffer.writeln('      };');
-  }
 }

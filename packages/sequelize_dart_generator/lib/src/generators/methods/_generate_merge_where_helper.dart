@@ -8,58 +8,39 @@ void _generateMergeWhereHelper(
   List<_FieldInfo> primaryKeys,
 ) {
   buffer.writeln(
-    '  /// Merge instance primary key where clause with optional provided where clause',
+    '  /// Merges instance primary key with optional where clause (Sequelize.js behavior)',
   );
   buffer.writeln(
-    '  /// Sequelize.js behavior: instance primary key replaces any primary key in provided where',
+    '  QueryOperator Function($columnsClassName c) _mergeWhere(QueryOperator Function($columnsClassName c)? where) {',
   );
+  buffer.writeln('    final pk = this.where();');
+  buffer.writeln('    if (pk == null) {');
   buffer.writeln(
-    '  /// This merging happens at the SQL level by Sequelize.js, so we use and() to combine them',
+    '      if (where != null) return where;',
   );
-  buffer.writeln(
-    '  QueryOperator Function($columnsClassName $whereCallbackName) _mergeWhere(',
-  );
-  buffer.writeln(
-    '    QueryOperator Function($columnsClassName $whereCallbackName)? where,',
-  );
-  buffer.writeln('  ) {');
-  buffer.writeln('    final instanceWhereClause = this.where();');
-  buffer.writeln(
-    '    QueryOperator Function($columnsClassName $whereCallbackName) finalWhere;',
-  );
-  buffer.writeln('    if (instanceWhereClause != null) {');
-  buffer.writeln(
-    '      // Convert instance where() Map to QueryOperator function',
-  );
-  _generateMapToWhereClause(
-    buffer,
-    whereCallbackName,
-    primaryKeys,
-    'primaryKeyWhere',
-    columnsClassName,
-  );
-  buffer.writeln('      if (where != null) {');
-  buffer.writeln(
-    '        // Merge with and(): Sequelize.js handles primary key replacement at SQL level',
-  );
-  buffer.writeln(
-    '        // Order: provided where first, then instance primary key (matches Sequelize.js behavior)',
-  );
-  buffer.writeln(
-    '        finalWhere = ($whereCallbackName) => and([where($whereCallbackName), primaryKeyWhere($whereCallbackName)]);',
-  );
-  buffer.writeln('      } else {');
-  buffer.writeln('        finalWhere = primaryKeyWhere;');
-  buffer.writeln('      }');
-  buffer.writeln('    } else if (where != null) {');
-  buffer.writeln('      // Use provided where clause only');
-  buffer.writeln('      finalWhere = where;');
-  buffer.writeln('    } else {');
   buffer.writeln(
     '      throw ArgumentError(\'Where clause is required\');',
   );
   buffer.writeln('    }');
-  buffer.writeln('    return finalWhere;');
+
+  // Generate primary key where builder
+  if (primaryKeys.length == 1) {
+    final key = primaryKeys.first.fieldName;
+    buffer.writeln('    final pkWhere = (c) => c.$key.eq(pk[\'$key\']);');
+  } else {
+    buffer.writeln('    final pkWhere = (c) => and([');
+    for (final pk in primaryKeys) {
+      final key = pk.fieldName;
+      buffer.writeln(
+        '      if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
+      );
+    }
+    buffer.writeln('    ]);');
+  }
+
+  buffer.writeln(
+    '    return where != null ? (c) => and([where(c), pkWhere(c)]) : pkWhere;',
+  );
   buffer.writeln('  }');
   buffer.writeln();
 }

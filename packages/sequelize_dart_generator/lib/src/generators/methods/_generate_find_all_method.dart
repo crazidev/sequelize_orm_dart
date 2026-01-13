@@ -24,8 +24,8 @@ void _generateFindAllMethod(
   buffer.writeln('    int? offset,');
   buffer.writeln('    QueryAttributes? attributes,');
   buffer.writeln('  }) {');
-  buffer.writeln('    final columns = $columnsClassName();');
-  buffer.writeln('    final includeHelper = const $includeHelperClassName();');
+  buffer.writeln('    const columns = $columnsClassName();');
+  buffer.writeln('    const includeHelper = $includeHelperClassName();');
   buffer.writeln('    final query = Query.fromCallbacks(');
   buffer.writeln('      where: where,');
   buffer.writeln('      include: include,');
