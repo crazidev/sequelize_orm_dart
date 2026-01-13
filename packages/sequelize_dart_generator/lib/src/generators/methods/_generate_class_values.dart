@@ -46,7 +46,21 @@ void _generateClassValues(
   }
   buffer.writeln();
 
-  // TODO: Enable isNewRecord, changed & previous
+  // Store previous data snapshot for change tracking
+  buffer.writeln('  Map<String, dynamic>? _previousDataValues;');
+  buffer.writeln();
+  buffer.writeln(
+    '  /// Get the previous data snapshot (used for change tracking)',
+  );
+  buffer.writeln(
+    '  Map<String, dynamic>? get previousDataValues => _previousDataValues;',
+  );
+  buffer.writeln();
+  buffer.writeln('  /// Set the previous data snapshot');
+  buffer.writeln('  void setPreviousDataValues(Map<String, dynamic>? data) {');
+  buffer.writeln('    _previousDataValues = data;');
+  buffer.writeln('  }');
+  buffer.writeln();
 
   buffer.writeln('  $valuesClassName({');
   for (var field in fields) {

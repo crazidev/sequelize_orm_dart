@@ -117,81 +117,86 @@ void _generateInstanceMethods(
         .toList();
     buffer.writeln('  /// Saves all changes made to this instance');
     buffer.writeln(
-      '  /// Returns the number of affected rows (0 if no changes, 1 if updated)',
+      '  /// Returns the number of affected rows (0 if no changes, 1 if updated/created)',
     );
     buffer.writeln('  Future<int> save({List<String>? fields}) async {');
-    buffer.writeln('    final pkValues = getPrimaryKeyMap();');
-    buffer.writeln('    if (pkValues == null || pkValues.isEmpty) {');
+    buffer.writeln('    // Get primary key values');
     buffer.writeln(
-      '      throw StateError(\'Cannot save: instance has no primary key values\');',
-    );
-    buffer.writeln('    }');
-    buffer.writeln();
-    buffer.writeln('    // Build update data from current instance');
-    buffer.writeln('    final data = toJson();');
-    buffer.writeln('    // Remove primary keys from update data');
-    for (final pk in primaryKeys) {
-      buffer.writeln('    data.remove(\'${pk.name}\');');
-    }
-    buffer.writeln('    // Remove association fields from update data');
-    for (final assoc in associations) {
-      buffer.writeln('    data.remove(\'${assoc.as}\');');
-    }
-    buffer.writeln();
-    buffer.writeln('    // Filter to specified fields if provided');
-    buffer.writeln('    if (fields != null && fields.isNotEmpty) {');
-    buffer.writeln('      final filteredData = <String, dynamic>{};');
-    buffer.writeln('      for (final field in fields) {');
-    buffer.writeln('        if (data.containsKey(field)) {');
-    buffer.writeln('          filteredData[field] = data[field];');
-    buffer.writeln('        }');
-    buffer.writeln('      }');
-    buffer.writeln('      data.clear();');
-    buffer.writeln('      data.addAll(filteredData);');
-    buffer.writeln('    }');
-    buffer.writeln();
-    buffer.writeln('    if (data.isEmpty) {');
-    buffer.writeln('      // No changes to save');
-    buffer.writeln('      return 0;');
-    buffer.writeln('    }');
-    buffer.writeln();
-    buffer.writeln('    // Build primary key where clause');
-    buffer.writeln('    final pkWhere = ($columnsClassName c) => ');
-    if (primaryKeys.length == 1) {
-      final key = primaryKeys.first.fieldName;
-      buffer.writeln(
-        '        c.$key.eq(pkValues[\'${primaryKeys.first.name}\']);',
-      );
-    } else {
-      buffer.writeln('        and([');
-      for (final pk in primaryKeys) {
-        buffer.writeln(
-          '          c.${pk.fieldName}.eq(pkValues[\'${pk.name}\']),',
-        );
-      }
-      buffer.writeln('        ]);');
-    }
-    buffer.writeln();
-    buffer.writeln('    // Extract values from data map for named parameters');
-    buffer.write(
-      '    final affectedRows = await $generatedClassName().update(',
+      '    final pkValues = getPrimaryKeyMap() ?? <String, dynamic>{};',
     );
     buffer.writeln();
-    // Generate named parameters by extracting from data map
-    for (final field in updateableFields) {
-      buffer.writeln(
-        '      ${field.fieldName}: data[\'${field.name}\'] as ${field.dartType}?,',
-      );
-    }
-    buffer.writeln('      where: pkWhere,');
-    buffer.writeln('    );');
-    buffer.writeln();
-    buffer.writeln('    // Reload to get updated values from database');
-    buffer.writeln('    if (affectedRows > 0) {');
+    buffer.writeln(
+      '    // If we have a primary key but no previousData, reload to get full data from DB',
+    );
+    buffer.writeln(
+      '    // This ensures foreign keys and other fields are preserved when saving',
+    );
+    buffer.writeln(
+      '    if (pkValues.isNotEmpty && previousDataValues == null) {',
+    );
     buffer.writeln('      await reload();');
     buffer.writeln('    }');
     buffer.writeln();
-    buffer.writeln('    return affectedRows;');
+    buffer.writeln('    // Get current data from instance');
+    buffer.writeln('    final currentData = toJson();');
+    buffer.writeln();
+    buffer.writeln('    // Get previous data values (null if new record)');
+    buffer.writeln('    final previousData = previousDataValues;');
+    buffer.writeln();
+    buffer.writeln(
+      '    // Merge previousData with currentData to preserve foreign keys and other fields',
+    );
+    buffer.writeln(
+      '    // This ensures fields that exist in DB but are null in current instance are preserved',
+    );
+    buffer.writeln(
+      '    // Start with previousData, then overlay non-null values from currentData',
+    );
+    buffer.writeln(
+      '    final mergedData = <String, dynamic>{...?previousData};',
+    );
+    buffer.writeln('    for (final entry in currentData.entries) {');
+    buffer.writeln(
+      '      // Only update with non-null values from currentData',
+    );
+    buffer.writeln(
+      '      // This preserves previousData values when currentData has null',
+    );
+    buffer.writeln('      if (entry.value != null) {');
+    buffer.writeln('        mergedData[entry.key] = entry.value;');
+    buffer.writeln('      }');
+    buffer.writeln('    }');
+    buffer.writeln();
+    buffer.writeln('    // Filter to specified fields if provided');
+    buffer.writeln(
+      '    final dataToSave = (fields != null && fields.isNotEmpty)',
+    );
+    buffer.writeln('        ? <String, dynamic>{');
+    buffer.writeln('            for (final f in fields)');
+    buffer.writeln('              if (mergedData[f] != null) f: mergedData[f]');
+    buffer.writeln('          }');
+    buffer.writeln('        : mergedData;');
+    buffer.writeln();
+    buffer.writeln('    // Call bridge save handler');
+    buffer.writeln('    final result = await QueryEngine().save(');
+    buffer.writeln('      modelName: $generatedClassName().name,');
+    buffer.writeln('      currentData: dataToSave,');
+    buffer.writeln('      previousData: previousData,');
+    buffer.writeln('      primaryKeyValues: pkValues,');
+    buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
+    buffer.writeln('      model: $generatedClassName().sequelizeModel,');
+    buffer.writeln('    );');
+    buffer.writeln();
+    buffer.writeln('    // Update instance fields from result');
+    buffer.writeln(
+      '    final updatedInstance = $valuesClassName.fromJson(result.data);',
+    );
+    buffer.writeln('    _updateFields(updatedInstance);');
+    buffer.writeln();
+    buffer.writeln('    // Update previous data snapshot');
+    buffer.writeln('    setPreviousDataValues(toJson());');
+    buffer.writeln();
+    buffer.writeln('    return 1; // save() always returns 1 if successful');
     buffer.writeln('  }');
     buffer.writeln();
 

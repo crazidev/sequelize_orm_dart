@@ -100,4 +100,14 @@ abstract class QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   });
+
+  /// Save an instance (INSERT for new records, UPDATE for existing)
+  Future<ModelInstanceData> save({
+    required String modelName,
+    required Map<String, dynamic> currentData,
+    Map<String, dynamic>? previousData,
+    required Map<String, dynamic> primaryKeyValues,
+    dynamic sequelize,
+    dynamic model,
+  });
 }

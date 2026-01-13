@@ -48,7 +48,7 @@ void _generateFindOneMethod(
     '        final instance = $valuesClassName.fromJson(result.data);',
   );
   buffer.writeln('        instance.originalQuery = query;');
-  // TODO: Enable isNewRecord, changed & previous
+  buffer.writeln('        instance.setPreviousDataValues(instance.toJson());');
   buffer.writeln('        return instance;');
   buffer.writeln('      })() : null');
   buffer.writeln('    );');

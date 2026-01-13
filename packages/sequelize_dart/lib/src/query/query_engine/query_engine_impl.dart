@@ -335,4 +335,38 @@ class QueryEngine extends QueryEngineInterface {
       throw Exception('Failed to execute $operation: $e');
     }
   }
+
+  @override
+  Future<ModelInstanceData> save({
+    required String modelName,
+    required Map<String, dynamic> currentData,
+    Map<String, dynamic>? previousData,
+    required Map<String, dynamic> primaryKeyValues,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call('save', {
+        'model': modelName,
+        'currentData': currentData,
+        'previousData': previousData,
+        'primaryKeyValues': primaryKeyValues,
+      });
+
+      if (result is Map) {
+        final converted = _deepConvert(result) as Map<String, dynamic>;
+        final data = converted['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          return ModelInstanceData.fromBridgeResponse({'data': data});
+        }
+      }
+
+      throw Exception(
+        'Invalid response format: expected Map with data, got ${result.runtimeType}',
+      );
+    } catch (e) {
+      if (e is BridgeException) rethrow;
+      throw Exception('Failed to execute save: $e');
+    }
+  }
 }

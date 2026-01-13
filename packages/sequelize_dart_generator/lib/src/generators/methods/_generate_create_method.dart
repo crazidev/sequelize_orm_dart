@@ -57,6 +57,7 @@ void _generateCreateMethod(
     '      final instance = $valuesClassName.fromJson(result.data);',
   );
   buffer.writeln('      instance.originalQuery = query;');
+  buffer.writeln('      instance.setPreviousDataValues(instance.toJson());');
   buffer.writeln('      return instance;');
   buffer.writeln('    });');
   buffer.writeln('  }');

@@ -12,6 +12,18 @@ abstract class ModelValuesBase<T extends ModelValuesBase<T>> {
   /// Stores the original query for reload() method
   Query? originalQuery;
 
+  /// Stores the previous data snapshot for change tracking
+  /// This is set when the instance is created/loaded and updated after save
+  Map<String, dynamic>? _previousDataValues;
+
+  /// Get the previous data snapshot (used for change tracking)
+  Map<String, dynamic>? get previousDataValues => _previousDataValues;
+
+  /// Set the previous data snapshot (typically called after creation/load/save)
+  void setPreviousDataValues(Map<String, dynamic>? data) {
+    _previousDataValues = data;
+  }
+
   /// Convert instance to JSON representation
   Map<String, dynamic> toJson();
 
