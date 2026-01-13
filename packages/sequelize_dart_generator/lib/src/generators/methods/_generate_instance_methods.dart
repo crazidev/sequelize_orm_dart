@@ -120,6 +120,10 @@ void _generateInstanceMethods(
       '  /// Returns the number of affected rows (0 if no changes, 1 if updated/created)',
     );
     buffer.writeln('  Future<int> save({List<String>? fields}) async {');
+    buffer.writeln('    // Get current data from instance (before any reload)');
+    buffer.writeln('    // This preserves user modifications');
+    buffer.writeln('    final currentData = toJson();');
+    buffer.writeln();
     buffer.writeln('    // Get primary key values');
     buffer.writeln(
       '    final pkValues = getPrimaryKeyMap() ?? <String, dynamic>{};',
@@ -132,13 +136,13 @@ void _generateInstanceMethods(
       '    // This ensures foreign keys and other fields are preserved when saving',
     );
     buffer.writeln(
+      '    // Note: currentData is captured before reload to preserve user modifications',
+    );
+    buffer.writeln(
       '    if (pkValues.isNotEmpty && previousDataValues == null) {',
     );
     buffer.writeln('      await reload();');
     buffer.writeln('    }');
-    buffer.writeln();
-    buffer.writeln('    // Get current data from instance');
-    buffer.writeln('    final currentData = toJson();');
     buffer.writeln();
     buffer.writeln('    // Get previous data values (null if new record)');
     buffer.writeln('    final previousData = previousDataValues;');

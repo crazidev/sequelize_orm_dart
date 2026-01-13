@@ -188,6 +188,35 @@ void _generateMixinMethods(
   buffer.writeln('      _updateFields(source);');
   buffer.writeln();
 
+  // Override reload() to also set previousDataValues after reloading
+  buffer.writeln('  @override');
+  buffer.writeln('  Future<$valuesClassName?> reload() async {');
+  buffer.writeln('    final pk = getPrimaryKeyMap();');
+  buffer.writeln('    if (pk == null || pk.isEmpty) {');
+  buffer.writeln(
+    '      throw StateError(\'Cannot reload: instance has no primary key values\');',
+  );
+  buffer.writeln('    }');
+  buffer.writeln();
+  buffer.writeln(
+    '    final result = await findByPrimaryKey(pk, originalQuery: originalQuery);',
+  );
+  buffer.writeln('    if (result == null) {');
+  buffer.writeln('      return null;');
+  buffer.writeln('    }');
+  buffer.writeln();
+  buffer.writeln('    copyFieldsFrom(result);');
+  buffer.writeln('    // Preserve original query for future reloads');
+  buffer.writeln('    originalQuery = result.originalQuery ?? originalQuery;');
+  buffer.writeln(
+    '    // Update previousDataValues after reload to track current state',
+  );
+  buffer.writeln('    setPreviousDataValues(toJson());');
+  buffer.writeln();
+  buffer.writeln('    return this as $valuesClassName;');
+  buffer.writeln('  }');
+  buffer.writeln();
+
   final columnsClassName = '\$${className}Columns';
 
   // Generate findByPrimaryKey
