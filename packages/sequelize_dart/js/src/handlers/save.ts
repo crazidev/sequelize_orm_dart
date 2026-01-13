@@ -25,13 +25,12 @@ export async function handleSave(params: SaveParams): Promise<Record<string, any
 
   // Determine if this is a new record (no previousData means it's new)
   const isNewRecord = !previousData || Object.keys(previousData).length === 0;
-  printLogs(`isNewRecord: ${isNewRecord}`);
 
   if (isNewRecord) {
     // Create new record using Sequelize's create
     const instance = await ModelClass.create(currentData, params.options || {});
     return {
-      data: instance.toJSON(),
+      data: (instance && instance.toJSON()) || {},
       isNewRecord: true,
     };
   } else {
@@ -50,7 +49,7 @@ export async function handleSave(params: SaveParams): Promise<Record<string, any
       // Copy all previous values into _previousDataValues
       // This ensures Sequelize can properly detect what has changed
       (instance as any)._previousDataValues = { ...previousData };
-      
+
       // Also ensure dataValues contains all fields from currentData
       // Sequelize will compare dataValues (current) with _previousDataValues (previous)
       for (const key of Object.keys(currentData)) {

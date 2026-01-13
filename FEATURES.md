@@ -81,8 +81,8 @@ class Users {
 
 ## ❌ Not Yet Implemented
 
-- **CRUD**: `create`, `update`, `destroy`, `findByPk`, `count`, `bulkCreate`
-- **Associations**: `hasOne`, `belongsTo`, `hasMany`, `belongsToMany`
+- **CRUD**: `create ✅`, `update ✅`, `destroy`, `findByPk`, `count ✅`, `bulkCreate`
+- **Associations**: `hasOne ✅`, `belongsTo`, `hasMany ✅`, `belongsToMany`
 - **Transactions**: Transaction support
 - **Migrations**: Schema migrations
 - **Raw queries**: `sequelize.query()`
@@ -90,7 +90,7 @@ class Users {
 
 ## Implementated
 
-- **Functions**: `sequelize.fn()`, `sequelize.literal()`
+- **Functions**: `sequelize.fn() ✅`, `sequelize.literal() ✅`, `sequelize.col() ✅`
 - **Nested Sorting**: Support for `hoistIncludeOptions` to sort by included models
 
 ---

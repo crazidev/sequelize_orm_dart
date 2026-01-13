@@ -22,7 +22,7 @@
 
 ### Include
 
-- Do not generate include.seperate for unsupported association example error (Only HasMany associations support include.separate)
+- Do not generate include.seperate for unsupported association example error (Only HasMany associations support include.separate) - done
 - Implement include through another model
 
 ### Utilities
