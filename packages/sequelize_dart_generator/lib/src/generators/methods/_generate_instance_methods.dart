@@ -173,11 +173,24 @@ void _generateInstanceMethods(
     buffer.writeln();
     buffer.writeln('    // Filter to specified fields if provided');
     buffer.writeln(
+      '    // Always include primary key fields even if not in fields list (required for UPDATE)',
+    );
+    buffer.writeln(
       '    final dataToSave = (fields != null && fields.isNotEmpty)',
     );
     buffer.writeln('        ? <String, dynamic>{');
+    // Include primary key fields first (required for Sequelize to identify the record)
+    for (final pk in primaryKeys) {
+      buffer.writeln(
+        '            \'${pk.name}\': mergedData[\'${pk.name}\'],',
+      );
+    }
+    // Then include specified fields (excluding primary keys to avoid duplicates)
     buffer.writeln('            for (final f in fields)');
-    buffer.writeln('              if (mergedData[f] != null) f: mergedData[f]');
+    buffer.writeln(
+      '              if (mergedData[f] != null && !pkValues.containsKey(f))',
+    );
+    buffer.writeln('                f: mergedData[f]');
     buffer.writeln('          }');
     buffer.writeln('        : mergedData;');
     buffer.writeln();
