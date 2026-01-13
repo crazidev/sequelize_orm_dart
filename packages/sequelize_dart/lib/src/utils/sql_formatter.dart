@@ -98,16 +98,34 @@ class SqlFormatter {
 
   /// Formats SQL by parsing it into logical sections
   static String _formatSql(String sql) {
-    final result = StringBuffer();
+    final upperSql = sql.toUpperCase();
 
-    // Find SELECT clause
+    // Handle INSERT queries
+    if (upperSql.contains(RegExp(r'\bINSERT\s+INTO\b'))) {
+      return _formatInsert(sql);
+    }
+
+    // Handle UPDATE queries
+    if (upperSql.contains(RegExp(r'\bUPDATE\b'))) {
+      return _formatUpdate(sql);
+    }
+
+    // Handle SELECT queries
     final selectMatch = RegExp(
       r'\bSELECT\b',
       caseSensitive: false,
     ).firstMatch(sql);
-    if (selectMatch == null) {
-      return sql; // Not a SELECT query, return as-is
+    if (selectMatch != null) {
+      return _formatSelect(sql, selectMatch);
     }
+
+    // Unknown query type, return as-is
+    return sql;
+  }
+
+  /// Formats SELECT queries
+  static String _formatSelect(String sql, RegExpMatch selectMatch) {
+    final result = StringBuffer();
 
     // Add SELECT keyword
     result.writeln('SELECT');
@@ -140,6 +158,381 @@ class SqlFormatter {
     }
 
     return result.toString().trim();
+  }
+
+  /// Formats INSERT queries
+  static String _formatInsert(String sql) {
+    final result = StringBuffer();
+
+    // Match INSERT INTO "table" (columns) VALUES (values) RETURNING ...
+    final insertMatch = RegExp(
+      r'\bINSERT\s+INTO\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (insertMatch == null) return sql;
+
+    result.write('INSERT INTO');
+
+    // Find table name (quoted identifier after INTO)
+    final afterInto = sql.substring(insertMatch.end).trim();
+    final tableMatch = RegExp(r'^("[^"]+"|\w+)').firstMatch(afterInto);
+    if (tableMatch != null) {
+      result.writeln(' ${tableMatch.group(0)}');
+    }
+
+    // Find column list in parentheses
+    final columnsMatch = RegExp(r'\(([^)]+)\)').firstMatch(afterInto);
+    if (columnsMatch != null) {
+      final columnsStr = columnsMatch.group(1)!;
+      final columns = _splitColumns(columnsStr);
+      result.writeln('(');
+      for (int i = 0; i < columns.length; i++) {
+        final column = columns[i].trim();
+        if (column.isNotEmpty) {
+          result.write('  $column');
+          if (i < columns.length - 1) {
+            result.write(',');
+          }
+          result.writeln();
+        }
+      }
+      result.write(')');
+    }
+
+    // Find VALUES clause
+    final valuesMatch = RegExp(
+      r'\bVALUES\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (valuesMatch != null) {
+      result.writeln();
+      result.write('VALUES');
+
+      // Find the values list (everything between VALUES and RETURNING or end)
+      final afterValues = sql.substring(valuesMatch.end).trim();
+      final returningMatch = RegExp(
+        r'\bRETURNING\b',
+        caseSensitive: false,
+      ).firstMatch(afterValues);
+
+      final valuesEnd = returningMatch?.start ?? afterValues.length;
+      final valuesStr = afterValues.substring(0, valuesEnd).trim();
+
+      // Format values (handle parentheses)
+      if (valuesStr.startsWith('(') && valuesStr.endsWith(')')) {
+        final innerValues = valuesStr.substring(1, valuesStr.length - 1);
+        final values = _splitColumns(innerValues);
+
+        // Check if values are simple (parameters or DEFAULT) - keep on one line
+        final areSimpleValues = values.every((v) => _isSimpleValue(v.trim()));
+
+        if (areSimpleValues) {
+          // Keep simple values on one line
+          result.write(' ($innerValues)');
+        } else {
+          // Format complex values across multiple lines
+          result.writeln(' (');
+          for (int i = 0; i < values.length; i++) {
+            final value = values[i].trim();
+            if (value.isNotEmpty) {
+              result.write('  $value');
+              if (i < values.length - 1) {
+                result.write(',');
+              }
+              result.writeln();
+            }
+          }
+          result.write(')');
+        }
+      } else {
+        result.write(' $valuesStr');
+      }
+    }
+
+    // Handle RETURNING clause
+    final returningMatch = RegExp(
+      r'\bRETURNING\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (returningMatch != null) {
+      _formatReturning(result, sql, returningMatch);
+    }
+
+    return result.toString().trim();
+  }
+
+  /// Formats UPDATE queries
+  static String _formatUpdate(String sql) {
+    final result = StringBuffer();
+
+    // Match UPDATE "table" SET ... WHERE ... RETURNING ...
+    final updateMatch = RegExp(
+      r'\bUPDATE\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (updateMatch == null) return sql;
+
+    result.write('UPDATE');
+
+    // Find table name (quoted identifier after UPDATE)
+    final afterUpdate = sql.substring(updateMatch.end).trim();
+    final tableMatch = RegExp(r'^("[^"]+"|\w+)').firstMatch(afterUpdate);
+    if (tableMatch != null) {
+      result.writeln(' ${tableMatch.group(0)}');
+    }
+
+    // Find SET clause
+    final setMatch = RegExp(
+      r'\bSET\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (setMatch != null) {
+      result.write('SET');
+
+      // Find everything between SET and WHERE/RETURNING/end
+      final afterSet = sql.substring(setMatch.end).trim();
+      final whereMatch = RegExp(
+        r'\bWHERE\b',
+        caseSensitive: false,
+      ).firstMatch(afterSet);
+      final returningMatch = RegExp(
+        r'\bRETURNING\b',
+        caseSensitive: false,
+      ).firstMatch(afterSet);
+
+      final setEnd =
+          whereMatch?.start ?? returningMatch?.start ?? afterSet.length;
+      final setClause = afterSet.substring(0, setEnd).trim();
+
+      // Split SET assignments by comma, but respect quoted strings and operators
+      final assignments = _splitSetAssignments(setClause);
+      result.writeln();
+      for (int i = 0; i < assignments.length; i++) {
+        final assignment = assignments[i].trim();
+        if (assignment.isNotEmpty) {
+          result.write('  $assignment');
+          if (i < assignments.length - 1) {
+            result.write(',');
+          }
+          result.writeln();
+        }
+      }
+    }
+
+    // Handle WHERE clause
+    final whereMatch = RegExp(
+      r'\bWHERE\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (whereMatch != null) {
+      result.writeln();
+      result.write('WHERE');
+
+      final afterWhere = sql.substring(whereMatch.end).trim();
+      final returningMatch = RegExp(
+        r'\bRETURNING\b',
+        caseSensitive: false,
+      ).firstMatch(afterWhere);
+
+      final whereEnd = returningMatch?.start ?? afterWhere.length;
+      final whereClause = afterWhere.substring(0, whereEnd).trim();
+
+      // Format WHERE clause with proper indentation for AND/OR
+      final formattedWhere = _formatWhereClause(whereClause);
+      result.writeln(' $formattedWhere');
+    }
+
+    // Handle RETURNING clause
+    final returningMatch = RegExp(
+      r'\bRETURNING\b',
+      caseSensitive: false,
+    ).firstMatch(sql);
+    if (returningMatch != null) {
+      _formatReturning(result, sql, returningMatch);
+    }
+
+    return result.toString().trim();
+  }
+
+  /// Splits SET assignments respecting quoted strings and operators
+  static List<String> _splitSetAssignments(String setClause) {
+    final assignments = <String>[];
+    final buffer = StringBuffer();
+    bool inQuotes = false;
+    int parenDepth = 0;
+
+    for (int i = 0; i < setClause.length; i++) {
+      final char = setClause[i];
+
+      if (char == '"' && (i == 0 || setClause[i - 1] != '\\')) {
+        inQuotes = !inQuotes;
+        buffer.write(char);
+      } else if (!inQuotes && char == '(') {
+        parenDepth++;
+        buffer.write(char);
+      } else if (!inQuotes && char == ')') {
+        parenDepth--;
+        buffer.write(char);
+      } else if (!inQuotes && parenDepth == 0 && char == ',') {
+        final assignment = buffer.toString().trim();
+        if (assignment.isNotEmpty) {
+          assignments.add(assignment);
+        }
+        buffer.clear();
+      } else {
+        buffer.write(char);
+      }
+    }
+
+    final lastAssignment = buffer.toString().trim();
+    if (lastAssignment.isNotEmpty) {
+      assignments.add(lastAssignment);
+    }
+
+    return assignments;
+  }
+
+  /// Formats WHERE clause with proper indentation for AND/OR
+  static String _formatWhereClause(String whereClause) {
+    // Replace AND/OR with newlines and proper indentation
+    final formatted = whereClause
+        .replaceAll(RegExp(r'\bAND\b', caseSensitive: false), '\n  AND')
+        .replaceAll(RegExp(r'\bOR\b', caseSensitive: false), '\n  OR')
+        .trim();
+
+    return formatted;
+  }
+
+  /// Checks if a value is simple (parameter, DEFAULT, number, quoted string, NULL)
+  /// Simple values don't contain operators, function calls, or complex expressions
+  static bool _isSimpleValue(String value) {
+    final trimmed = value.trim();
+
+    // Empty values are considered simple
+    if (trimmed.isEmpty) return true;
+
+    // Parameters like $1, $2, etc.
+    if (RegExp(r'^\$\d+$').hasMatch(trimmed)) return true;
+
+    // DEFAULT keyword
+    if (trimmed.toUpperCase() == 'DEFAULT') return true;
+
+    // NULL
+    if (trimmed.toUpperCase() == 'NULL') return true;
+
+    // Simple numbers (integer or decimal)
+    if (RegExp(r'^-?\d+(\.\d+)?$').hasMatch(trimmed)) return true;
+
+    // Simple quoted strings/identifiers (no expressions inside)
+    if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+        (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+      // Check if it's just a quoted identifier/string (no operators, functions, etc.)
+      final inner = trimmed.substring(1, trimmed.length - 1);
+      // If inner contains operators or function-like patterns, it's complex
+      if (inner.contains(RegExp(r'[+\-*/()]'))) return false;
+      return true;
+    }
+
+    // If it contains operators (outside of quotes), it's complex
+    // Simple check: if it has operators and isn't quoted, it's complex
+    if (trimmed.contains(RegExp(r'[+\-*/]'))) {
+      // Check if operators are inside quotes
+      int quoteCount = 0;
+      int singleQuoteCount = 0;
+      for (int i = 0; i < trimmed.length; i++) {
+        final char = trimmed[i];
+        if (char == '"' && (i == 0 || trimmed[i - 1] != '\\')) {
+          quoteCount++;
+        } else if (char == "'" && (i == 0 || trimmed[i - 1] != '\\')) {
+          singleQuoteCount++;
+        } else if (RegExp(r'[+\-*/]').hasMatch(char)) {
+          // If we find an operator and we're not inside quotes, it's complex
+          if (quoteCount % 2 == 0 && singleQuoteCount % 2 == 0) {
+            return false;
+          }
+        }
+      }
+    }
+
+    // Check for function calls (word followed by opening parenthesis)
+    if (RegExp(r'[a-zA-Z_][a-zA-Z0-9_]*\s*\(').hasMatch(trimmed)) {
+      return false;
+    }
+
+    // Default to simple if no complex patterns detected
+    return true;
+  }
+
+  /// Checks if a column name is simple (quoted identifier or simple name)
+  static bool _isSimpleColumn(String column) {
+    final trimmed = column.trim();
+
+    // Empty columns are considered simple
+    if (trimmed.isEmpty) return true;
+
+    // Quoted identifiers are simple
+    if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+        (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+      return true;
+    }
+
+    // Simple unquoted identifiers (alphanumeric and underscore)
+    if (RegExp(r'^[a-zA-Z_][a-zA-Z0-9_]*$').hasMatch(trimmed)) {
+      return true;
+    }
+
+    // If it contains operators, functions, or other complex patterns, it's not simple
+    if (trimmed.contains(RegExp(r'[+\-*/()]'))) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Formats RETURNING clause, keeping simple columns on one line
+  static void _formatReturning(
+    StringBuffer result,
+    String sql,
+    RegExpMatch returningMatch,
+  ) {
+    result.writeln();
+    result.write('RETURNING');
+
+    final afterReturning = sql.substring(returningMatch.end).trim();
+    // Remove trailing semicolon if present
+    final returningContent = afterReturning.replaceFirst(RegExp(r';?\s*$'), '');
+
+    if (returningContent == '*') {
+      result.write(' *');
+    } else {
+      final columns = _splitColumns(returningContent);
+      // Check if all columns are simple (quoted identifiers or simple names)
+      final areSimpleColumns = columns.every(
+        (col) => _isSimpleColumn(col.trim()),
+      );
+
+      if (areSimpleColumns) {
+        // Keep simple columns on one line
+        result.write(' $returningContent');
+      } else {
+        // Format complex columns across multiple lines
+        if (columns.length > 1) {
+          result.writeln();
+          for (int i = 0; i < columns.length; i++) {
+            final column = columns[i].trim();
+            if (column.isNotEmpty) {
+              result.write('  $column');
+              if (i < columns.length - 1) {
+                result.write(',');
+              }
+              result.writeln();
+            }
+          }
+        } else {
+          result.write(' $returningContent');
+        }
+      }
+    }
   }
 
   /// Splits column list respecting quoted strings
@@ -269,8 +662,15 @@ class SqlFormatter {
     // List of keywords to highlight
     final keywords = [
       'SELECT',
+      'INSERT',
+      'INTO',
+      'UPDATE',
+      'DELETE',
       'FROM',
       'WHERE',
+      'SET',
+      'VALUES',
+      'RETURNING',
       'JOIN',
       'LEFT',
       'RIGHT',

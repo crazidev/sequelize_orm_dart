@@ -137,10 +137,15 @@ abstract class Model<T> extends ModelInterface {
   }
 
   /// Create a new record
-  Future<T> create(Map<String, dynamic> data) {
+  Future<T> create(covariant dynamic data) {
+    // Convert data to Map if it's not already (for Create classes)
+    final Map<String, dynamic> dataMap = data is Map<String, dynamic>
+        ? data
+        : (data as dynamic).toJson();
+
     return QueryEngine().create(
           modelName: name,
-          data: data,
+          data: dataMap,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
         )

@@ -25,6 +25,25 @@ abstract class QueryEngineInterface {
   Future<ModelInstanceData> create({
     required String modelName,
     required Map<String, dynamic> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Create multiple records (bulk create)
+  Future<List<ModelInstanceData>> bulkCreate({
+    required String modelName,
+    required List<Map<String, dynamic>> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Update records
+  Future<int> update({
+    required String modelName,
+    required Map<String, dynamic> data,
+    Query? query,
     dynamic sequelize,
     dynamic model,
   });

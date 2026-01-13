@@ -96,6 +96,7 @@ class QueryEngine extends QueryEngineInterface {
   Future<ModelInstanceData> create({
     required String modelName,
     required Map<String, dynamic> data,
+    Query? query,
     dynamic sequelize,
     dynamic model,
   }) async {
@@ -103,12 +104,71 @@ class QueryEngine extends QueryEngineInterface {
       final result = await getBridge(sequelize).call('create', {
         'model': modelName,
         'data': data,
+        'options': query?.toJson(),
       });
+
+      // Handle both single result and array result
+      if (result is List && result.isNotEmpty) {
+        return _toModelInstanceData(result.first);
+      }
 
       return _toModelInstanceData(result);
     } catch (e) {
       if (e is BridgeException) rethrow;
       throw Exception('Failed to execute create: $e');
+    }
+  }
+
+  @override
+  Future<List<ModelInstanceData>> bulkCreate({
+    required String modelName,
+    required List<Map<String, dynamic>> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call('create', {
+        'model': modelName,
+        'data': data,
+        'options': query?.toJson(),
+      });
+
+      if (result is List) {
+        return result.map(_toModelInstanceData).toList();
+      }
+
+      throw Exception('Invalid response format from bridge');
+    } catch (e) {
+      if (e is BridgeException) rethrow;
+      throw Exception('Failed to execute bulkCreate: $e');
+    }
+  }
+
+  @override
+  Future<int> update({
+    required String modelName,
+    required Map<String, dynamic> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call('update', {
+        'model': modelName,
+        'data': data,
+        'query': query?.toJson(),
+      });
+
+      if (result is int) return result;
+      if (result is num) return result.toInt();
+
+      throw Exception(
+        'Invalid response format: expected int, got ${result.runtimeType}',
+      );
+    } catch (e) {
+      if (e is BridgeException) rethrow;
+      throw Exception('Failed to execute update: $e');
     }
   }
 

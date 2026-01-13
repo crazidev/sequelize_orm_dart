@@ -1,33 +1,80 @@
 part of '../../sequelize_model_generator.dart';
 
+String _getModelCreateClassName(String className) {
+  return '\$${className}Create';
+}
+
 void _generateClassCreate(
   StringBuffer buffer,
   String createClassName,
   List<_FieldInfo> fields,
+  List<_AssociationInfo> associations,
 ) {
   buffer.writeln('class $createClassName {');
+  // Add regular fields
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
-      buffer.writeln('  final ${field.dartType} ${field.fieldName};');
+      buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
     }
   }
+
+  // Add association fields
+  for (var assoc in associations) {
+    final modelCreateClassName = _getModelCreateClassName(
+      assoc.modelClassName,
+    );
+    if (assoc.associationType == 'hasOne') {
+      buffer.writeln('  final $modelCreateClassName? ${assoc.fieldName};');
+    } else {
+      buffer.writeln(
+        '  final List<$modelCreateClassName>? ${assoc.fieldName};',
+      );
+    }
+  }
+
   buffer.writeln();
   buffer.writeln('  $createClassName({');
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
-      buffer.writeln('    required this.${field.fieldName},');
+      buffer.writeln('    this.${field.fieldName},');
     }
+  }
+  for (var assoc in associations) {
+    buffer.writeln('    this.${assoc.fieldName},');
   }
   buffer.writeln('  });');
   buffer.writeln();
   buffer.writeln('  Map<String, dynamic> toJson() {');
-  buffer.writeln('    return {');
+  buffer.writeln('    final result = <String, dynamic>{};');
+
+  // Add regular fields
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
-      buffer.writeln("      '${field.name}': ${field.fieldName},");
+      buffer.writeln(
+        "    if (${field.fieldName} != null) result['${field.name}'] = ${field.fieldName};",
+      );
     }
   }
-  buffer.writeln('    };');
+
+  // Add associations (nested in the data object for Sequelize)
+  for (var assoc in associations) {
+    final assocName = assoc.as ?? assoc.fieldName;
+    if (assoc.associationType == 'hasOne') {
+      buffer.writeln('    if (${assoc.fieldName} != null) {');
+      buffer.writeln(
+        '      result[\'$assocName\'] = ${assoc.fieldName}!.toJson();',
+      );
+      buffer.writeln('    }');
+    } else {
+      buffer.writeln('    if (${assoc.fieldName} != null) {');
+      buffer.writeln(
+        '      result[\'$assocName\'] = ${assoc.fieldName}!.map((e) => e.toJson()).toList();',
+      );
+      buffer.writeln('    }');
+    }
+  }
+
+  buffer.writeln('    return result;');
   buffer.writeln('  }');
   buffer.writeln('}');
   buffer.writeln();

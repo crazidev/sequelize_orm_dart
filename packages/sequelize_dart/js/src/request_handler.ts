@@ -15,6 +15,7 @@ import { handleMin } from './handlers/min';
 import { handleSum } from './handlers/sum';
 import { handleIncrement } from './handlers/increment';
 import { handleDecrement } from './handlers/decrement';
+import { handleUpdate } from './handlers/update';
 
 export type JsonRpcRequest = {
   id: unknown;
@@ -96,6 +97,10 @@ export async function processRequest(
 
       case 'decrement':
         result = await handleDecrement(params);
+        break;
+
+      case 'update':
+        result = await handleUpdate(params);
         break;
 
       case 'close':

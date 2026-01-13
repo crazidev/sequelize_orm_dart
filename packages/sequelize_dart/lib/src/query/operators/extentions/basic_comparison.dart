@@ -18,7 +18,7 @@ extension BasicComparisonExtension<T> on Column<T> {
   /// ```sql
   /// SELECT * FROM "posts" WHERE "authorId" = 12;
   /// ```
-  ComparisonOperator eq(T value) {
+  ComparisonOperator eq(T? value) {
     return ComparisonOperator(
       column: name,
       value: {'\$eq': value},

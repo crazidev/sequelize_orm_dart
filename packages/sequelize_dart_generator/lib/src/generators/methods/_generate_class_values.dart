@@ -110,6 +110,9 @@ void _generateClassValues(
   // Generate where() method (also satisfies getPrimaryKeyMap from mixin)
   _generateWhereMethod(buffer, className, generatedClassName);
 
+  // getPrimaryKeyMap() is provided by ReloadableMixin and calls getPrimaryKeyMap()
+  // which we implement via where() in the mixin methods
+
   final columnsClassName = '\$${className}Columns';
   final whereCallbackName = _toCamelCase(className);
 

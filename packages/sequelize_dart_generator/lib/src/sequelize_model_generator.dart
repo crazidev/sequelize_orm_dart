@@ -15,10 +15,12 @@ part 'generators/methods/_extract_table_annotation.dart';
 part 'generators/methods/_extract_validate_code.dart';
 part 'generators/methods/_generate_associate_model_method.dart';
 part 'generators/methods/_generate_class_create.dart';
+part 'generators/methods/_generate_class_update.dart';
 part 'generators/methods/_generate_class_definition.dart';
 part 'generators/methods/_generate_class_values.dart';
 part 'generators/methods/_generate_columns.dart';
 part 'generators/methods/_generate_count_method.dart';
+part 'generators/methods/_generate_create_method.dart';
 part 'generators/methods/_generate_define_method.dart';
 part 'generators/methods/_generate_find_all_method.dart';
 part 'generators/methods/_generate_find_one_method.dart';
@@ -28,14 +30,15 @@ part 'generators/methods/_generate_get_options_json_method.dart';
 part 'generators/methods/_generate_get_query_builder_method.dart';
 part 'generators/methods/_generate_include_helper.dart';
 part 'generators/methods/_generate_increment_method.dart';
+part 'generators/methods/_generate_instance_methods.dart';
 part 'generators/methods/_generate_json_value_parser.dart';
 part 'generators/methods/_generate_max_method.dart';
+part 'generators/methods/_generate_merge_where_helper.dart';
 part 'generators/methods/_generate_min_method.dart';
 part 'generators/methods/_generate_query_builder.dart';
 part 'generators/methods/_generate_sum_method.dart';
+part 'generators/methods/_generate_update_method.dart';
 part 'generators/methods/_generate_where_method.dart';
-part 'generators/methods/_generate_merge_where_helper.dart';
-part 'generators/methods/_generate_instance_methods.dart';
 part 'generators/methods/_generator_naming_config.dart';
 part 'generators/methods/_get_association_json_key.dart';
 part 'generators/methods/_get_associations.dart';
@@ -71,6 +74,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     final generatedClassName = '\$$className';
     final valuesClassName = '\$${className}Values';
     final createClassName = '\$${className}Create';
+    final updateClassName = '\$${className}Update';
 
     final buffer = StringBuffer();
 
@@ -124,6 +128,21 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       baseCallbackName,
       includeParamName,
+    );
+    _generateCreateMethod(
+      buffer,
+      className,
+      valuesClassName,
+      baseCallbackName,
+      includeParamName,
+      fields,
+      associations,
+    );
+    _generateUpdateMethod(
+      buffer,
+      className,
+      baseCallbackName,
+      fields,
     );
     _generateCountMethod(
       buffer,
@@ -185,6 +204,13 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       _generateClassCreate(
         buffer,
         createClassName,
+        fields,
+        associations,
+      );
+      // Also generate Update class (same structure but without associations)
+      _generateClassUpdate(
+        buffer,
+        updateClassName,
         fields,
       );
     }
