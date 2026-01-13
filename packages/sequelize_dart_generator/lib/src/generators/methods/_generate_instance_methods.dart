@@ -56,18 +56,7 @@ void _generateInstanceMethods(
     buffer.writeln('      return null;');
     buffer.writeln('    }');
     buffer.writeln();
-    buffer.writeln(
-      '    // Update instance fields with fresh data (Sequelize.js behavior)',
-    );
-    for (final field in fields) {
-      final fieldName = field.fieldName;
-      buffer.writeln('    $fieldName = result.$fieldName;');
-    }
-    // Update association fields
-    for (final assoc in associations) {
-      final assocFieldName = assoc.fieldName;
-      buffer.writeln('    $assocFieldName = result.$assocFieldName;');
-    }
+    buffer.writeln('    _updateFields(result);');
     buffer.writeln('    // Preserve original query for future reloads');
     buffer.writeln(
       '    _originalQuery = result._originalQuery ?? _originalQuery;',
@@ -149,7 +138,13 @@ void _generateInstanceMethods(
   buffer.writeln('      where: finalWhere,');
   buffer.writeln('    );');
   buffer.writeln();
-  buffer.writeln('    return result.firstOrNull;');
+  buffer.writeln('    final updated = result.firstOrNull;');
+  buffer.writeln('    if (updated == null) {');
+  buffer.writeln('      return null;');
+  buffer.writeln('    }');
+  buffer.writeln();
+  buffer.writeln('    _updateFields(updated);');
+  buffer.writeln('    return this;');
   buffer.writeln('  }');
   buffer.writeln();
 
@@ -204,7 +199,13 @@ void _generateInstanceMethods(
   buffer.writeln('      where: finalWhere,');
   buffer.writeln('    );');
   buffer.writeln();
-  buffer.writeln('    return result.firstOrNull;');
+  buffer.writeln('    final updated = result.firstOrNull;');
+  buffer.writeln('    if (updated == null) {');
+  buffer.writeln('      return null;');
+  buffer.writeln('    }');
+  buffer.writeln();
+  buffer.writeln('    _updateFields(updated);');
+  buffer.writeln('    return this;');
   buffer.writeln('  }');
   buffer.writeln();
 }

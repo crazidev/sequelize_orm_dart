@@ -104,6 +104,9 @@ void _generateClassValues(
     primaryKeys,
   );
 
+  // Generate _updateFields helper method
+  _generateUpdateFieldsHelper(buffer, valuesClassName, fields, associations);
+
   // Generate instance methods
   _generateInstanceMethods(
     buffer,
@@ -115,5 +118,29 @@ void _generateClassValues(
   );
 
   buffer.writeln('}');
+  buffer.writeln();
+}
+
+/// Generates the _updateFields helper method that updates all instance fields
+/// from another instance. Used by reload(), increment(), decrement().
+void _generateUpdateFieldsHelper(
+  StringBuffer buffer,
+  String valuesClassName,
+  List<_FieldInfo> fields,
+  List<_AssociationInfo> associations,
+) {
+  buffer.writeln(
+    '  /// Updates all instance fields from another instance (Sequelize.js behavior)',
+  );
+  buffer.writeln('  void _updateFields($valuesClassName source) {');
+  for (final field in fields) {
+    final fieldName = field.fieldName;
+    buffer.writeln('    $fieldName = source.$fieldName;');
+  }
+  for (final assoc in associations) {
+    final assocFieldName = assoc.fieldName;
+    buffer.writeln('    $assocFieldName = source.$assocFieldName;');
+  }
+  buffer.writeln('  }');
   buffer.writeln();
 }
