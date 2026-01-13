@@ -12,6 +12,7 @@ export 'src/connection/dialects/postgres.dart';
 export 'src/connection/query_options.dart';
 // Model exports
 export 'src/model/model.dart';
+export 'src/model/model_instance_data.dart';
 export 'src/model/model_values_base.dart';
 export 'src/model/reloadable_mixin.dart';
 // Association exports

@@ -1,15 +1,15 @@
 import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
-import { printLogs } from '../utils/printLogs';
-import { Model, Op } from '@sequelize/core';
+import { toModelResponseArray, ModelResponse } from '../utils/modelResponse';
+import { Model } from '@sequelize/core';
 
 type FindAllParams = {
   model: string;
   options?: any;
 };
 
-export async function handleFindAll(params: FindAllParams): Promise<any[]> {
+export async function handleFindAll(params: FindAllParams): Promise<ModelResponse[]> {
   const sequelize = getSequelize();
   checkConnection(sequelize);
 
@@ -20,5 +20,5 @@ export async function handleFindAll(params: FindAllParams): Promise<any[]> {
   checkModelDefinition(model, modelName);
 
   const results: Model[] = await model.findAll(options);
-  return results.map((row: any) => row.toJSON());
+  return toModelResponseArray(results);
 }

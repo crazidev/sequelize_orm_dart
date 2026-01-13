@@ -2,13 +2,14 @@ import { Model } from '@sequelize/core';
 import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
+import { toModelResponse, ModelResponse } from '../utils/modelResponse';
 
 type FindOneParams = {
   model: string;
   options?: any;
 };
 
-export async function handleFindOne(params: FindOneParams): Promise<any | null> {
+export async function handleFindOne(params: FindOneParams): Promise<ModelResponse | null> {
   const sequelize = getSequelize();
   checkConnection(sequelize);
 
@@ -20,5 +21,5 @@ export async function handleFindOne(params: FindOneParams): Promise<any | null> 
   checkModelDefinition(model, modelName);
 
   const result: Model = await model.findOne(options);
-  return result ? result.toJSON() : null;
+  return result ? toModelResponse(result) : null;
 }

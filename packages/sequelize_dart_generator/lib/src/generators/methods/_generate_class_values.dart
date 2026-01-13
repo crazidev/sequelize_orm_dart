@@ -45,6 +45,20 @@ void _generateClassValues(
     buffer.writeln('  Query? _originalQuery;');
   }
   buffer.writeln();
+
+  // Add Sequelize instance metadata fields
+  buffer.writeln('  /// Previous values before any changes');
+  buffer.writeln('  Map<String, dynamic> previous = {};');
+  buffer.writeln();
+  buffer.writeln('  /// List of changed field names');
+  buffer.writeln('  List<String> changedFields = [];');
+  buffer.writeln();
+  buffer.writeln(
+    '  /// True if this instance has not been persisted to the database',
+  );
+  buffer.writeln('  bool isNewRecord = false;');
+  buffer.writeln();
+
   buffer.writeln('  $valuesClassName({');
   for (var field in fields) {
     // Nullable fields should be optional, not required
@@ -55,6 +69,15 @@ void _generateClassValues(
     buffer.writeln('    this.${assoc.fieldName},');
   }
   buffer.writeln('  });');
+  buffer.writeln();
+
+  // Add changed() method that matches Sequelize.js behavior
+  buffer.writeln(
+    '  /// Returns false if no changes, or list of changed field names',
+  );
+  buffer.writeln(
+    '  dynamic changed() => changedFields.isEmpty ? false : changedFields;',
+  );
   buffer.writeln();
   buffer.writeln(
     '  factory $valuesClassName.fromJson(Map<String, dynamic> json) {',
@@ -228,6 +251,10 @@ void _generateUpdateFieldsHelper(
     final assocFieldName = assoc.fieldName;
     buffer.writeln('    $assocFieldName = source.$assocFieldName;');
   }
+  // Also copy metadata fields
+  buffer.writeln('    previous = source.previous;');
+  buffer.writeln('    changedFields = source.changedFields;');
+  buffer.writeln('    isNewRecord = source.isNewRecord;');
   buffer.writeln('  }');
   buffer.writeln();
 }

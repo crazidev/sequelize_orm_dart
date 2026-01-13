@@ -42,10 +42,15 @@ void _generateFindAllMethod(
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');
-  buffer.writeln('    ).then((data) =>');
-  buffer.writeln('      data.map((value) {');
-  buffer.writeln('        final instance = $valuesClassName.fromJson(value);');
+  buffer.writeln('    ).then((results) =>');
+  buffer.writeln('      results.map((result) {');
+  buffer.writeln(
+    '        final instance = $valuesClassName.fromJson(result.data);',
+  );
   buffer.writeln('        instance.originalQuery = query;');
+  buffer.writeln('        instance.previous = result.previous;');
+  buffer.writeln('        instance.changedFields = result.changed;');
+  buffer.writeln('        instance.isNewRecord = result.isNewRecord;');
   buffer.writeln('        return instance;');
   buffer.writeln('      }).toList()');
   buffer.writeln('    );');

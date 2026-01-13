@@ -1,3 +1,4 @@
+import 'package:sequelize_dart/src/model/model_instance_data.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 
 /// Abstract interface for query engines
@@ -5,7 +6,7 @@ import 'package:sequelize_dart/src/query/query/query.dart';
 /// regardless of whether they're running in JS or Dart VM environment
 abstract class QueryEngineInterface {
   /// Find all records matching the query
-  Future<dynamic> findAll({
+  Future<List<ModelInstanceData>> findAll({
     required String modelName,
     Query? query,
     dynamic sequelize,
@@ -13,7 +14,7 @@ abstract class QueryEngineInterface {
   });
 
   /// Find one record matching the query
-  Future<dynamic> findOne({
+  Future<ModelInstanceData?> findOne({
     required String modelName,
     Query? query,
     dynamic sequelize,
@@ -21,7 +22,7 @@ abstract class QueryEngineInterface {
   });
 
   /// Create a new record
-  Future<dynamic> create({
+  Future<ModelInstanceData> create({
     required String modelName,
     required Map<String, dynamic> data,
     dynamic sequelize,
@@ -64,7 +65,7 @@ abstract class QueryEngineInterface {
   });
 
   /// Increment numeric column values
-  Future<List<Map<String, dynamic>>> increment({
+  Future<List<ModelInstanceData>> increment({
     required String modelName,
     required Map<String, dynamic> fields,
     Query? query,
@@ -73,7 +74,7 @@ abstract class QueryEngineInterface {
   });
 
   /// Decrement numeric column values
-  Future<List<Map<String, dynamic>>> decrement({
+  Future<List<ModelInstanceData>> decrement({
     required String modelName,
     required Map<String, dynamic> fields,
     Query? query,

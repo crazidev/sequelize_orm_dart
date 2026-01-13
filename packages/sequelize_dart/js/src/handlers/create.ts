@@ -1,13 +1,13 @@
-import { ModelStatic } from '@sequelize/core';
 import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { getModels, getSequelize } from '../utils/state';
+import { toModelResponse, ModelResponse } from '../utils/modelResponse';
 
 type CreateParams = {
   model: string;
   data?: Record<string, any>;
 };
 
-export async function handleCreate(params: CreateParams): Promise<any> {
+export async function handleCreate(params: CreateParams): Promise<ModelResponse> {
   const sequelize = getSequelize();
   checkConnection(sequelize);
 
@@ -18,5 +18,5 @@ export async function handleCreate(params: CreateParams): Promise<any> {
   checkModelDefinition(model, modelName);
 
   const result = await model.create(data);
-  return result.toJSON();
+  return toModelResponse(result);
 }

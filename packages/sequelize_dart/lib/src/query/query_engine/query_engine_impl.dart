@@ -1,4 +1,5 @@
 import 'package:sequelize_dart/src/bridge/bridge_client.dart';
+import 'package:sequelize_dart/src/model/model_instance_data.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize.dart';
@@ -17,6 +18,12 @@ dynamic _deepConvert(dynamic value) {
     return value.map((e) => _deepConvert(e)).toList();
   }
   return value;
+}
+
+/// Converts a bridge response to ModelInstanceData
+ModelInstanceData _toModelInstanceData(dynamic item) {
+  final converted = _deepConvert(item) as Map<String, dynamic>;
+  return ModelInstanceData.fromBridgeResponse(converted);
 }
 
 /// Unified QueryEngine implementation for both Dart VM and dart2js.
@@ -41,7 +48,7 @@ class QueryEngine extends QueryEngineInterface {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> findAll({
+  Future<List<ModelInstanceData>> findAll({
     required String modelName,
     Query? query,
     dynamic sequelize,
@@ -54,9 +61,7 @@ class QueryEngine extends QueryEngineInterface {
       });
 
       if (result is List) {
-        return result
-            .map((item) => _deepConvert(item) as Map<String, dynamic>)
-            .toList();
+        return result.map(_toModelInstanceData).toList();
       }
 
       throw Exception('Invalid response format from bridge');
@@ -67,7 +72,7 @@ class QueryEngine extends QueryEngineInterface {
   }
 
   @override
-  Future<Map<String, dynamic>?> findOne({
+  Future<ModelInstanceData?> findOne({
     required String modelName,
     Query? query,
     dynamic sequelize,
@@ -80,7 +85,7 @@ class QueryEngine extends QueryEngineInterface {
       });
 
       if (result == null) return null;
-      return _deepConvert(result) as Map<String, dynamic>;
+      return _toModelInstanceData(result);
     } catch (e) {
       if (e is BridgeException) rethrow;
       throw Exception('Failed to execute findOne: $e');
@@ -88,7 +93,7 @@ class QueryEngine extends QueryEngineInterface {
   }
 
   @override
-  Future<Map<String, dynamic>> create({
+  Future<ModelInstanceData> create({
     required String modelName,
     required Map<String, dynamic> data,
     dynamic sequelize,
@@ -100,7 +105,7 @@ class QueryEngine extends QueryEngineInterface {
         'data': data,
       });
 
-      return _deepConvert(result) as Map<String, dynamic>;
+      return _toModelInstanceData(result);
     } catch (e) {
       if (e is BridgeException) rethrow;
       throw Exception('Failed to execute create: $e');
@@ -214,7 +219,7 @@ class QueryEngine extends QueryEngineInterface {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> increment({
+  Future<List<ModelInstanceData>> increment({
     required String modelName,
     required Map<String, dynamic> fields,
     Query? query,
@@ -231,7 +236,7 @@ class QueryEngine extends QueryEngineInterface {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> decrement({
+  Future<List<ModelInstanceData>> decrement({
     required String modelName,
     required Map<String, dynamic> fields,
     Query? query,
@@ -247,7 +252,7 @@ class QueryEngine extends QueryEngineInterface {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _executeNumericOperation({
+  Future<List<ModelInstanceData>> _executeNumericOperation({
     required String modelName,
     required Map<String, dynamic> fields,
     Query? query,
@@ -262,9 +267,7 @@ class QueryEngine extends QueryEngineInterface {
       });
 
       if (result is List) {
-        return result
-            .map((item) => _deepConvert(item) as Map<String, dynamic>)
-            .toList();
+        return result.map(_toModelInstanceData).toList();
       }
       return [];
     } catch (e) {

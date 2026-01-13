@@ -1,6 +1,7 @@
 import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
-import { getModels, getSequelize, sendNotification } from '../utils/state';
+import { getModels, getSequelize } from '../utils/state';
+import { toModelResponseArray, ModelResponse } from '../utils/modelResponse';
 
 type IncrementParams = {
   model: string;
@@ -8,7 +9,7 @@ type IncrementParams = {
   query?: any;
 };
 
-export async function handleIncrement(params: IncrementParams): Promise<any> {
+export async function handleIncrement(params: IncrementParams): Promise<ModelResponse[]> {
   const sequelize = getSequelize();
   checkConnection(sequelize);
 
@@ -25,6 +26,7 @@ export async function handleIncrement(params: IncrementParams): Promise<any> {
   }
 
   const result = await model.increment(fields, options);
-  return result[0][0];
+  // result[0] is an array of updated instances
+  return toModelResponseArray(result[0]);
 }
 

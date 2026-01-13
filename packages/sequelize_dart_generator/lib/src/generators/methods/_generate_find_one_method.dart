@@ -42,10 +42,15 @@ void _generateFindOneMethod(
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');
-  buffer.writeln('    ).then((data) =>');
-  buffer.writeln('      data != null ? (() {');
-  buffer.writeln('        final instance = $valuesClassName.fromJson(data);');
+  buffer.writeln('    ).then((result) =>');
+  buffer.writeln('      result != null ? (() {');
+  buffer.writeln(
+    '        final instance = $valuesClassName.fromJson(result.data);',
+  );
   buffer.writeln('        instance.originalQuery = query;');
+  buffer.writeln('        instance.previous = result.previous;');
+  buffer.writeln('        instance.changedFields = result.changed;');
+  buffer.writeln('        instance.isNewRecord = result.isNewRecord;');
   buffer.writeln('        return instance;');
   buffer.writeln('      })() : null');
   buffer.writeln('    );');
