@@ -168,25 +168,30 @@ void _generateMixinMethods(
   buffer.writeln('      _updateFields(source);');
   buffer.writeln();
 
+  final columnsClassName = '\$${className}Columns';
+
   // Generate findByPrimaryKey
   buffer.writeln('  @override');
   buffer.writeln(
     '  Future<$valuesClassName?> findByPrimaryKey(Map<String, dynamic> pk, {Query? originalQuery}) async {',
   );
 
-  // Build primary key where clause
+  // Build primary key where clause with explicit type
+  buffer.writeln(
+    '    QueryOperator pkWhere($columnsClassName c) => ',
+  );
   if (primaryKeys.length == 1) {
     final key = primaryKeys.first.fieldName;
-    buffer.writeln('    final pkWhere = (c) => c.$key.eq(pk[\'$key\']);');
+    buffer.writeln('        c.$key.eq(pk[\'$key\']);');
   } else {
-    buffer.writeln('    final pkWhere = (c) => and([');
+    buffer.writeln('        and([');
     for (final pk in primaryKeys) {
       final key = pk.fieldName;
       buffer.writeln(
-        '      if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
+        '          if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
       );
     }
-    buffer.writeln('    ]);');
+    buffer.writeln('        ]);');
   }
 
   buffer.writeln('    final q = originalQuery;');

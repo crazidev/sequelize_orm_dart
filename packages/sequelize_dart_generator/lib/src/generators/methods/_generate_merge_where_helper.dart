@@ -23,23 +23,26 @@ void _generateMergeWhereHelper(
   );
   buffer.writeln('    }');
 
-  // Generate primary key where builder
+  // Generate primary key where builder with explicit type
+  buffer.writeln(
+    '    QueryOperator pkWhere($columnsClassName c) => ',
+  );
   if (primaryKeys.length == 1) {
     final key = primaryKeys.first.fieldName;
-    buffer.writeln('    final pkWhere = (c) => c.$key.eq(pk[\'$key\']);');
+    buffer.writeln('        c.$key.eq(pk[\'$key\']);');
   } else {
-    buffer.writeln('    final pkWhere = (c) => and([');
+    buffer.writeln('        and([');
     for (final pk in primaryKeys) {
       final key = pk.fieldName;
       buffer.writeln(
-        '      if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
+        '          if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
       );
     }
-    buffer.writeln('    ]);');
+    buffer.writeln('        ]);');
   }
 
   buffer.writeln(
-    '    return where != null ? (c) => and([where(c), pkWhere(c)]) : pkWhere;',
+    '    return where != null ? ($columnsClassName c) => and([where(c), pkWhere(c)]) : pkWhere;',
   );
   buffer.writeln('  }');
   buffer.writeln();

@@ -14,7 +14,13 @@ void _generateQueryBuilder(
     '/// Extends $columnsClassName to provide column access plus associations',
   );
   buffer.writeln('class $queryBuilderClassName extends $columnsClassName {');
-  buffer.writeln('  const $queryBuilderClassName();');
+
+  // Can't use const if we have associations (AssociationReference uses .instance which isn't const)
+  if (associations.isEmpty) {
+    buffer.writeln('  const $queryBuilderClassName();');
+  } else {
+    buffer.writeln('  $queryBuilderClassName();');
+  }
 
   // Generate association references (columns are inherited from $columnsClassName)
   if (associations.isNotEmpty) {
