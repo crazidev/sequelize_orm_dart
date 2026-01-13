@@ -9,50 +9,8 @@ void _generateInstanceMethods(
   List<_AssociationInfo> associations,
 ) {
   final columnsClassName = '\$${className}Columns';
-  final includeHelperClassName = '\$${className}IncludeHelper';
 
-  // Generate reload method (always available, not just for numeric fields)
-  final primaryKeys = fields.where((f) => f.primaryKey).toList();
-  if (primaryKeys.isNotEmpty) {
-    buffer.writeln('  /// Reloads this instance from the database');
-    buffer.writeln('  Future<$valuesClassName?> reload() async {');
-    buffer.writeln('    final pk = this.where();');
-    buffer.writeln(
-      '    if (pk == null) throw StateError(\'Cannot reload: no primary key\');',
-    );
-
-    // Generate primary key where builder (compact)
-    if (primaryKeys.length == 1) {
-      final key = primaryKeys.first.fieldName;
-      buffer.writeln('    final pkWhere = (c) => c.$key.eq(pk[\'$key\']);');
-    } else {
-      buffer.writeln('    final pkWhere = (c) => and([');
-      for (final pk in primaryKeys) {
-        final key = pk.fieldName;
-        buffer.writeln(
-          '      if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
-        );
-      }
-      buffer.writeln('    ]);');
-    }
-
-    buffer.writeln('    final q = _originalQuery;');
-    buffer.writeln('    final result = await $generatedClassName().findOne(');
-    buffer.writeln('      where: pkWhere,');
-    buffer.writeln(
-      '      include: q?.include != null ? ($includeHelperClassName _) => q!.include! : null,',
-    );
-    buffer.writeln(
-      '      order: q?.order, group: q?.group, limit: q?.limit, offset: q?.offset, attributes: q?.attributes,',
-    );
-    buffer.writeln('    );');
-    buffer.writeln('    if (result == null) return null;');
-    buffer.writeln('    _updateFields(result);');
-    buffer.writeln('    _originalQuery = result._originalQuery ?? q;');
-    buffer.writeln('    return this;');
-    buffer.writeln('  }');
-    buffer.writeln();
-  }
+  // Note: reload() is now provided by ReloadableMixin
 
   // Filter numeric fields (same as static method)
   final numericFields = fields.where((field) {

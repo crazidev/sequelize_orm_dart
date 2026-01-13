@@ -8,7 +8,18 @@ void _generateClassValues(
   required String className,
   required String generatedClassName,
 }) {
-  buffer.writeln('class $valuesClassName {');
+  final primaryKeys = fields.where((f) => f.primaryKey).toList();
+  final includeHelperClassName = '\$${className}IncludeHelper';
+
+  // Use ReloadableMixin if there are primary keys
+  if (primaryKeys.isNotEmpty) {
+    buffer.writeln(
+      'class $valuesClassName with ReloadableMixin<$valuesClassName> {',
+    );
+  } else {
+    buffer.writeln('class $valuesClassName {');
+  }
+
   for (var field in fields) {
     buffer.writeln('  ${field.dartType}? ${field.fieldName};');
   }
@@ -25,8 +36,14 @@ void _generateClassValues(
       );
     }
   }
-  // Store original query for reload() method
-  buffer.writeln('  Query? _originalQuery;');
+
+  // Store original query for reload() method (override from mixin)
+  if (primaryKeys.isNotEmpty) {
+    buffer.writeln('  @override');
+    buffer.writeln('  Query? originalQuery;');
+  } else {
+    buffer.writeln('  Query? _originalQuery;');
+  }
   buffer.writeln();
   buffer.writeln('  $valuesClassName({');
   for (var field in fields) {
@@ -87,11 +104,9 @@ void _generateClassValues(
   buffer.writeln('  }');
   buffer.writeln();
 
-  // Generate where() method
+  // Generate where() method (also satisfies getPrimaryKeyMap from mixin)
   _generateWhereMethod(buffer, className, generatedClassName);
 
-  // Get primary keys for helper method
-  final primaryKeys = fields.where((f) => f.primaryKey).toList();
   final columnsClassName = '\$${className}Columns';
   final whereCallbackName = _toCamelCase(className);
 
@@ -104,10 +119,22 @@ void _generateClassValues(
     primaryKeys,
   );
 
-  // Generate _updateFields helper method
+  // Generate _updateFields helper method (also satisfies copyFieldsFrom from mixin)
   _generateUpdateFieldsHelper(buffer, valuesClassName, fields, associations);
 
-  // Generate instance methods
+  // Generate mixin implementation methods if using ReloadableMixin
+  if (primaryKeys.isNotEmpty) {
+    _generateMixinMethods(
+      buffer,
+      valuesClassName,
+      className,
+      generatedClassName,
+      primaryKeys,
+      includeHelperClassName,
+    );
+  }
+
+  // Generate instance methods (increment, decrement)
   _generateInstanceMethods(
     buffer,
     valuesClassName,
@@ -118,6 +145,61 @@ void _generateClassValues(
   );
 
   buffer.writeln('}');
+  buffer.writeln();
+}
+
+/// Generates the mixin implementation methods for ReloadableMixin
+void _generateMixinMethods(
+  StringBuffer buffer,
+  String valuesClassName,
+  String className,
+  String generatedClassName,
+  List<_FieldInfo> primaryKeys,
+  String includeHelperClassName,
+) {
+  // Generate getPrimaryKeyMap (alias for where())
+  buffer.writeln('  @override');
+  buffer.writeln('  Map<String, dynamic>? getPrimaryKeyMap() => where();');
+  buffer.writeln();
+
+  // Generate copyFieldsFrom (delegates to _updateFields)
+  buffer.writeln('  @override');
+  buffer.writeln('  void copyFieldsFrom($valuesClassName source) =>');
+  buffer.writeln('      _updateFields(source);');
+  buffer.writeln();
+
+  // Generate findByPrimaryKey
+  buffer.writeln('  @override');
+  buffer.writeln(
+    '  Future<$valuesClassName?> findByPrimaryKey(Map<String, dynamic> pk, {Query? originalQuery}) async {',
+  );
+
+  // Build primary key where clause
+  if (primaryKeys.length == 1) {
+    final key = primaryKeys.first.fieldName;
+    buffer.writeln('    final pkWhere = (c) => c.$key.eq(pk[\'$key\']);');
+  } else {
+    buffer.writeln('    final pkWhere = (c) => and([');
+    for (final pk in primaryKeys) {
+      final key = pk.fieldName;
+      buffer.writeln(
+        '      if (pk[\'$key\'] != null) c.$key.eq(pk[\'$key\']),',
+      );
+    }
+    buffer.writeln('    ]);');
+  }
+
+  buffer.writeln('    final q = originalQuery;');
+  buffer.writeln('    return $generatedClassName().findOne(');
+  buffer.writeln('      where: pkWhere,');
+  buffer.writeln(
+    '      include: q?.include != null ? ($includeHelperClassName _) => q!.include! : null,',
+  );
+  buffer.writeln(
+    '      order: q?.order, group: q?.group, limit: q?.limit, offset: q?.offset, attributes: q?.attributes,',
+  );
+  buffer.writeln('    );');
+  buffer.writeln('  }');
   buffer.writeln();
 }
 

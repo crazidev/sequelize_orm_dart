@@ -13,10 +13,12 @@ export 'src/connection/query_options.dart';
 // Model exports
 export 'src/model/model.dart';
 export 'src/model/model_values_base.dart';
+export 'src/model/reloadable_mixin.dart';
 // Association exports
 export 'src/query/association/association_reference.dart';
 export 'src/query/association/include_builder.dart';
 export 'src/query/association/include_helper.dart';
+export 'src/query/association/include_options.dart';
 export 'src/query/operators/operators.dart';
 export 'src/query/operators/operators_interface.dart';
 // Query exports

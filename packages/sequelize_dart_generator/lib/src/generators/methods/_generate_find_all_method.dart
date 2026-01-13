@@ -45,7 +45,7 @@ void _generateFindAllMethod(
   buffer.writeln('    ).then((data) =>');
   buffer.writeln('      data.map((value) {');
   buffer.writeln('        final instance = $valuesClassName.fromJson(value);');
-  buffer.writeln('        instance._originalQuery = query;');
+  buffer.writeln('        instance.originalQuery = query;');
   buffer.writeln('        return instance;');
   buffer.writeln('      }).toList()');
   buffer.writeln('    );');
