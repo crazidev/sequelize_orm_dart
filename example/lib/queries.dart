@@ -21,7 +21,12 @@ Future<void> runQueries() async {
   );
 
   final firstUser = users.first;
-  print('${firstUser.firstName} post view ${firstUser.post?.views}');
+  print('User: ${firstUser.firstName}');
+  print('Post views before: ${firstUser.post?.views}');
+  print('isNewRecord: ${firstUser.post?.isNewRecord}');
+  print('changed(): ${firstUser.post?.changed()}');
+
   await firstUser.post?.increment(views: 1);
-  print('${firstUser.firstName} post view is ${firstUser.post?.views}');
+
+  print('Post views after increment: ${firstUser.post?.views}');
 }

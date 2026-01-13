@@ -26,7 +26,30 @@ export async function handleIncrement(params: IncrementParams): Promise<ModelRes
   }
 
   const result = await model.increment(fields, options);
-  // result[0] is an array of updated instances
-  return toModelResponseArray(result[0]);
+  
+  // Increment returns [affectedRows, affectedCount] where affectedRows can be:
+  // - Array of Model instances (PostgreSQL with RETURNING)
+  // - Array containing an array of plain objects [[{...}]]
+  // We need to handle both cases
+  let rows = result[0];
+  
+  // If first element is an array, unwrap it (some dialects wrap results)
+  if (Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])) {
+    rows = rows[0];
+  }
+  
+  // Check if we have Model instances or plain objects
+  if (rows.length > 0 && typeof rows[0]?.toJSON === 'function') {
+    // Model instances - use the standard converter
+    return toModelResponseArray(rows);
+  }
+  
+  // Plain objects - wrap them in the response format
+  return rows.map((row: any) => ({
+    data: row,
+    previous: {},
+    changed: false,
+    isNewRecord: false,
+  }));
 }
 
