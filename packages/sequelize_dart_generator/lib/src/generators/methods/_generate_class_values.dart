@@ -47,10 +47,21 @@ void _generateClassValues(
   buffer.writeln();
 
   // Add Sequelize instance metadata fields
+  // TODO: Test these fields once JS side enables changed() and previous():
+  // 1. Test previous field is populated correctly from Sequelize's _previousDataValues
+  // 2. Test changedFields is populated correctly from Sequelize's changed() method
+  // 3. Test with findAll() - should track changes after field modifications
+  // 4. Test with findOne() - should track changes after field modifications
+  // 5. Test with create() - new records should have isNewRecord = true
+  // 6. Test with increment/decrement - may not have metadata if returning plain objects
   buffer.writeln('  /// Previous values before any changes');
+  buffer.writeln(
+    '  /// TODO: Currently empty until JS side enables previous()',
+  );
   buffer.writeln('  Map<String, dynamic> previous = {};');
   buffer.writeln();
   buffer.writeln('  /// List of changed field names');
+  buffer.writeln('  /// TODO: Currently empty until JS side enables changed()');
   buffer.writeln('  List<String> changedFields = [];');
   buffer.writeln();
   buffer.writeln(
@@ -72,8 +83,18 @@ void _generateClassValues(
   buffer.writeln();
 
   // Add changed() method that matches Sequelize.js behavior
+  // TODO: Test this method once JS side enables changed():
+  // 1. Verify it returns false when changedFields is empty
+  // 2. Verify it returns List<String> when changedFields has values
+  // 3. Test that changedFields is populated correctly from JS bridge
   buffer.writeln(
     '  /// Returns false if no changes, or list of changed field names',
+  );
+  buffer.writeln(
+    '  /// Matches Sequelize.js behavior: returns false or string[]',
+  );
+  buffer.writeln(
+    '  /// TODO: Test once JS side enables changed() - currently always returns false',
   );
   buffer.writeln(
     '  dynamic changed() => changedFields.isEmpty ? false : changedFields;',
@@ -252,6 +273,8 @@ void _generateUpdateFieldsHelper(
     buffer.writeln('    $assocFieldName = source.$assocFieldName;');
   }
   // Also copy metadata fields
+  // TODO: Once JS side enables changed() and previous(), these will be populated
+  // and correctly copied when reload(), increment(), or decrement() update the instance
   buffer.writeln('    previous = source.previous;');
   buffer.writeln('    changedFields = source.changedFields;');
   buffer.writeln('    isNewRecord = source.isNewRecord;');

@@ -2,6 +2,7 @@ import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 import { toModelResponseArray, ModelResponse } from '../utils/modelResponse';
+import { printLogs } from '../utils/printLogs';
 
 type IncrementParams = {
   model: string;

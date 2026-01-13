@@ -121,6 +121,9 @@ void _generateNumericOperationMethod(
   buffer.writeln(
     '        final instance = $valuesClassName.fromJson(result.data);',
   );
+  // TODO: Once JS side enables previous() and changed(), these will be populated
+  // Note: increment/decrement may return plain objects (not model instances) from some dialects,
+  // so metadata may not be available even after JS side is enabled
   buffer.writeln('        instance.previous = result.previous;');
   buffer.writeln('        instance.changedFields = result.changed;');
   buffer.writeln('        instance.isNewRecord = result.isNewRecord;');
