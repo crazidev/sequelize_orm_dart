@@ -1,9 +1,5 @@
 part of '../../sequelize_model_generator.dart';
 
-String _getModelUpdateClassName(String className) {
-  return '\$${className}Update';
-}
-
 void _generateClassUpdate(
   StringBuffer buffer,
   String updateClassName,
@@ -18,13 +14,18 @@ void _generateClassUpdate(
   }
 
   buffer.writeln();
-  buffer.writeln('  $updateClassName({');
-  for (var field in fields) {
-    if (!field.autoIncrement && !field.primaryKey) {
+  final updateFields = fields
+      .where((field) => !field.autoIncrement && !field.primaryKey)
+      .toList();
+  if (updateFields.isEmpty) {
+    buffer.writeln('  $updateClassName();');
+  } else {
+    buffer.writeln('  $updateClassName({');
+    for (var field in updateFields) {
       buffer.writeln('    this.${field.fieldName},');
     }
+    buffer.writeln('  });');
   }
-  buffer.writeln('  });');
   buffer.writeln();
   buffer.writeln('  Map<String, dynamic> toJson() {');
   buffer.writeln('    final result = <String, dynamic>{};');

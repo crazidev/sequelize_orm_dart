@@ -18,8 +18,11 @@ void _generateColumns(
   // Generate column references as static const for efficiency
   for (var field in fields) {
     final dartType = _getDartTypeForQuery(field.dataType);
+
+    final typeExpression = _getDataTypeExpression(field);
+
     buffer.writeln(
-      "  final ${field.fieldName} = const Column<$dartType>('${field.name}', DataType.${field.dataType});",
+      "  final ${field.fieldName} = const Column<$dartType>('${field.name}', $typeExpression);",
     );
   }
 

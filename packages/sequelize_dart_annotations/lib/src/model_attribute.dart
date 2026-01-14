@@ -1,4 +1,6 @@
-import 'package:sequelize_dart_annotations/src/enums.dart';
+// ignore_for_file: non_constant_identifier_names
+import 'package:meta/meta_meta.dart';
+import 'package:sequelize_dart_annotations/src/datatype.dart';
 
 /// Referential action for foreign key constraints
 enum ReferentialAction {
@@ -65,187 +67,187 @@ abstract class Validator {
 // ============================================================================
 
 /// Checks for email format (foo@bar.com)
+@Target({TargetKind.field})
 class IsEmail extends Validator {
   final String? msg;
 
-  const IsEmail() : msg = null;
-  const IsEmail.withMsg(this.msg);
+  const IsEmail([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for url format (http://foo.com)
+@Target({TargetKind.field})
 class IsUrl extends Validator {
   final String? msg;
 
-  const IsUrl() : msg = null;
-  const IsUrl.withMsg(this.msg);
+  const IsUrl([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for IPv4 (129.89.23.1) or IPv6 format
+@Target({TargetKind.field})
 class IsIP extends Validator {
   final String? msg;
 
-  const IsIP() : msg = null;
-  const IsIP.withMsg(this.msg);
+  const IsIP([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for IPv4 (129.89.23.1)
+@Target({TargetKind.field})
 class IsIPv4 extends Validator {
   final String? msg;
 
-  const IsIPv4() : msg = null;
-  const IsIPv4.withMsg(this.msg);
+  const IsIPv4([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for IPv6 format
+@Target({TargetKind.field})
 class IsIPv6 extends Validator {
   final String? msg;
 
-  const IsIPv6() : msg = null;
-  const IsIPv6.withMsg(this.msg);
+  const IsIPv6([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Will only allow letters
+@Target({TargetKind.field})
 class IsAlpha extends Validator {
   final String? msg;
 
-  const IsAlpha() : msg = null;
-  const IsAlpha.withMsg(this.msg);
+  const IsAlpha([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Will only allow alphanumeric characters, so "_abc" will fail
+@Target({TargetKind.field})
 class IsAlphanumeric extends Validator {
   final String? msg;
 
-  const IsAlphanumeric() : msg = null;
-  const IsAlphanumeric.withMsg(this.msg);
+  const IsAlphanumeric([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Will only allow numbers
+@Target({TargetKind.field})
 class IsNumeric extends Validator {
   final String? msg;
 
-  const IsNumeric() : msg = null;
-  const IsNumeric.withMsg(this.msg);
+  const IsNumeric([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for valid integers
+@Target({TargetKind.field})
 class IsInt extends Validator {
   final String? msg;
 
-  const IsInt() : msg = null;
-  const IsInt.withMsg(this.msg);
+  const IsInt([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for valid floating point numbers
+@Target({TargetKind.field})
 class IsFloat extends Validator {
   final String? msg;
 
-  const IsFloat() : msg = null;
-  const IsFloat.withMsg(this.msg);
+  const IsFloat([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for any numbers
+@Target({TargetKind.field})
 class IsDecimal extends Validator {
   final String? msg;
 
-  const IsDecimal() : msg = null;
-  const IsDecimal.withMsg(this.msg);
+  const IsDecimal([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for lowercase
+@Target({TargetKind.field})
 class IsLowercase extends Validator {
   final String? msg;
 
-  const IsLowercase() : msg = null;
-  const IsLowercase.withMsg(this.msg);
+  const IsLowercase([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Checks for uppercase
+@Target({TargetKind.field})
 class IsUppercase extends Validator {
   final String? msg;
 
-  const IsUppercase() : msg = null;
-  const IsUppercase.withMsg(this.msg);
+  const IsUppercase([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Don't allow empty strings
+@Target({TargetKind.field})
 class NotEmpty extends Validator {
   final String? msg;
 
-  const NotEmpty() : msg = null;
-  const NotEmpty.withMsg(this.msg);
+  const NotEmpty([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Only allow arrays
+@Target({TargetKind.field})
 class IsArray extends Validator {
   final String? msg;
 
-  const IsArray() : msg = null;
-  const IsArray.withMsg(this.msg);
+  const IsArray([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Check for valid credit card numbers
+@Target({TargetKind.field})
 class IsCreditCard extends Validator {
   final String? msg;
 
-  const IsCreditCard() : msg = null;
-  const IsCreditCard.withMsg(this.msg);
+  const IsCreditCard([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
 }
 
 /// Only allow date strings
+@Target({TargetKind.field})
 class IsDate extends Validator {
   final String? msg;
 
-  const IsDate() : msg = null;
-  const IsDate.withMsg(this.msg);
+  const IsDate([this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg} : true;
@@ -260,22 +262,18 @@ class IsDate extends Validator {
 /// - `Is('^[a-z]+\$')` will only allow letters
 /// - `Is.withFlags('^[a-z]+\$', 'i')` with regex flags
 /// - `Is.withMsg('^[a-z]+\$', msg: 'Only letters allowed')` with custom message
+/// Pattern matching validator
+@Target({TargetKind.field})
 class Is extends Validator {
   final String pattern;
   final String? flags;
   final String? msg;
 
   /// Simple pattern match
-  const Is(this.pattern) : flags = null, msg = null;
+  const Is(this.pattern, [this.msg]) : flags = null;
 
   /// Pattern with regex flags (e.g., 'i' for case-insensitive)
-  const Is.withFlags(this.pattern, this.flags) : msg = null;
-
-  /// Pattern with custom error message
-  const Is.withMsg(this.pattern, {required this.msg}) : flags = null;
-
-  /// Pattern with flags and custom error message
-  const Is.full(this.pattern, {this.flags, this.msg});
+  const Is.withFlags(this.pattern, this.flags, [this.msg]);
 
   @override
   Object toJson() {
@@ -292,22 +290,18 @@ class Is extends Validator {
 /// Negated pattern matching validator
 /// - `Not('[a-z]')` will not allow letters
 /// - `Not.withFlags('[a-z]', 'i')` with regex flags
+/// Negated pattern matching validator
+@Target({TargetKind.field})
 class Not extends Validator {
   final String pattern;
   final String? flags;
   final String? msg;
 
   /// Simple pattern match
-  const Not(this.pattern) : flags = null, msg = null;
+  const Not(this.pattern, [this.msg]) : flags = null;
 
   /// Pattern with regex flags
-  const Not.withFlags(this.pattern, this.flags) : msg = null;
-
-  /// Pattern with custom error message
-  const Not.withMsg(this.pattern, {required this.msg}) : flags = null;
-
-  /// Pattern with flags and custom error message
-  const Not.full(this.pattern, {this.flags, this.msg});
+  const Not.withFlags(this.pattern, this.flags, [this.msg]);
 
   @override
   Object toJson() {
@@ -327,48 +321,52 @@ class Not extends Validator {
 // ============================================================================
 
 /// Only allow a specific value
+/// Only allow a specific value
+@Target({TargetKind.field})
 class Equals extends Validator {
   final String value;
   final String? msg;
 
-  const Equals(this.value) : msg = null;
-  const Equals.withMsg(this.value, {required this.msg});
+  const Equals(this.value, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': value} : value;
 }
 
 /// Force specific substrings
+/// Force specific substrings
+@Target({TargetKind.field})
 class Contains extends Validator {
   final String value;
   final String? msg;
 
-  const Contains(this.value) : msg = null;
-  const Contains.withMsg(this.value, {required this.msg});
+  const Contains(this.value, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': value} : value;
 }
 
 /// Only allow date strings after a specific date
+/// Only allow date strings after a specific date
+@Target({TargetKind.field})
 class IsAfter extends Validator {
   final String date;
   final String? msg;
 
-  const IsAfter(this.date) : msg = null;
-  const IsAfter.withMsg(this.date, {required this.msg});
+  const IsAfter(this.date, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': date} : date;
 }
 
 /// Only allow date strings before a specific date
+/// Only allow date strings before a specific date
+@Target({TargetKind.field})
 class IsBefore extends Validator {
   final String date;
   final String? msg;
 
-  const IsBefore(this.date) : msg = null;
-  const IsBefore.withMsg(this.date, {required this.msg});
+  const IsBefore(this.date, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': date} : date;
@@ -380,12 +378,13 @@ class IsBefore extends Validator {
 // ============================================================================
 
 /// Only allow values <= max
+/// Only allow values <= max
+@Target({TargetKind.field})
 class Max extends Validator {
   final num value;
   final String? msg;
 
-  const Max(this.value) : msg = null;
-  const Max.withMsg(this.value, {required this.msg});
+  const Max(this.value, [this.msg]);
 
   @override
   Object toJson() => msg != null
@@ -397,12 +396,13 @@ class Max extends Validator {
 }
 
 /// Only allow values >= min
+/// Only allow values >= min
+@Target({TargetKind.field})
 class Min extends Validator {
   final num value;
   final String? msg;
 
-  const Min(this.value) : msg = null;
-  const Min.withMsg(this.value, {required this.msg});
+  const Min(this.value, [this.msg]);
 
   @override
   Object toJson() => msg != null
@@ -414,13 +414,14 @@ class Min extends Validator {
 }
 
 /// Only allow uuids
+/// Only allow uuids
+@Target({TargetKind.field})
 class IsUUID extends Validator {
   final int version;
   final String? msg;
 
   /// UUID version (1, 3, 4, or 5)
-  const IsUUID(this.version) : msg = null;
-  const IsUUID.withMsg(this.version, {required this.msg});
+  const IsUUID(this.version, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': version} : version;
@@ -432,13 +433,14 @@ class IsUUID extends Validator {
 // ============================================================================
 
 /// Only allow values with length between min and max
+/// Only allow values with length between min and max
+@Target({TargetKind.field})
 class Len extends Validator {
   final int min;
   final int max;
   final String? msg;
 
-  const Len(this.min, this.max) : msg = null;
-  const Len.withMsg(this.min, this.max, {required this.msg});
+  const Len(this.min, this.max, [this.msg]);
 
   @override
   Object toJson() => msg != null
@@ -455,39 +457,127 @@ class Len extends Validator {
 // ============================================================================
 
 /// Check the value is one of these
+/// Check the value is one of these
+@Target({TargetKind.field})
 class IsIn extends Validator {
   final List<dynamic> values;
   final String? msg;
 
-  const IsIn(this.values) : msg = null;
-  const IsIn.withMsg(this.values, {required this.msg});
+  const IsIn(this.values, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': values} : values;
 }
 
 /// Check the value is not one of these
+/// Check the value is not one of these
+@Target({TargetKind.field})
 class NotIn extends Validator {
   final List<dynamic> values;
   final String? msg;
 
-  const NotIn(this.values) : msg = null;
-  const NotIn.withMsg(this.values, {required this.msg});
+  const NotIn(this.values, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': values} : values;
 }
 
 /// Don't allow specific substrings
+@Target({TargetKind.field})
 class NotContains extends Validator {
   final Object value; // String | List<String>
   final String? msg;
 
-  const NotContains(this.value) : msg = null;
-  const NotContains.withMsg(this.value, {required this.msg});
+  const NotContains(this.value, [this.msg]);
 
   @override
   Object toJson() => msg != null ? {'msg': msg, 'args': value} : value;
+}
+
+// ============================================================================
+// Validate Namespace Class
+// ============================================================================
+
+/// Namespace class for all validators using named constructors.
+/// This allows for syntax like `@Validate.IsEmail('msg')`.
+@Target({TargetKind.field})
+class Validate extends Validator {
+  final String? msg;
+  final dynamic value;
+  final dynamic args;
+  final String? pattern;
+  final String? flags;
+  final int? min;
+  final int? max;
+
+  /// Private constructor to prevent direct instantiation without a named type.
+  const Validate._({
+    this.msg,
+    this.value,
+    this.args,
+    this.pattern,
+    this.flags,
+    this.min,
+    this.max,
+  });
+
+  const Validate.IsEmail([String? msg]) : this._(msg: msg);
+  const Validate.IsUrl([String? msg]) : this._(msg: msg);
+  const Validate.IsIP([String? msg]) : this._(msg: msg);
+  const Validate.IsIPv4([String? msg]) : this._(msg: msg);
+  const Validate.IsIPv6([String? msg]) : this._(msg: msg);
+  const Validate.IsAlpha([String? msg]) : this._(msg: msg);
+  const Validate.IsAlphanumeric([String? msg]) : this._(msg: msg);
+  const Validate.IsNumeric([String? msg]) : this._(msg: msg);
+  const Validate.IsInt([String? msg]) : this._(msg: msg);
+  const Validate.IsFloat([String? msg]) : this._(msg: msg);
+  const Validate.IsDecimal([String? msg]) : this._(msg: msg);
+  const Validate.IsLowercase([String? msg]) : this._(msg: msg);
+  const Validate.IsUppercase([String? msg]) : this._(msg: msg);
+  const Validate.NotEmpty([String? msg]) : this._(msg: msg);
+  const Validate.IsArray([String? msg]) : this._(msg: msg);
+  const Validate.IsCreditCard([String? msg]) : this._(msg: msg);
+  const Validate.IsDate([String? msg]) : this._(msg: msg);
+
+  const Validate.Is(String pattern, [String? msg])
+    : this._(pattern: pattern, msg: msg);
+  const Validate.IsWithFlags(String pattern, String flags, [String? msg])
+    : this._(pattern: pattern, flags: flags, msg: msg);
+
+  const Validate.Not(String pattern, [String? msg])
+    : this._(pattern: pattern, msg: msg);
+  const Validate.NotWithFlags(String pattern, String flags, [String? msg])
+    : this._(pattern: pattern, flags: flags, msg: msg);
+
+  const Validate.Equals(String value, [String? msg])
+    : this._(value: value, msg: msg);
+  const Validate.Contains(String value, [String? msg])
+    : this._(value: value, msg: msg);
+  const Validate.IsAfter(String date, [String? msg])
+    : this._(value: date, msg: msg);
+  const Validate.IsBefore(String date, [String? msg])
+    : this._(value: date, msg: msg);
+
+  const Validate.Max(num value, [String? msg]) : this._(value: value, msg: msg);
+  const Validate.Min(num value, [String? msg]) : this._(value: value, msg: msg);
+  const Validate.IsUUID(int version, [String? msg])
+    : this._(value: version, msg: msg);
+  const Validate.Len(int min, int max, [String? msg])
+    : this._(min: min, max: max, msg: msg);
+
+  const Validate.IsIn(List<dynamic> values, [String? msg])
+    : this._(value: values, msg: msg);
+  const Validate.NotIn(List<dynamic> values, [String? msg])
+    : this._(value: values, msg: msg);
+  const Validate.NotContains(Object value, [String? msg])
+    : this._(value: value, msg: msg);
+
+  @override
+  Object toJson() {
+    // This is not strictly used by the generator as it generates the individual classes,
+    // but implemented for completeness.
+    return {};
+  }
 }
 
 // ============================================================================
@@ -605,7 +695,7 @@ class ValidateOption {
 }
 
 /// Column options for model schema attributes
-class ModelAttributes {
+class ColumnDefinition {
   /// The name of the column in the database.
   ///
   /// This maps to Sequelize's `columnName` option.
@@ -656,7 +746,7 @@ class ModelAttributes {
   /// or a custom validation function.
   final ValidateOption? validate;
 
-  const ModelAttributes({
+  const ColumnDefinition({
     required this.name,
     required this.type,
     this.allowNull,
@@ -673,8 +763,8 @@ class ModelAttributes {
 
   /// Legacy constructor for backward compatibility
   /// @deprecated Use the main constructor
-  @Deprecated('Use ModelAttributes constructor')
-  const ModelAttributes.legacy({
+  @Deprecated('Use ColumnDefinition constructor')
+  const ColumnDefinition.legacy({
     required this.name,
     required this.type,
     this.defaultValue,

@@ -1,6 +1,7 @@
 /// Sequelize Dart - A Dart ORM for Sequelize.js integration
 library;
 
+export 'package:meta/meta.dart';
 export 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 export 'src/association/association_model.dart';

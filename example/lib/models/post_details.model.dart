@@ -7,39 +7,35 @@ part 'post_details.model.g.dart';
   underscored: true,
 )
 class PostDetails {
-  @ModelAttributes(
+  @ColumnDefinition(
     name: 'id',
     type: DataType.INTEGER,
     primaryKey: true,
-    allowNull: true,
     autoIncrement: true,
   )
   dynamic id;
 
-  @ModelAttributes(
+  @ColumnDefinition(
     name: 'post_id',
     type: DataType.INTEGER,
   )
   dynamic postId;
 
-  @ModelAttributes(
+  @ColumnDefinition(
     name: 'views',
     type: DataType.INTEGER,
-    allowNull: false,
   )
   dynamic views;
 
-  @ModelAttributes(
+  @ColumnDefinition(
     name: 'likes',
     type: DataType.INTEGER,
-    allowNull: false,
   )
   dynamic likes;
 
-  @ModelAttributes(
+  @ColumnDefinition(
     name: 'metadata',
     type: DataType.JSON,
-    allowNull: true,
   )
   dynamic metadata;
 

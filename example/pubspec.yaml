@@ -10,6 +10,7 @@ dependencies:
   sequelize_dart:
     path: ../packages/sequelize_dart
   dotenv: ^4.2.0
+  meta: ^1.17.0
 
 
 dev_dependencies:

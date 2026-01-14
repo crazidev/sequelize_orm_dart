@@ -10,6 +10,14 @@ class _FieldInfo {
   final bool? allowNull;
   final Object? defaultValue;
   final String? validateCode; // Generated code for ValidateOption
+  final String? columnName;
+  final String? comment;
+  final Object? unique; // bool | String | UniqueOption
+  final Object? index; // bool | String | IndexOption
+  final bool? autoIncrementIdentity;
+  final bool unsigned;
+  final bool zerofill;
+  final bool binary;
 
   _FieldInfo({
     required this.fieldName,
@@ -21,6 +29,14 @@ class _FieldInfo {
     this.allowNull,
     this.defaultValue,
     this.validateCode,
+    this.columnName,
+    this.comment,
+    this.unique,
+    this.index,
+    this.autoIncrementIdentity,
+    this.unsigned = false,
+    this.zerofill = false,
+    this.binary = false,
   });
 }
 

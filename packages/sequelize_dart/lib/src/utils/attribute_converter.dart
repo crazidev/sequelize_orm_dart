@@ -1,10 +1,10 @@
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
-/// Utility class for converting ModelAttributes to JSON format for Sequelize
+/// Utility class for converting ColumnDefinition to JSON format for Sequelize
 class AttributeConverter {
-  /// Converts a list of ModelAttributes to a JSON map for Sequelize
+  /// Converts a list of ColumnDefinition to a JSON map for Sequelize
   static Map<String, Map<String, dynamic>> convertAttributesToJson(
-    List<ModelAttributes> attributes,
+    List<ColumnDefinition> attributes,
   ) {
     final map = <String, Map<String, dynamic>>{};
 

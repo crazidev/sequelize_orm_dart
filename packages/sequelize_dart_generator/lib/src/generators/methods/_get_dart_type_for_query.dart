@@ -1,7 +1,10 @@
 part of '../../sequelize_model_generator.dart';
 
 String _getDartTypeForQuery(String dataType) {
-  switch (dataType) {
+  // Extract base type name if parameterized (e.g., "TINYINT(2)" -> "TINYINT")
+  final baseType = dataType.contains('(') ? dataType.split('(')[0] : dataType;
+
+  switch (baseType) {
     case 'INTEGER':
     case 'BIGINT':
     case 'TINYINT':

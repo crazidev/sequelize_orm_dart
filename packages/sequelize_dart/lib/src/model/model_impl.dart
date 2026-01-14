@@ -122,6 +122,7 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 ///
 abstract class Model<T> extends ModelInterface {
   @override
+  @protected
   ModelInterface define(String modelName, Object sq) {
     sequelizeInstance = sq;
     name = modelName;
@@ -135,6 +136,7 @@ abstract class Model<T> extends ModelInterface {
   /// Base implementation of associateModel - override in generated models
   /// Called by Sequelize.initialize() after all models are defined
   @override
+  @protected
   Future<void> associateModel() async {
     // Base implementation does nothing
     // Generated model classes override this to set up associations
@@ -187,10 +189,14 @@ abstract class Model<T> extends ModelInterface {
   }
 
   /// Get model attributes for Sequelize
-  List<ModelAttributes> getAttributes();
+  @override
+  @protected
+  List<ColumnDefinition> $getAttributes();
 
   /// Convert attributes to JSON for Sequelize
-  Map<String, Map<String, dynamic>> getAttributesJson();
+  @override
+  @protected
+  Map<String, Map<String, dynamic>> $getAttributesJson();
 
   /// Get model options for Sequelize
   Map<String, dynamic> getOptionsJson();

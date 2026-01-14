@@ -78,7 +78,7 @@ class Sequelize extends SequelizeInterface {
 
       final response = await _bridge.call('defineModel', {
         'name': model.name,
-        'attributes': model.getAttributesJson(),
+        'attributes': model.$getAttributesJson(),
         'options': model.getOptionsJson(),
       });
 
@@ -106,7 +106,7 @@ class Sequelize extends SequelizeInterface {
       _bridge
           .call('defineModel', {
             'name': model.name,
-            'attributes': model.getAttributesJson(),
+            'attributes': model.$getAttributesJson(),
             'options': model.getOptionsJson(),
           })
           .catchError((error) {

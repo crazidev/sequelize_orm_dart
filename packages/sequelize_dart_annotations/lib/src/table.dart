@@ -1,3 +1,5 @@
+import 'package:meta/meta_meta.dart';
+
 /// An object with two attributes, `singular` and `plural`, which are used when this model is associated to others.
 class ModelNameOption {
   final String singular;
@@ -61,6 +63,7 @@ class VersionOption {
 }
 
 /// Marks a class as a database table
+@Target({TargetKind.classType})
 class Table {
   /// The name of the table in SQL.
   ///
@@ -273,4 +276,72 @@ class Table {
 
     return json;
   }
+}
+
+@Target({TargetKind.field})
+class PrimaryKey {
+  const PrimaryKey();
+}
+
+@Target({TargetKind.field})
+class NotNull {
+  const NotNull();
+}
+
+@Target({TargetKind.field})
+class AutoIncrement {
+  const AutoIncrement();
+}
+
+@Target({TargetKind.field})
+class AllowNull {
+  const AllowNull();
+}
+
+@Target({TargetKind.field})
+class ColumnName {
+  final String name;
+  const ColumnName(this.name);
+}
+
+enum DefaultType {
+  uniqid,
+  now,
+  fn,
+}
+
+@Target({TargetKind.field})
+class Default {
+  final dynamic value;
+  final DefaultType? type;
+  final String? functionName;
+
+  const Default(this.value) : type = null, functionName = null;
+  const Default.uniqid()
+    : value = null,
+      type = DefaultType.uniqid,
+      functionName = null;
+  const Default.now()
+    : value = null,
+      type = DefaultType.now,
+      functionName = null;
+  const Default.fn(this.functionName) : value = null, type = DefaultType.fn;
+}
+
+@Target({TargetKind.field})
+class Comment {
+  final String comment;
+  const Comment(this.comment);
+}
+
+@Target({TargetKind.field})
+class Unique {
+  final Object? value; // String? | dynamic (UniqueOption)
+  const Unique([this.value]);
+}
+
+@Target({TargetKind.field})
+class Index {
+  final Object? value; // String? | dynamic (IndexOption)
+  const Index([this.value]);
 }

@@ -5,41 +5,25 @@ part 'users.model.g.dart';
 
 @Table(
   tableName: 'users',
-  underscored: true,
-  timestamps: false,
-  createdAt: TimestampOption.custom('columnName'),
-  name: ModelNameOption(singular: 'user', plural: 'users'),
+  createdAt: TimestampOption.disabled(),
+  updatedAt: TimestampOption.disabled(),
 )
 class Users {
-  @ModelAttributes(
-    name: 'id',
-    type: DataType.INTEGER,
-    primaryKey: true,
-    allowNull: true,
-    autoIncrement: true,
-  )
-  dynamic id;
+  @PrimaryKey()
+  @AutoIncrement()
+  @NotNull()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(
-    name: 'email',
-    type: DataType.STRING,
-    validate: ValidateOption(
-      isEmail: IsEmail(),
-    ),
-  )
-  dynamic email;
+  @Validate.IsEmail('Email is not valid')
+  @NotNull()
+  DataType email = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'first_name',
-    type: DataType.STRING,
-  )
-  dynamic firstName;
+  @ColumnName('first_name')
+  @NotNull()
+  DataType firstName = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'last_name',
-    type: DataType.STRING,
-  )
-  dynamic lastName;
+  @ColumnName('last_name')
+  DataType lastName = DataType.STRING;
 
   @HasOne(Post, foreignKey: 'userId', as: 'post')
   Post? post;

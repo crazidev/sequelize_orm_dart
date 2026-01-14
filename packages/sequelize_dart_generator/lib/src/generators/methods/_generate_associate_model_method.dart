@@ -6,6 +6,7 @@ void _generateAssociateModelMethod(
   List<_AssociationInfo> associations,
 ) {
   // Always generate the method with @override annotation
+  buffer.writeln('  @protected');
   buffer.writeln('  @override');
   buffer.writeln('  Future<void> associateModel() async {');
 

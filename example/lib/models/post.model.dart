@@ -9,39 +9,19 @@ part 'post.model.g.dart';
   underscored: true,
 )
 class Post {
-  @ModelAttributes(
-    name: 'id',
-    type: DataType.INTEGER,
-    primaryKey: true,
-    allowNull: true,
-    autoIncrement: true,
-  )
-  dynamic id;
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(
-    name: 'title',
-    type: DataType.STRING,
-  )
-  dynamic title;
+  DataType title = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'content',
-    type: DataType.TEXT,
-  )
-  dynamic content;
+  DataType content = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'user_id',
-    type: DataType.INTEGER,
-  )
-  dynamic userId;
+  @ColumnName('user_id')
+  DataType userId = DataType.INTEGER;
 
-  @ModelAttributes(
-    name: 'views',
-    type: DataType.INTEGER,
-    defaultValue: 0,
-  )
-  dynamic views;
+  @Default(0)
+  DataType views = DataType.INTEGER;
 
   @HasOne(PostDetails, foreignKey: 'postId', as: 'postDetails')
   PostDetails? postDetails;

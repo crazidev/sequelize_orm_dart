@@ -5,6 +5,7 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
 part 'generators/methods/_extract_boolean_validator.dart';
+part 'generators/methods/_extract_from_datatype_field.dart';
 part 'generators/methods/_extract_len_validator.dart';
 part 'generators/methods/_extract_list_validator.dart';
 part 'generators/methods/_extract_not_contains_validator.dart';
@@ -43,6 +44,7 @@ part 'generators/methods/_generator_naming_config.dart';
 part 'generators/methods/_get_association_json_key.dart';
 part 'generators/methods/_get_associations.dart';
 part 'generators/methods/_get_dart_type_for_query.dart';
+part 'generators/methods/_get_datatype_expression.dart';
 part 'generators/methods/_get_fields.dart';
 part 'generators/methods/_get_model_class_name.dart';
 part 'generators/methods/_get_model_values_class_name.dart';
@@ -55,11 +57,11 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
   SequelizeModelGenerator(this.options);
 
   @override
-  String generateForAnnotatedElement(
+  Future<String> generateForAnnotatedElement(
     Element element,
     ConstantReader annotation,
     BuildStep buildStep,
-  ) {
+  ) async {
     if (element is! ClassElement) {
       throw InvalidGenerationSourceError(
         'Generator cannot target `${element.displayName}`.',
@@ -69,7 +71,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
     final className = element.name ?? 'Unknown';
     final tableAnnotation = _extractTableAnnotation(annotation);
 
-    final fields = _getFields(element);
+    final fields = await _getFields(element, buildStep);
     final associations = _getAssociations(element);
     final generatedClassName = '\$$className';
     final valuesClassName = '\$${className}Values';

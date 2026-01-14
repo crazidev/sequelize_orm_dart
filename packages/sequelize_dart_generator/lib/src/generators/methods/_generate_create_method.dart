@@ -9,7 +9,6 @@ void _generateCreateMethod(
   List<_FieldInfo> fields,
   List<_AssociationInfo> associations,
 ) {
-  final columnsClassName = '\$${className}Columns';
   final createClassName = '\$${className}Create';
 
   // Generate create method that accepts Create class with associations

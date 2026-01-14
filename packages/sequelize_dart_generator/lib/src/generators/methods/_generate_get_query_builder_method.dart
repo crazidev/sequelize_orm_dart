@@ -6,6 +6,7 @@ void _generateGetQueryBuilderMethod(
 ) {
   final queryBuilderClassName = '\$${className}Query';
 
+  buffer.writeln('  @protected');
   buffer.writeln('  @override');
   buffer.writeln('  dynamic getQueryBuilder() {');
   buffer.writeln('    return $queryBuilderClassName();');

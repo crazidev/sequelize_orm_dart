@@ -5,6 +5,7 @@ void _generateDefineMethod(
   String generatedClassName,
   List<_AssociationInfo> associations,
 ) {
+  buffer.writeln('  @protected');
   buffer.writeln('  @override');
   buffer.writeln(
     '  $generatedClassName define(String modelName, Object sequelize) {',

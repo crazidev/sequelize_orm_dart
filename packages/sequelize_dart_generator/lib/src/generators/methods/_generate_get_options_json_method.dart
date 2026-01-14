@@ -4,6 +4,7 @@ void _generateGetOptionsJsonMethod(
   StringBuffer buffer,
   Map<String, dynamic> tableAnnotation,
 ) {
+  buffer.writeln('  @protected');
   buffer.writeln('  @override');
   buffer.writeln('  Map<String, dynamic> getOptionsJson() {');
   buffer.writeln('    final table = Table(');

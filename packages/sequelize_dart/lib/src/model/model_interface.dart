@@ -1,15 +1,26 @@
+import 'package:meta/meta.dart';
 import 'package:sequelize_dart/src/association/association_model.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 abstract class ModelInterface<T> {
+  @protected
   late Sequelize sequelize;
+
+  @protected
   late String name;
+
+  @protected
   late dynamic sequelizeInstance;
+
+  @protected
   late dynamic sequelizeModel;
+
+  @protected
   List<String> primaryKeys = [];
 
   /// Get primary key attribute names
+  @protected
   List<String> getPrimaryKeys() => primaryKeys;
 
   /// Define the model in Sequelize
@@ -17,6 +28,7 @@ abstract class ModelInterface<T> {
 
   /// Associate models - called after all models are defined
   /// Override in generated models to set up associations
+  @protected
   Future<void> associateModel();
 
   Future<Association> hasOne(
@@ -35,12 +47,19 @@ abstract class ModelInterface<T> {
 
   /// Get the query builder for this model
   /// Returns a typed query builder (generated class)
+  @protected
   dynamic getQueryBuilder();
+
+  @protected
+  List<ColumnDefinition> $getAttributes();
+
+  @protected
+  Map<String, Map<String, dynamic>> $getAttributesJson();
 }
 
-/// Extension to add toJsonForBridge to ModelAttributes for JS conversion
+/// Extension to add toJsonForBridge to ColumnDefinition for JS conversion
 /// This wraps the attribute in a map with the column name as key
-extension ModelAttributesJson on ModelAttributes {
+extension ColumnDefinitionJson on ColumnDefinition {
   Map<String, Map<String, dynamic>> toJsonForBridge() {
     final attr = <String, dynamic>{
       'type': type.name,
