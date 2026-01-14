@@ -8,12 +8,6 @@ import 'package:sequelize_dart_example/models/users.model.dart';
 Future<void> runQueries() async {
   // Test create functionality with Create class
   final users = await Users.instance.findOne(
-    where: (whereUsers) => and([const Column('view').eq(6)]),
-    include: (includeUsers) => [
-      // Intentionally invalid include to trigger EagerLoadingError
-    ],
+    where: (whereUsers) => and([]),
   );
-
-  await Users.instance.findOne();
-  // print(users.map((e) => e.toJson()));
 }

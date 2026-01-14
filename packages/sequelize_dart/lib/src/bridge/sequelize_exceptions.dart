@@ -256,9 +256,6 @@ class SequelizeException implements Exception {
       buffer.write('${AnsiColor.brightBlue.wrap('SQL:')} ');
       final cleanedSql = sql!.replaceAll(RegExp(r'\s+'), ' ').trim();
       buffer.writeln(SqlFormatter.addColors(cleanedSql));
-      buffer.writeln(
-        AnsiColor.red.wrap("${'=' * 20} SEQUELIZE ERROR END ${'=' * 16}"),
-      );
     }
 
     // 6. Print StackTrace (No arrows, clean standard format)

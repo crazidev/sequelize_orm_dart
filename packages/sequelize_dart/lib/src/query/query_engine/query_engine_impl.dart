@@ -73,6 +73,7 @@ class QueryEngine extends QueryEngineInterface {
       throw SequelizeException(
         e.toString(),
         context: 'Exception: failed to execute findAll()',
+        stack: StackTrace.current.toString(),
       );
     }
   }
