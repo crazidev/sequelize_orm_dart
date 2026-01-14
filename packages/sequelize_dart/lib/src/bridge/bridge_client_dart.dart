@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:sequelize_dart/src/bridge/bridge_client_interface.dart';
 import 'package:sequelize_dart/src/bridge/bridge_exception.dart';
+import 'package:sequelize_dart/src/bridge/sequelize_exceptions.dart';
 
 /// Client for communicating with the Node.js Sequelize bridge server.
 /// Uses stdio (stdin/stdout) for Dart VM environments.
@@ -300,42 +301,14 @@ class BridgeClient implements BridgeClientInterface {
           String? errorName;
 
           if (error is Map) {
-            errorName = error['name'] as String?;
-            errorMessage =
-                error['message'] as String? ??
-                error['name'] as String? ??
-                'Unknown error';
-            errorCode = error['code'] as int?;
-            errorStack = error['stack'] as String?;
-
-            // Build a more detailed error message
-            final buffer = StringBuffer();
-            if (errorName != null && errorName != 'Error') {
-              buffer.writeln('$errorName: $errorMessage');
-            } else {
-              buffer.writeln(errorMessage);
-            }
-
-            // Add original error if available
-            if (error['original'] is Map) {
-              final original = error['original'] as Map;
-              final originalMsg = original['message'] as String?;
-              if (originalMsg != null) {
-                buffer.writeln('Original error: $originalMsg');
-              }
-            }
-
-            // Add SQL if available
-            if (error['sql'] != null) {
-              buffer.writeln('SQL: ${error['sql']}');
-            }
-
-            errorMessage = buffer.toString().trim();
+            completer.completeError(
+              SequelizeException.fromBridge(Map<String, dynamic>.from(error)),
+            );
+          } else {
+            completer.completeError(
+              BridgeException(errorMessage, code: errorCode, stack: errorStack),
+            );
           }
-
-          completer.completeError(
-            BridgeException(errorMessage, code: errorCode, stack: errorStack),
-          );
         } else {
           completer.complete(response['result']);
         }

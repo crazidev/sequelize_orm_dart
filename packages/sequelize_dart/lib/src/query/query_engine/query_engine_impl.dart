@@ -1,4 +1,5 @@
 import 'package:sequelize_dart/src/bridge/bridge_client.dart';
+import 'package:sequelize_dart/src/bridge/sequelize_exceptions.dart';
 import 'package:sequelize_dart/src/model/model_instance_data.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine_interface.dart';
@@ -66,8 +67,13 @@ class QueryEngine extends QueryEngineInterface {
 
       throw Exception('Invalid response format from bridge');
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute findAll: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute findAll()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute findAll()',
+      );
     }
   }
 
@@ -87,8 +93,13 @@ class QueryEngine extends QueryEngineInterface {
       if (result == null) return null;
       return _toModelInstanceData(result);
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute findOne: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute findOne()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute findOne()',
+      );
     }
   }
 
@@ -114,8 +125,13 @@ class QueryEngine extends QueryEngineInterface {
 
       return _toModelInstanceData(result);
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute create: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute create()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute create()',
+      );
     }
   }
 
@@ -140,8 +156,13 @@ class QueryEngine extends QueryEngineInterface {
 
       throw Exception('Invalid response format from bridge');
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute bulkCreate: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute bulkCreate()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute bulkCreate()',
+      );
     }
   }
 
@@ -167,8 +188,13 @@ class QueryEngine extends QueryEngineInterface {
         'Invalid response format: expected int, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute update: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute update()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute update()',
+      );
     }
   }
 
@@ -192,8 +218,13 @@ class QueryEngine extends QueryEngineInterface {
         'Invalid response format: expected int, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute count: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute count()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute count()',
+      );
     }
   }
 
@@ -219,8 +250,13 @@ class QueryEngine extends QueryEngineInterface {
         'Invalid response format: expected num, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute max: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute max()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute max()',
+      );
     }
   }
 
@@ -246,8 +282,13 @@ class QueryEngine extends QueryEngineInterface {
         'Invalid response format: expected num, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute min: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute min()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute min()',
+      );
     }
   }
 
@@ -273,8 +314,13 @@ class QueryEngine extends QueryEngineInterface {
         'Invalid response format: expected num, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute sum: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute sum()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute sum()',
+      );
     }
   }
 
@@ -331,8 +377,13 @@ class QueryEngine extends QueryEngineInterface {
       }
       return [];
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute $operation: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute $operation()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute $operation()',
+      );
     }
   }
 
@@ -365,8 +416,13 @@ class QueryEngine extends QueryEngineInterface {
         'Invalid response format: expected Map with data, got ${result.runtimeType}',
       );
     } catch (e) {
-      if (e is BridgeException) rethrow;
-      throw Exception('Failed to execute save: $e');
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute save()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute save()',
+      );
     }
   }
 }

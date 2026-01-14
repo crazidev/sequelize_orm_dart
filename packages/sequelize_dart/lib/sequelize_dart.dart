@@ -5,6 +5,8 @@ export 'package:meta/meta.dart';
 export 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 export 'src/association/association_model.dart';
+export 'src/bridge/bridge_exception.dart';
+export 'src/bridge/sequelize_exceptions.dart';
 // Connection exports
 export 'src/connection/core_options.dart';
 export 'src/connection/dialects/mariadb.dart';
