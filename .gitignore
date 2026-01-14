@@ -16,9 +16,9 @@ packages/sequelize_dart/js/node_modules/
 packages/sequelize_dart/js/package-lock.json
 
 # Docusaurus
-website/build/
-website/.docusaurus/
-website/node_modules/
+docs/build/*
+docs/.docusaurus/*
+docs/node_modules/*
 
 # Prettier
 .prettiercache
