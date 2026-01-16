@@ -20,4 +20,5 @@ Models in Sequelize Dart are regular Dart classes annotated with `@Table` and va
 - **[Primary Keys](./models/primary-keys)** - Defining primary and composite keys
 - **[Auto Increment](./models/auto-increment)** - Auto-incrementing fields
 - **[Nullability](./models/nullability)** - Controlling null values
+- **[Models Registry](./models/models-registry)** - Centralized model access with automatic discovery
 - **[Complete Example](./models/complete-example)** - Full example with all features

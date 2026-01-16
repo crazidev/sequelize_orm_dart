@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
         'models/primary-keys',
         'models/auto-increment',
         'models/nullability',
+        'models/models-registry',
         'models/complete-example',
       ],
     },
