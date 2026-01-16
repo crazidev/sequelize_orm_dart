@@ -9,13 +9,13 @@ class Db {
   Db._();
 
   /// Returns the Post model instance
-  static $Post get post => $Post();
+  static PostModel get post => PostModel();
 
   /// Returns the PostDetails model instance
-  static $PostDetails get postDetails => $PostDetails();
+  static PostDetailsModel get postDetails => PostDetailsModel();
 
   /// Returns the Users model instance
-  static $Users get users => $Users();
+  static UsersModel get users => UsersModel();
 
   /// Returns a list of all model instances
   static List<Model> allModels() {

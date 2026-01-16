@@ -6,6 +6,7 @@ void _generateIncrementMethod(
   String valuesClassName,
   String whereCallbackName,
   List<_FieldInfo> fields,
+  GeneratorNamingConfig namingConfig,
 ) {
   _generateNumericOperationMethod(
     buffer,
@@ -14,6 +15,7 @@ void _generateIncrementMethod(
     whereCallbackName,
     fields,
     'increment',
+    namingConfig,
   );
 }
 
@@ -23,6 +25,7 @@ void _generateDecrementMethod(
   String valuesClassName,
   String whereCallbackName,
   List<_FieldInfo> fields,
+  GeneratorNamingConfig namingConfig,
 ) {
   _generateNumericOperationMethod(
     buffer,
@@ -31,6 +34,7 @@ void _generateDecrementMethod(
     whereCallbackName,
     fields,
     'decrement',
+    namingConfig,
   );
 }
 
@@ -41,8 +45,9 @@ void _generateNumericOperationMethod(
   String whereCallbackName,
   List<_FieldInfo> fields,
   String operation,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
 
   // Filter numeric fields (int, double, num) but exclude primary keys, auto-increment, and foreign key fields
   final numericFields = fields.where((field) {

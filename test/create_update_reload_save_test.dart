@@ -26,11 +26,11 @@ void main() {
     test('create user with single post and increment post views', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_create_$timestamp@example.com',
           firstName: 'Test',
           lastName: 'User',
-          post: $PostCreate(
+          post: PostCreate(
             title: 'test_post_$timestamp',
             content: 'Test Content',
             views: 1,
@@ -40,7 +40,7 @@ void main() {
 
       expect(
         newUser,
-        isA<$UsersValues>(),
+        isA<UsersValues>(),
         reason: 'create() should return a UsersValues instance',
       );
       expect(newUser.id, isNotNull, reason: 'User should have an ID');
@@ -70,7 +70,7 @@ void main() {
 
       expect(
         updatedPost,
-        isA<$PostValues?>(),
+        isA<PostValues?>(),
         reason: 'increment() should return PostValues instance',
       );
       expect(
@@ -95,17 +95,17 @@ void main() {
       () async {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final newUser = await Users.instance.create(
-          $UsersCreate(
+          UsersCreate(
             email: 'test_multi_$timestamp@example.com',
             firstName: 'Multi',
             lastName: 'Post',
             posts: [
-              $PostCreate(
+              PostCreate(
                 title: 'post_1_$timestamp',
                 content: 'Content 1',
                 views: 10,
               ),
-              $PostCreate(
+              PostCreate(
                 title: 'post_2_$timestamp',
                 content: 'Content 2',
                 views: 20,
@@ -116,7 +116,7 @@ void main() {
 
         expect(
           newUser,
-          isA<$UsersValues>(),
+          isA<UsersValues>(),
           reason: 'create() should return a UsersValues instance',
         );
         expect(newUser.id, isNotNull, reason: 'User should have an ID');
@@ -154,7 +154,7 @@ void main() {
 
           expect(
             updatedPost,
-            isA<List<$PostValues>>(),
+            isA<List<PostValues>>(),
             reason: 'increment() should return list of PostValues',
           );
           expect(
@@ -177,11 +177,11 @@ void main() {
       () async {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final newUser = await Users.instance.create(
-          $UsersCreate(
+          UsersCreate(
             email: 'test_save_$timestamp@example.com',
             firstName: 'Save',
             lastName: 'Test',
-            post: $PostCreate(
+            post: PostCreate(
               title: 'save_post_$timestamp',
               content: 'Save Content',
               views: 5,
@@ -273,11 +273,11 @@ void main() {
     test('verify associated post has user_id after create', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_fk_$timestamp@example.com',
           firstName: 'FK',
           lastName: 'Test',
-          post: $PostCreate(
+          post: PostCreate(
             title: 'fk_post_$timestamp',
             content: 'FK Content',
             views: 0,
@@ -311,7 +311,7 @@ void main() {
     test('static update() with named parameters', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_update_$timestamp@example.com',
           firstName: 'Update',
           lastName: 'Test',
@@ -370,14 +370,14 @@ void main() {
     test('static update() with where clause filters correctly', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final user1 = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'user1_$timestamp@example.com',
           firstName: 'User1',
           lastName: 'Test',
         ),
       );
       final user2 = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'user2_$timestamp@example.com',
           firstName: 'User2',
           lastName: 'Test',
@@ -422,7 +422,7 @@ void main() {
     test('instance update() method', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_instance_update_$timestamp@example.com',
           firstName: 'Instance',
           lastName: 'Update',
@@ -470,7 +470,7 @@ void main() {
     test('reload() updates instance with latest database values', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_reload_$timestamp@example.com',
           firstName: 'Reload',
           lastName: 'Test',
@@ -516,11 +516,11 @@ void main() {
     test('reload() with associations preserves includes', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_reload_include_$timestamp@example.com',
           firstName: 'Reload',
           lastName: 'Include',
-          post: $PostCreate(
+          post: PostCreate(
             title: 'reload_post_$timestamp',
             content: 'Reload Content',
             views: 100,
@@ -564,7 +564,7 @@ void main() {
     });
 
     test('reload() throws error when instance has no primary key', () async {
-      final newUser = $UsersValues(
+      final newUser = UsersValues(
         email: 'test@example.com',
         firstName: 'Test',
         lastName: 'User',
@@ -581,7 +581,7 @@ void main() {
   group('Save Method - Instance Implementation', () {
     test('save() creates new record when no primary key', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = $UsersValues(
+      final newUser = UsersValues(
         email: 'test_save_new_$timestamp@example.com',
         firstName: 'Save',
         lastName: 'New',
@@ -611,7 +611,7 @@ void main() {
     test('save() updates existing record when primary key exists', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_save_update_$timestamp@example.com',
           firstName: 'Save',
           lastName: 'Update',
@@ -657,11 +657,11 @@ void main() {
       () async {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final newUser = await Users.instance.create(
-          $UsersCreate(
+          UsersCreate(
             email: 'test_save_fk_$timestamp@example.com',
             firstName: 'Save',
             lastName: 'FK',
-            post: $PostCreate(
+            post: PostCreate(
               title: 'save_fk_post_$timestamp',
               content: 'Save FK Content',
               views: 50,
@@ -724,7 +724,7 @@ void main() {
     test('save() with fields parameter saves only specified fields', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_save_fields_$timestamp@example.com',
           firstName: 'Save',
           lastName: 'Fields',
@@ -783,11 +783,11 @@ void main() {
 
       // 1. Create
       final newUser = await Users.instance.create(
-        $UsersCreate(
+        UsersCreate(
           email: 'test_workflow_$timestamp@example.com',
           firstName: 'Workflow',
           lastName: 'Test',
-          post: $PostCreate(
+          post: PostCreate(
             title: 'workflow_post_$timestamp',
             content: 'Workflow Content',
             views: 1,

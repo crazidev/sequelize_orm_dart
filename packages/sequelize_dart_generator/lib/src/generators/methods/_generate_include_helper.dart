@@ -6,7 +6,9 @@ void _generateIncludeHelper(
   List<_AssociationInfo> associations,
   GeneratorNamingConfig namingConfig,
 ) {
-  final helperClassName = '\$${className}IncludeHelper';
+  final helperClassName = namingConfig.getModelIncludeHelperClassName(
+    className,
+  );
 
   buffer.writeln('/// Type-safe include helper for $className');
   buffer.writeln('class $helperClassName {');
@@ -17,8 +19,10 @@ void _generateIncludeHelper(
     final associationName = assoc.as ?? assoc.fieldName;
     final modelClassName = assoc.modelClassName;
     final methodName = assoc.fieldName;
-    final colsClass = '\$${modelClassName}Columns';
-    final inclClass = '\$${modelClassName}IncludeHelper';
+    final colsClass = namingConfig.getModelColumnsClassName(modelClassName);
+    final inclClass = namingConfig.getModelIncludeHelperClassName(
+      modelClassName,
+    );
     final generateSeparate = assoc.associationType == 'hasMany';
 
     buffer.writeln();

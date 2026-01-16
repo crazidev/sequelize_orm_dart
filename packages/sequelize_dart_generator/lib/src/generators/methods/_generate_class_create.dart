@@ -1,14 +1,11 @@
 part of '../../sequelize_model_generator.dart';
 
-String _getModelCreateClassName(String className) {
-  return '\$${className}Create';
-}
-
 void _generateClassCreate(
   StringBuffer buffer,
   String createClassName,
   List<_FieldInfo> fields,
   List<_AssociationInfo> associations,
+  GeneratorNamingConfig namingConfig,
 ) {
   buffer.writeln('class $createClassName {');
   // Add regular fields
@@ -20,7 +17,7 @@ void _generateClassCreate(
 
   // Add association fields
   for (var assoc in associations) {
-    final modelCreateClassName = _getModelCreateClassName(
+    final modelCreateClassName = namingConfig.getModelCreateClassName(
       assoc.modelClassName,
     );
     if (assoc.associationType == 'hasOne') {

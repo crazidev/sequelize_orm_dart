@@ -30,7 +30,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'increment() should return a list of updated records',
       );
       expect(
@@ -60,7 +60,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'increment() should return a list of updated records',
       );
       expect(
@@ -101,7 +101,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'decrement() should return a list of updated records',
       );
       expect(
@@ -133,7 +133,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'decrement() should return a list of updated records',
       );
       expect(
@@ -175,7 +175,7 @@ void main() {
 
       expect(
         incrementResult,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'increment() should return a list of updated records',
       );
 
@@ -189,7 +189,7 @@ void main() {
 
       expect(
         decrementResult,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'decrement() should return a list of updated records',
       );
       expect(
@@ -208,7 +208,7 @@ void main() {
 
       expect(
         bulkIncrement,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'bulk increment() should return a list of updated records',
       );
 
@@ -222,7 +222,7 @@ void main() {
 
       expect(
         bulkDecrement,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'bulk decrement() should return a list of updated records',
       );
       expect(
@@ -242,7 +242,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'increment() with zero should still execute',
       );
       expect(
@@ -260,7 +260,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'decrement() with zero should still execute',
       );
       expect(
@@ -278,7 +278,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'increment() with negative value should work',
       );
       expect(
@@ -296,7 +296,7 @@ void main() {
 
       expect(
         result,
-        isA<List<$PostValues>>(),
+        isA<List<PostValues>>(),
         reason: 'decrement() with negative value should work',
       );
       expect(

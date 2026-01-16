@@ -39,5 +39,5 @@ class PostDetails {
   )
   dynamic metadata;
 
-  static $PostDetails get instance => $PostDetails();
+  static PostDetailsModel get instance => PostDetailsModel();
 }

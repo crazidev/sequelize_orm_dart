@@ -4,6 +4,7 @@ void _generateClassDefinition(
   StringBuffer buffer,
   String generatedClassName,
   String? className,
+  GeneratorNamingConfig namingConfig,
 ) {
   buffer.writeln('class $generatedClassName extends Model {');
   buffer.writeln(
@@ -19,7 +20,8 @@ void _generateClassDefinition(
   buffer.writeln('    return _instance;');
   buffer.writeln('  }');
   buffer.writeln();
+  final columnsClassName = namingConfig.getModelColumnsClassName(className!);
   buffer.writeln(
-    '  \$${className}Columns get columns => \$${className}Columns();',
+    '  $columnsClassName get columns => $columnsClassName();',
   );
 }

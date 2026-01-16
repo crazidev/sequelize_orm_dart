@@ -5,8 +5,9 @@ void _generateUpdateMethod(
   String className,
   String whereCallbackName,
   List<_FieldInfo> fields,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
 
   // Generate update method with named parameters for each field
   buffer.writeln('  Future<int> update({');

@@ -4,8 +4,9 @@ void _generateCountMethod(
   StringBuffer buffer,
   String className,
   String whereCallbackName,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
 
   buffer.writeln('  @override');
   buffer.writeln('  Future<int> count({');

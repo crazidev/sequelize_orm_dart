@@ -6,9 +6,12 @@ void _generateFindAllMethod(
   String valuesClassName,
   String whereCallbackName,
   String includeCallbackName,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final columnsClassName = '\$${className}Columns';
-  final includeHelperClassName = '\$${className}IncludeHelper';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
+  final includeHelperClassName = namingConfig.getModelIncludeHelperClassName(
+    className,
+  );
 
   buffer.writeln('  @override');
   buffer.writeln('  Future<List<$valuesClassName>> findAll({');

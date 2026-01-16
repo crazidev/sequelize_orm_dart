@@ -7,9 +7,12 @@ void _generateClassValues(
   List<_AssociationInfo> associations, {
   required String className,
   required String generatedClassName,
+  required GeneratorNamingConfig namingConfig,
 }) {
   final primaryKeys = fields.where((f) => f.primaryKey).toList();
-  final includeHelperClassName = '\$${className}IncludeHelper';
+  final includeHelperClassName = namingConfig.getModelIncludeHelperClassName(
+    className,
+  );
 
   // Use ReloadableMixin if there are primary keys
   if (primaryKeys.isNotEmpty) {
@@ -25,7 +28,7 @@ void _generateClassValues(
   }
   // Add association fields
   for (var assoc in associations) {
-    final modelValuesClassName = _getModelValuesClassName(
+    final modelValuesClassName = namingConfig.getModelValuesClassName(
       assoc.modelClassName,
     );
     if (assoc.associationType == 'hasOne') {
@@ -83,7 +86,7 @@ void _generateClassValues(
   }
   // Add association parsing
   for (var assoc in associations) {
-    final modelValuesClassName = _getModelValuesClassName(
+    final modelValuesClassName = namingConfig.getModelValuesClassName(
       assoc.modelClassName,
     );
     final jsonKey = _getAssociationJsonKey(assoc.as, assoc.modelClassName);
@@ -127,7 +130,7 @@ void _generateClassValues(
   // getPrimaryKeyMap() is provided by ReloadableMixin and calls getPrimaryKeyMap()
   // which we implement via where() in the mixin methods
 
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
   final whereCallbackName = _toCamelCase(className);
 
   // Generate merge where helper method
@@ -151,6 +154,7 @@ void _generateClassValues(
       generatedClassName,
       primaryKeys,
       includeHelperClassName,
+      namingConfig,
     );
   }
 
@@ -162,6 +166,7 @@ void _generateClassValues(
     generatedClassName,
     fields,
     associations,
+    namingConfig,
   );
 
   buffer.writeln('}');
@@ -176,6 +181,7 @@ void _generateMixinMethods(
   String generatedClassName,
   List<_FieldInfo> primaryKeys,
   String includeHelperClassName,
+  GeneratorNamingConfig namingConfig,
 ) {
   // Generate getPrimaryKeyMap (alias for where())
   buffer.writeln('  @override');
@@ -217,7 +223,7 @@ void _generateMixinMethods(
   buffer.writeln('  }');
   buffer.writeln();
 
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
 
   // Generate findByPrimaryKey
   buffer.writeln('  @override');

@@ -4,8 +4,9 @@ void _generateColumns(
   StringBuffer buffer,
   String className,
   List<_FieldInfo> fields,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
 
   buffer.writeln('/// Type-safe columns for $className');
   buffer.writeln(

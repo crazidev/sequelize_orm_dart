@@ -8,8 +8,9 @@ void _generateCreateMethod(
   String includeCallbackName,
   List<_FieldInfo> fields,
   List<_AssociationInfo> associations,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final createClassName = '\$${className}Create';
+  final createClassName = namingConfig.getModelCreateClassName(className);
 
   // Generate create method that accepts Create class with associations
   buffer.writeln(

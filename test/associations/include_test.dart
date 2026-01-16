@@ -148,7 +148,7 @@ void main() {
 
     test('IncludeBuilder creation and toJson', () async {
       // Test that IncludeBuilder can be created with various options
-      const includeHelper = $UsersIncludeHelper();
+      const includeHelper = UsersIncludeHelper();
       final include = includeHelper.posts(
         separate: true,
         required: false,
@@ -173,7 +173,7 @@ void main() {
 
     test('AssociationReference col method', () async {
       // Test that we can get column references from associations
-      final queryBuilder = $UsersQuery();
+      final queryBuilder = UsersQuery();
       final colRef = queryBuilder.posts.col('title');
       expect(colRef, equals('posts.title'));
     });

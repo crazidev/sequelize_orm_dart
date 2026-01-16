@@ -26,5 +26,5 @@ abstract class Post {
   @HasOne(PostDetails, foreignKey: 'postId', as: 'postDetails')
   PostDetails? postDetails;
 
-  static $Post get instance => $Post();
+  static PostModel get instance => PostModel();
 }

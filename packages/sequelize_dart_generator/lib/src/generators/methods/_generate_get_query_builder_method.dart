@@ -3,8 +3,9 @@ part of '../../sequelize_model_generator.dart';
 void _generateGetQueryBuilderMethod(
   StringBuffer buffer,
   String className,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final queryBuilderClassName = '\$${className}Query';
+  final queryBuilderClassName = namingConfig.getModelQueryClassName(className);
 
   buffer.writeln('  @protected');
   buffer.writeln('  @override');

@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:sequelize_dart_generator/src/generator_naming_config.dart';
 import 'package:source_gen/source_gen.dart';
 
 part 'generators/methods/_extract_boolean_validator.dart';
@@ -47,7 +48,6 @@ part 'generators/methods/_get_dart_type_for_query.dart';
 part 'generators/methods/_get_datatype_expression.dart';
 part 'generators/methods/_get_fields.dart';
 part 'generators/methods/_get_model_class_name.dart';
-part 'generators/methods/_get_model_values_class_name.dart';
 part 'generators/methods/_models.dart';
 part 'generators/methods/_to_camel_case.dart';
 
@@ -73,10 +73,11 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
 
     final fields = await _getFields(element, buildStep);
     final associations = _getAssociations(element);
-    final generatedClassName = '\$$className';
-    final valuesClassName = '\$${className}Values';
-    final createClassName = '\$${className}Create';
-    final updateClassName = '\$${className}Update';
+    final namingConfig = GeneratorNamingConfig.fromOptions(options);
+    final generatedClassName = namingConfig.getModelClassName(className);
+    final valuesClassName = namingConfig.getModelValuesClassName(className);
+    final createClassName = namingConfig.getModelCreateClassName(className);
+    final updateClassName = namingConfig.getModelUpdateClassName(className);
 
     final buffer = StringBuffer();
 
@@ -84,6 +85,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       buffer,
       generatedClassName,
       className,
+      namingConfig,
     );
     _generateDefineMethod(
       buffer,
@@ -99,7 +101,6 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       buffer,
       tableAnnotation,
     );
-    final namingConfig = GeneratorNamingConfig.fromOptions(options);
 
     final singularName =
         (tableAnnotation['name']?['singular'] as String?) ??
@@ -123,6 +124,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       baseCallbackName,
       includeParamName,
+      namingConfig,
     );
     _generateFindOneMethod(
       buffer,
@@ -130,6 +132,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       baseCallbackName,
       includeParamName,
+      namingConfig,
     );
     _generateCreateMethod(
       buffer,
@@ -139,32 +142,38 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       includeParamName,
       fields,
       associations,
+      namingConfig,
     );
     _generateUpdateMethod(
       buffer,
       className,
       baseCallbackName,
       fields,
+      namingConfig,
     );
     _generateCountMethod(
       buffer,
       className,
       baseCallbackName,
+      namingConfig,
     );
     _generateMaxMethod(
       buffer,
       className,
       baseCallbackName,
+      namingConfig,
     );
     _generateMinMethod(
       buffer,
       className,
       baseCallbackName,
+      namingConfig,
     );
     _generateSumMethod(
       buffer,
       className,
       baseCallbackName,
+      namingConfig,
     );
     _generateIncrementMethod(
       buffer,
@@ -172,6 +181,7 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       baseCallbackName,
       fields,
+      namingConfig,
     );
     _generateDecrementMethod(
       buffer,
@@ -179,10 +189,12 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       valuesClassName,
       baseCallbackName,
       fields,
+      namingConfig,
     );
     _generateGetQueryBuilderMethod(
       buffer,
       className,
+      namingConfig,
     );
     _generateAssociateModelMethod(
       buffer,
@@ -200,14 +212,16 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       associations,
       className: className,
       generatedClassName: generatedClassName,
+      namingConfig: namingConfig,
     );
-    // Conditionally generate $ModelCreate class based on config
+    // Conditionally generate ModelCreate class based on config
     if (namingConfig.generateCreateClass) {
       _generateClassCreate(
         buffer,
         createClassName,
         fields,
         associations,
+        namingConfig,
       );
       // Also generate Update class (same structure but without associations)
       _generateClassUpdate(
@@ -220,12 +234,14 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       buffer,
       className,
       fields,
+      namingConfig,
     );
     _generateQueryBuilder(
       buffer,
       className,
       fields,
       associations,
+      namingConfig,
     );
     _generateIncludeHelper(
       buffer,

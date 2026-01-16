@@ -5,9 +5,10 @@ void _generateQueryBuilder(
   String className,
   List<_FieldInfo> fields,
   List<_AssociationInfo> associations,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final queryBuilderClassName = '\$${className}Query';
-  final columnsClassName = '\$${className}Columns';
+  final queryBuilderClassName = namingConfig.getModelQueryClassName(className);
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
 
   buffer.writeln('/// Type-safe query builder for $className');
   buffer.writeln(
@@ -36,7 +37,9 @@ void _generateQueryBuilder(
 
   // Generate include helper property
   if (associations.isNotEmpty) {
-    final helperClassName = '\$${className}IncludeHelper';
+    final helperClassName = namingConfig.getModelIncludeHelperClassName(
+      className,
+    );
     buffer.writeln();
     buffer.writeln('  final include = const $helperClassName();');
   }

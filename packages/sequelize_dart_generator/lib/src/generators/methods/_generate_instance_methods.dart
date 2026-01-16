@@ -7,8 +7,9 @@ void _generateInstanceMethods(
   String generatedClassName,
   List<_FieldInfo> fields,
   List<_AssociationInfo> associations,
+  GeneratorNamingConfig namingConfig,
 ) {
-  final columnsClassName = '\$${className}Columns';
+  final columnsClassName = namingConfig.getModelColumnsClassName(className);
   final primaryKeys = fields.where((f) => f.primaryKey).toList();
 
   // Note: reload() is now provided by ReloadableMixin

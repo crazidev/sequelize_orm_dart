@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
+import 'package:sequelize_dart_generator/src/generator_naming_config.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Custom builder that generates a models registry from all model files
@@ -102,13 +103,18 @@ class ModelsRegistryBuilder implements Builder {
         await buildStep.resolver.libraryFor(assetId),
       );
 
+      // Create naming config instance
+      final namingConfig = GeneratorNamingConfig.fromOptions(options);
+
       // Find the class annotated with @Table
       for (final element in libraryReader.allElements) {
         if (element is ClassElement) {
           if (_hasTableAnnotation(element)) {
             final className = element.name;
             if (className == null) continue;
-            final generatedClassName = '\$$className';
+            final generatedClassName = namingConfig.getModelClassName(
+              className,
+            );
 
             // Get the import path relative to lib/
             final importPath = p.withoutExtension(
