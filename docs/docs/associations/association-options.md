@@ -12,7 +12,7 @@ Specify the foreign key column name:
 @HasOne(Post, foreignKey: 'userId', as: 'post')
 Post? post;
 
-// If not specified, Sequelize infers: 'userId' from 'Users' -> 'user_id'
+// If not specified, Sequelize infers: 'userId' from 'User' -> 'user_id'
 ```
 
 ## as (Alias)
@@ -24,8 +24,10 @@ Give the association an alias:
 Post? mainPost;
 
 // Use the alias when querying
-final user = await Users.instance.findOne(
-  include: [Users.instance.mainPost],
+final user = await User.instance.findOne(
+  include: (u) => [
+    u.mainPost,
+  ],
 );
 ```
 
@@ -36,7 +38,7 @@ Specify the source key (the key in the source model):
 ```dart
 @HasOne(Post,
   foreignKey: 'userId',
-  sourceKey: 'id',  // Use 'id' from Users (default)
+  sourceKey: 'id',  // Use 'id' from User (default)
   as: 'post',
 )
 Post? post;

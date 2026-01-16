@@ -22,9 +22,9 @@ When `underscored: true`, Dart property names are automatically converted to sna
 ```dart
 @Table(tableName: 'users', underscored: true)
 class Users {
-  dynamic firstName;   // Maps to 'first_name'
-  dynamic lastName;    // Maps to 'last_name'
-  dynamic emailAddress; // Maps to 'email_address'
+  DataType firstName = DataType.STRING;    // Maps to 'first_name'
+  DataType lastName = DataType.STRING;     // Maps to 'last_name'
+  DataType emailAddress = DataType.STRING; // Maps to 'email_address'
 }
 ```
 
@@ -33,11 +33,8 @@ class Users {
 You can override the column name explicitly:
 
 ```dart
-@ModelAttributes(
-  name: 'first_name',  // Explicit column name
-  type: DataType.STRING,
-)
-dynamic firstName;
+@ColumnName('first_name')
+DataType firstName = DataType.STRING;
 ```
 
 ### Without Underscored
@@ -47,7 +44,7 @@ If `underscored: false`, column names match property names exactly:
 ```dart
 @Table(tableName: 'users', underscored: false)
 class Users {
-  dynamic firstName;   // Maps to 'firstName'
-  dynamic lastName;    // Maps to 'lastName'
+  DataType firstName = DataType.STRING; // Maps to 'firstName'
+  DataType lastName = DataType.STRING;  // Maps to 'lastName'
 }
 ```

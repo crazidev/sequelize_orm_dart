@@ -74,44 +74,22 @@ Models in Sequelize Dart are defined using annotations. Here's a basic example:
 
 ```dart
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 part 'users.model.g.dart';
 
-@Table(
-  tableName: 'users',
-  underscored: true,
-  timestamps: true,
-)
-class Users {
-  @ModelAttributes(
-    name: 'id',
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  )
-  dynamic id;
+@Table(tableName: 'users', underscored: true)
+class User {
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(
-    name: 'email',
-    type: DataType.STRING,
-    allowNull: false,
-  )
-  dynamic email;
+  @NotNull()
+  DataType username = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'first_name',
-    type: DataType.STRING,
-  )
-  dynamic firstName;
+  @ColumnName('is_active')
+  DataType isActive = DataType.BOOLEAN;
 
-  @ModelAttributes(
-    name: 'last_name',
-    type: DataType.STRING,
-  )
-  dynamic lastName;
-
-  static $Users get instance => $Users();
+  static $User get instance => $User();
 }
 ```
 
@@ -130,10 +108,9 @@ This generates the `*.model.g.dart` file that contains the model implementation.
 ### Create a Record
 
 ```dart
-final newUser = await Users.instance.create({
-  'email': 'user@example.com',
-  'firstName': 'John',
-  'lastName': 'Doe',
+final newUser = await User.instance.create({
+  'username': 'johndoe',
+  'isActive': true,
 });
 ```
 
@@ -141,20 +118,20 @@ final newUser = await Users.instance.create({
 
 ```dart
 // Find all users
-final users = await Users.instance.findAll();
+final users = await User.instance.findAll();
 
 // Find one user
-final user = await Users.instance.findOne(
-  where: Users.instance.id.equals(1),
+final user = await User.instance.findOne(
+  where: User.instance.id.equals(1),
 );
 ```
 
 ### Update a Record
 
 ```dart
-await Users.instance.update(
-  data: {'firstName': 'Jane'},
-  where: Users.instance.id.equals(1),
+await User.instance.update(
+  data: {'isActive': false},
+  where: User.instance.id.equals(1),
 );
 ```
 
@@ -164,7 +141,7 @@ Here's a complete example putting it all together:
 
 ```dart
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/models/user.model.dart';
 
 const connectionString = 'postgresql://postgres:postgres@localhost:5432/postgres';
 
@@ -180,32 +157,31 @@ Future<void> main() async {
   // Initialize with models
   await sequelize.initialize(
     models: [
-      Users.instance,
+      User.instance,
     ],
   );
 
   // Create a new user
-  final newUser = await Users.instance.create({
-    'email': 'john@example.com',
-    'firstName': 'John',
-    'lastName': 'Doe',
+  final newUser = await User.instance.create({
+    'username': 'johndoe',
+    'isActive': true,
   });
 
   // Find the user
-  final user = await Users.instance.findOne(
-    where: Users.instance.id.equals(newUser.id),
+  final user = await User.instance.findOne(
+    where: User.instance.id.equals(newUser.id),
   );
 
-  print('Found user: ${user?.email}');
+  print('Found user: ${user?.username}');
 
   // Update the user
-  await Users.instance.update(
-    data: {'firstName': 'Jane'},
-    where: Users.instance.id.equals(newUser.id),
+  await User.instance.update(
+    data: {'isActive': false},
+    where: User.instance.id.equals(newUser.id),
   );
 
   // Find all users
-  final allUsers = await Users.instance.findAll();
+  final allUsers = await User.instance.findAll();
   print('Total users: ${allUsers.length}');
 
   // Close connection

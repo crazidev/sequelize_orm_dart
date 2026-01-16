@@ -2,86 +2,67 @@
 sidebar_position: 9
 ---
 
-# Complete Model Example
+# Complete Example
 
-Here's a complete example with all features:
+Here is a comprehensive example of a model definition using various annotations and options.
 
 ```dart
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart'; // Optional if exported by main package
 
-part 'users.model.g.dart';
+part 'product.model.g.dart';
 
 @Table(
-  tableName: 'users',
+  tableName: 'products',
   underscored: true,
   timestamps: true,
-  name: ModelNameOption(singular: 'user', plural: 'users'),
 )
-class Users {
-  @ModelAttributes(
-    name: 'id',
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  )
-  dynamic id;
+class Product {
+  // Primary Key with Auto Increment
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(
-    name: 'email',
-    type: DataType.STRING,
-    allowNull: false,
-    validate: ValidateOption(
-      isEmail: IsEmail(),
-      notEmpty: NotEmpty(),
-    ),
-  )
-  dynamic email;
+  // String column with explicit name and not null constraint
+  @ColumnName('product_name')
+  @NotNull()
+  @Validate.Len(2, 100)
+  DataType name = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'first_name',
-    type: DataType.STRING,
-    allowNull: false,
-    validate: ValidateOption(
-      len: Len(min: 1, max: 50),
-    ),
-  )
-  dynamic firstName;
+  // Text column allowing nulls
+  @AllowNull()
+  DataType description = DataType.TEXT;
 
-  @ModelAttributes(
-    name: 'last_name',
-    type: DataType.STRING,
-    allowNull: false,
-  )
-  dynamic lastName;
+  // Decimal with precision, default value, and numeric validation
+  @Default(0.0)
+  @Validate.Min(0)
+  DataType price = DataType.DECIMAL(10, 2);
 
-  @ModelAttributes(
-    name: 'age',
-    type: DataType.INTEGER,
-    validate: ValidateOption(
-      min: Min(0),
-      max: Max(150),
-    ),
-  )
-  dynamic age;
+  // Enum-like string with specific allowed values
+  @Default('draft')
+  @Validate.IsIn(['draft', 'published', 'archived'])
+  DataType status = DataType.STRING;
 
-  @ModelAttributes(
-    name: 'is_active',
-    type: DataType.BOOLEAN,
-    defaultValue: true,
-  )
-  dynamic isActive;
+  // Boolean with default value
+  @Default(true)
+  DataType inStock = DataType.BOOLEAN;
 
-  static $Users get instance => $Users();
+  // UUID for tracking, auto-generated
+  @Default.uniqid()
+  DataType sku = DataType.UUID;
+
+  // Virtual helper getter (not a DB column)
+  bool get isPublished => status == 'published';
+
+  // Sequelize instance getter
+  static $Product get instance => $Product();
 }
 ```
 
-## Generating Model Code
+### Generating the Code
 
-After defining your model, generate the implementation:
+Remember to run the build runner to generate the `part` file:
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
-
-This creates the `*.model.g.dart` file with the model implementation.

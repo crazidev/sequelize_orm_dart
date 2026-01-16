@@ -72,7 +72,7 @@ void _generateNumericOperationMethod(
   for (final field in numericFields) {
     final fieldName = field.name;
     final camelCaseName = _toCamelCase(fieldName);
-    buffer.writeln('      int? $camelCaseName,');
+    buffer.writeln('      num? $camelCaseName,');
   }
   buffer.writeln(
     '      QueryOperator Function($columnsClassName $whereCallbackName)? where,',

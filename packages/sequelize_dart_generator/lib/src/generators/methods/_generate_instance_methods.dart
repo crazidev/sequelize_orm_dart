@@ -35,7 +35,7 @@ void _generateInstanceMethods(
     buffer.writeln('  /// Increments numeric fields and updates this instance');
     buffer.write('  Future<$valuesClassName?> increment({');
     for (final field in numericFields) {
-      buffer.write('int? ${_toCamelCase(field.name)}, ');
+      buffer.write('num? ${_toCamelCase(field.name)}, ');
     }
     buffer.writeln(
       'QueryOperator Function($columnsClassName c)? where}) async {',
@@ -74,7 +74,7 @@ void _generateInstanceMethods(
     buffer.writeln('  /// Decrements numeric fields and updates this instance');
     buffer.write('  Future<$valuesClassName?> decrement({');
     for (final field in numericFields) {
-      buffer.write('int? ${_toCamelCase(field.name)}, ');
+      buffer.write('num? ${_toCamelCase(field.name)}, ');
     }
     buffer.writeln(
       'QueryOperator Function($columnsClassName c)? where}) async {',

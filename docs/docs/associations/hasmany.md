@@ -10,26 +10,27 @@ The `hasMany` association creates a one-to-many relationship where one instance 
 
 ```dart
 @Table(tableName: 'users')
-class Users {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+class User {
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
   @HasMany(Post, foreignKey: 'userId', as: 'posts')
   List<Post>? posts;
 
-  static $Users get instance => $Users();
+  static $User get instance => $User();
 }
 
 @Table(tableName: 'posts')
 class Post {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(name: 'user_id', type: DataType.INTEGER)
-  dynamic userId;
+  @ColumnName('user_id')
+  DataType userId = DataType.INTEGER;
 
-  @ModelAttributes(name: 'title', type: DataType.STRING)
-  dynamic title;
+  DataType title = DataType.STRING;
 
   static $Post get instance => $Post();
 }
@@ -39,12 +40,15 @@ class Post {
 
 ```dart
 // Find user with all their posts
-final user = await Users.instance.findOne(
-  where: Users.instance.id.equals(1),
-  include: [Users.instance.posts],
+final user = await User.instance.findOne(
+  where: User.instance.id.equals(1),
+  include: (u) => [
+    // highlight-next-line
+    u.posts(),
+  ],
 );
 
-print('User: ${user?.email}');
+print('User ID: ${user?.id}');
 print('Posts: ${user?.posts?.length}');
 for (final post in user?.posts ?? []) {
   print('  - ${post.title}');

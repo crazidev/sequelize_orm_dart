@@ -4,3 +4,5 @@ targets:
       sequelize_dart_generator|sequelize_model_builder:
         enabled: true
         options:
+      sequelize_dart_generator|models_registry_builder:
+        enabled: true

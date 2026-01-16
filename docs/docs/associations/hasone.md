@@ -10,26 +10,27 @@ The `hasOne` association creates a one-to-one relationship where one instance of
 
 ```dart
 @Table(tableName: 'users')
-class Users {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+class User {
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
   @HasOne(Post, foreignKey: 'userId', as: 'post')
   Post? post;
 
-  static $Users get instance => $Users();
+  static $User get instance => $User();
 }
 
 @Table(tableName: 'posts')
 class Post {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(name: 'user_id', type: DataType.INTEGER)
-  dynamic userId;
+  @ColumnName('user_id')
+  DataType userId = DataType.INTEGER;
 
-  @ModelAttributes(name: 'title', type: DataType.STRING)
-  dynamic title;
+  DataType title = DataType.STRING;
 
   static $Post get instance => $Post();
 }
@@ -39,11 +40,14 @@ class Post {
 
 ```dart
 // Find user with their post
-final user = await Users.instance.findOne(
-  where: Users.instance.id.equals(1),
-  include: [Users.instance.post],
+final user = await User.instance.findOne(
+  where: User.instance.id.equals(1),
+  include: (u) => [
+    // highlight-next-line
+    u.post(),
+  ],
 );
 
-print('User: ${user?.email}');
+print('User ID: ${user?.id}');
 print('Post: ${user?.post?.title}');
 ```

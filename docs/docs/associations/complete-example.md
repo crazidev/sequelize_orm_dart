@@ -8,12 +8,13 @@ Here's a complete example with multiple associations:
 
 ```dart
 @Table(tableName: 'users')
-class Users {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+class User {
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(name: 'email', type: DataType.STRING)
-  dynamic email;
+  @Validate.IsEmail()
+  DataType email = DataType.STRING;
 
   // One-to-one: User has one profile
   @HasOne(Profile, foreignKey: 'userId', as: 'profile')
@@ -23,33 +24,33 @@ class Users {
   @HasMany(Post, foreignKey: 'userId', as: 'posts')
   List<Post>? posts;
 
-  static $Users get instance => $Users();
+  static $User get instance => $User();
 }
 
 @Table(tableName: 'profiles')
 class Profile {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(name: 'user_id', type: DataType.INTEGER)
-  dynamic userId;
+  @ColumnName('user_id')
+  DataType userId = DataType.INTEGER;
 
-  @ModelAttributes(name: 'bio', type: DataType.TEXT)
-  dynamic bio;
+  DataType bio = DataType.TEXT;
 
   static $Profile get instance => $Profile();
 }
 
 @Table(tableName: 'posts')
 class Post {
-  @ModelAttributes(name: 'id', type: DataType.INTEGER, primaryKey: true)
-  dynamic id;
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
 
-  @ModelAttributes(name: 'user_id', type: DataType.INTEGER)
-  dynamic userId;
+  @ColumnName('user_id')
+  DataType userId = DataType.INTEGER;
 
-  @ModelAttributes(name: 'title', type: DataType.STRING)
-  dynamic title;
+  DataType title = DataType.STRING;
 
   static $Post get instance => $Post();
 }
@@ -59,18 +60,18 @@ Future<void> example() async {
   // Initialize models
   await sequelize.initialize(
     models: [
-      Users.instance,
+      User.instance,
       Profile.instance,
       Post.instance,
     ],
   );
 
   // Find user with all associations
-  final user = await Users.instance.findOne(
-    where: Users.instance.id.equals(1),
-    include: [
-      Users.instance.profile,
-      Users.instance.posts,
+  final user = await User.instance.findOne(
+    where: User.instance.id.equals(1),
+    include: (u) => [
+      u.profile,
+      u.posts,
     ],
   );
 

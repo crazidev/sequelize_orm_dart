@@ -8,7 +8,7 @@ part 'post.model.g.dart';
   timestamps: false,
   underscored: true,
 )
-class Post {
+abstract class Post {
   @PrimaryKey()
   @AutoIncrement()
   DataType id = DataType.INTEGER;

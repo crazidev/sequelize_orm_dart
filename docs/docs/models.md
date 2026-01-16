@@ -8,7 +8,7 @@ This guide covers everything about defining models and working with database tab
 
 ## Overview
 
-Models in Sequelize Dart are regular Dart classes annotated with `@Table` and `@ModelAttributes`. They provide a type-safe way to interact with your database tables.
+Models in Sequelize Dart are regular Dart classes annotated with `@Table` and various column annotations (like `@ColumnName`, `@PrimaryKey`, etc.). They provide a type-safe way to interact with your database tables.
 
 ## Topics
 

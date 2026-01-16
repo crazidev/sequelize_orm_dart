@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -15,6 +15,7 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   docsSidebar: [
     'get-started',
+    'databases',
     {
       type: 'category',
       label: 'Models & Tables',
@@ -44,22 +45,7 @@ const sidebars: SidebarsConfig = {
         'associations/complete-example',
       ],
     },
-    {
-      type: 'category',
-      label: 'Querying',
-      items: [
-        'querying',
-        'querying/finding-records',
-        'querying/creating-records',
-        'querying/updating-records',
-        'querying/counting-records',
-        'querying/query-conditions',
-        'querying/sorting',
-        'querying/pagination',
-        'querying/selecting-attributes',
-        'querying/complete-examples',
-      ],
-    },
+    'querying',
   ],
 };
 

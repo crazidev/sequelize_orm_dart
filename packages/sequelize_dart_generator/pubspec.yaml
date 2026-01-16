@@ -10,6 +10,8 @@ environment:
 dependencies:
   analyzer: ^9.0.0
   build: ^4.0.3
+  glob: ^2.1.2
+  path: ^1.9.0
   source_gen: ^4.1.1
   sequelize_dart_annotations:
     path: ../sequelize_dart_annotations

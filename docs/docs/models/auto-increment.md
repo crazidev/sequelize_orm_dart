@@ -4,14 +4,30 @@ sidebar_position: 7
 
 # Auto Increment
 
-Enable auto-increment for integer primary keys:
+## Basic Usage
+
+Use the `@AutoIncrement()` annotation to create an auto-incrementing integer column.
 
 ```dart
-@ModelAttributes(
-  name: 'id',
-  type: DataType.INTEGER,
-  primaryKey: true,
-  autoIncrement: true,
+@PrimaryKey()
+@AutoIncrement()
+DataType id = DataType.INTEGER;
+```
+
+This is most commonly used with the Primary Key.
+
+## Starting Value
+
+To set the initial auto-increment value (MySQL/MariaDB only), use the `initialAutoIncrement` option in the `@Table` annotation.
+
+```dart
+@Table(
+  tableName: 'users',
+  initialAutoIncrement: '1000'
 )
-dynamic id;
+class Users {
+  @PrimaryKey()
+  @AutoIncrement()
+  DataType id = DataType.INTEGER;
+}
 ```

@@ -4,71 +4,59 @@ sidebar_position: 5
 
 # Column Validation
 
-Add validation rules to ensure data integrity:
+Add validation rules to ensure data integrity using the `@Validate` namespace annotations:
 
 ## Email Validation
 
 ```dart
-@ModelAttributes(
-  name: 'email',
-  type: DataType.STRING,
-  validate: ValidateOption(
-    isEmail: IsEmail(),
-  ),
-)
-dynamic email;
+@Validate.IsEmail('Must be a valid email')
+DataType email = DataType.STRING;
 ```
 
 ## Length Validation
 
 ```dart
-@ModelAttributes(
-  name: 'username',
-  type: DataType.STRING,
-  validate: ValidateOption(
-    len: Len(min: 3, max: 20),
-  ),
-)
-dynamic username;
+@Validate.Len(3, 20, 'Username must be between 3 and 20 characters')
+DataType username = DataType.STRING;
 ```
 
 ## Not Empty Validation
 
 ```dart
-@ModelAttributes(
-  name: 'name',
-  type: DataType.STRING,
-  validate: ValidateOption(
-    notEmpty: NotEmpty(),
-  ),
-)
-dynamic name;
+@Validate.NotEmpty('Name cannot be empty')
+DataType name = DataType.STRING;
 ```
 
 ## Numeric Range Validation
 
 ```dart
-@ModelAttributes(
-  name: 'age',
-  type: DataType.INTEGER,
-  validate: ValidateOption(
-    min: Min(0),
-    max: Max(150),
-  ),
-)
-dynamic age;
+@Validate.Min(0, 'Age must be positive')
+@Validate.Max(150, 'Age looks invalid')
+DataType age = DataType.INTEGER;
 ```
 
 ## Custom Validation
 
-```dart
-@ModelAttributes(
-  name: 'password',
-  type: DataType.STRING,
-  validate: ValidateOption(
-    len: Len(min: 8),
-    // Add custom validation logic in your application code
-  ),
-)
-dynamic password;
-```
+For more complex validation that requires custom logic, you can implement validation methods in your business logic or use lifecycle hooks, as Dart annotations are static constant values.
+
+## Supported Validators
+
+- `@Validate.IsEmail([msg])`
+- `@Validate.IsUrl([msg])`
+- `@Validate.IsIP([msg])`
+- `@Validate.IsAlpha([msg])`
+- `@Validate.IsAlphanumeric([msg])`
+- `@Validate.IsNumeric([msg])`
+- `@Validate.IsInt([msg])`
+- `@Validate.IsFloat([msg])`
+- `@Validate.IsDecimal([msg])`
+- `@Validate.IsLowercase([msg])`
+- `@Validate.IsUppercase([msg])`
+- `@Validate.NotEmpty([msg])`
+- `@Validate.Equals(value, [msg])`
+- `@Validate.Contains(value, [msg])`
+- `@Validate.Min(value, [msg])`
+- `@Validate.Max(value, [msg])`
+- `@Validate.Len(min, max, [msg])`
+- `@Validate.IsIn(list, [msg])`
+- `@Validate.NotIn(list, [msg])`

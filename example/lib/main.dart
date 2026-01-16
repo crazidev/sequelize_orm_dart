@@ -1,7 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/post.model.dart';
-import 'package:sequelize_dart_example/models/post_details.model.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/models/db.dart';
 import 'package:sequelize_dart_example/queries.dart';
 
 const connectionString =
@@ -25,11 +23,7 @@ Future<void> main() async {
   // 2. All model definitions
   // 3. All model associations
   await sequelize.initialize(
-    models: [
-      Users.instance,
-      Post.instance,
-      PostDetails.instance,
-    ],
+    models: Db.allModels(),
   );
 
   // Run queries - all query logic is in queries.dart

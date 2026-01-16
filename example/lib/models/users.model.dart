@@ -5,8 +5,7 @@ part 'users.model.g.dart';
 
 @Table(
   tableName: 'users',
-  createdAt: TimestampOption.disabled(),
-  updatedAt: TimestampOption.disabled(),
+  timestamps: false,
 )
 class Users {
   @PrimaryKey()
