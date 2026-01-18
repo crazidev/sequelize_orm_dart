@@ -51,7 +51,7 @@ compile_js() {
     
     # Add Node.js preamble for dart2js compatibility
     echo -e "${BLUE}Adding Node.js preamble...${NC}"
-    cat preamble.js example/build/temp.js > "example/build/${OUTPUT_NAME}.js"
+    cat packages/sequelize_dart/js/preamble.js example/build/temp.js > "example/build/${OUTPUT_NAME}.js"
     rm example/build/temp.js
     
     echo -e "${GREEN}Build complete: example/build/${OUTPUT_NAME}.js${NC}"

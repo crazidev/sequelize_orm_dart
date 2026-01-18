@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setup script to install git hooks
-# This copies hooks from the hooks/ directory to .git/hooks/
+# This copies hooks from the .github/hooks/ directory to .git/hooks/
 
 set -e
 
@@ -30,9 +30,9 @@ fi
 # Create .git/hooks directory if it doesn't exist
 mkdir -p .git/hooks
 
-# Copy hooks from hooks/ directory
-if [ -d "hooks" ]; then
-  for hook in hooks/*; do
+# Copy hooks from .github/hooks/ directory
+if [ -d ".github/hooks" ]; then
+  for hook in .github/hooks/*; do
     if [ -f "$hook" ] && [ -x "$hook" ]; then
       hook_name=$(basename "$hook")
       cp "$hook" ".git/hooks/$hook_name"
@@ -41,7 +41,7 @@ if [ -d "hooks" ]; then
     fi
   done
 else
-  echo -e "${RED}❌ Error: hooks/ directory not found${NC}"
+  echo -e "${RED}❌ Error: .github/hooks/ directory not found${NC}"
   exit 1
 fi
 

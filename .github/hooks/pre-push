@@ -64,4 +64,3 @@ if ! dart format --set-exit-if-changed . > /dev/null 2>&1; then
 fi
 
 echo -e "\n${GREEN}✅ All files are properly formatted!${NC}"
-
