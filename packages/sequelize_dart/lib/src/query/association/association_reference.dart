@@ -8,7 +8,7 @@ import 'package:sequelize_dart/src/query/query/query.dart';
 ///
 /// Note: To include associations, use the `include` property on the query builder:
 /// ```dart
-/// Users.instance.findAll((users) => Query(
+/// Users.model.findAll((users) => Query(
 ///   include: [
 ///     users.include.posts(), // Basic include
 ///     users.include.posts(separate: true), // With options
@@ -48,7 +48,7 @@ class AssociationReference<T> {
   ///
   /// Example:
   /// ```dart
-  /// Users.instance.findAll((users) => Query(
+  /// Users.model.findAll((users) => Query(
   ///   where: and([
   ///     users.id.eq(1),
   ///     users.posts.col('title').eq('My Post'),

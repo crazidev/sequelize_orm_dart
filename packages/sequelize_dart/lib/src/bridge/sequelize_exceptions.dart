@@ -21,12 +21,7 @@ class SequelizeException implements Exception {
     this.sql,
     this.original,
     this.context,
-  }) {
-    // Use provided stack or capture current Dart stack
-    _formattedStack = stack ?? StackTrace.current.toString();
-  }
-
-  late final String _formattedStack;
+  });
 
   /// Create a copy of this exception with a different context
   SequelizeException copyWithContext(String newContext) {
@@ -52,7 +47,7 @@ class SequelizeException implements Exception {
         ? Map<String, dynamic>.from(error['original'])
         : null;
 
-    final exception = _createSubclass(
+    return _createSubclass(
       name,
       message,
       code: code,
@@ -60,13 +55,6 @@ class SequelizeException implements Exception {
       sql: sql,
       original: original,
     );
-
-    // If JS stack is provided, use it. Otherwise, capture current Dart stack.
-    if (stack == null || stack.isEmpty) {
-      exception._formattedStack = StackTrace.current.toString();
-    }
-
-    return exception;
   }
 
   static SequelizeException _createSubclass(

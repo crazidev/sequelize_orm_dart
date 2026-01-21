@@ -14,16 +14,16 @@ Retrieve multiple records matching your criteria.
 
 ```dart
 // Find all users
-final users = await Users.instance.findAll();
+final users = await Users.model.findAll();
 
 // Find users with conditions
-final activeUsers = await Users.instance.findAll(
+final activeUsers = await Users.model.findAll(
   where: (user) => user.email.isNotNull(),
   limit: 10,
 );
 
 // Find with associations
-final usersWithPosts = await Users.instance.findAll(
+final usersWithPosts = await Users.model.findAll(
   include: (include) => [include.posts()],
 );
 ```
@@ -34,12 +34,12 @@ Retrieve a single record.
 
 ```dart
 // Find a user by email
-final user = await Users.instance.findOne(
+final user = await Users.model.findOne(
   where: (user) => user.email.equals('user@example.com'),
 );
 
 // Find with associations
-final userWithPost = await Users.instance.findOne(
+final userWithPost = await Users.model.findOne(
   where: (user) => user.id.equals(1),
   include: (include) => [include.post()],
 );
@@ -53,13 +53,13 @@ Creates a new record in the database.
 
 ```dart
 // Create using the generated helper class (Recommended)
-final user = await Users.instance.create(
-  $UsersCreate(
+final user = await Users.model.create(
+  CreateUsers(
     email: 'user@example.com',
     firstName: 'John',
     lastName: 'Doe',
     // Support for creating with associations
-    post: $PostCreate(
+    post: CreatePost(
       title: 'First Post',
       content: 'Hello World',
     ),
@@ -75,13 +75,13 @@ Updates records matching the query conditions.
 
 ```dart
 // Update with named parameters
-final affected = await Users.instance.update(
+final affected = await Users.model.update(
   firstName: 'Jane',
   where: (user) => user.email.equals('user@example.com'),
 );
 
 // Update multiple fields
-await Users.instance.update(
+await Users.model.update(
   lastName: 'Smith',
   firstName: 'Jane',
   where: (user) => user.id.equals(1),
@@ -93,7 +93,7 @@ await Users.instance.update(
 You can also update a model instance directly.
 
 ```dart
-final user = await Users.instance.findByPk(1);
+final user = await Users.model.findByPk(1);
 
 if (user != null) {
   user.firstName = 'Updated Name';
@@ -154,7 +154,7 @@ You can combine multiple conditions using `and`, `or`, and `not`.
 
 ```dart
 // AND (Implicit or explicit)
-Users.instance.findAll(
+Users.model.findAll(
   where: (user) => and([
     user.age.gte(18),
     user.isActive.equals(true),
@@ -162,7 +162,7 @@ Users.instance.findAll(
 );
 
 // OR
-Users.instance.findAll(
+Users.model.findAll(
   where: (user) => or([
     user.role.equals('admin'),
     user.role.equals('moderator'),
@@ -170,14 +170,14 @@ Users.instance.findAll(
 );
 
 // NOT
-Users.instance.findAll(
+Users.model.findAll(
   where: (user) => not([
     user.status.equals('banned'),
   ]),
 );
 
 // Nested Combinations
-Users.instance.findAll(
+Users.model.findAll(
   where: (user) => and([
     user.email.isNotNull(),
     or([
@@ -195,7 +195,7 @@ Users.instance.findAll(
 Cast columns using the `::` syntax within a `Column` definition.
 
 ```dart
-Users.instance.findOne(
+Users.model.findOne(
   where: (user) => and([
     const Column('id::text').eq('1'),
   ]),
@@ -207,7 +207,7 @@ Users.instance.findOne(
 Filter using columns from associated models in the top-level `where` clause using the `$` syntax.
 
 ```dart
-Users.instance.findOne(
+Users.model.findOne(
   include: (include) => [include.post()],
   where: (user) => and([
     const Column('$post.views$').gt(100),
@@ -222,7 +222,7 @@ Users.instance.findOne(
 Sort results using simple arrays, `Sequelize.col`, or `Sequelize.literal`.
 
 ```dart
-Users.instance.findAll(
+Users.model.findAll(
   order: [
     // Simple ordering: [column, direction]
     ['lastName', 'ASC'],
@@ -250,7 +250,7 @@ Control the number of records returned.
 
 ```dart
 // Get 2nd page of 20 users
-final users = await Users.instance.findAll(
+final users = await Users.model.findAll(
   limit: 20,
   offset: 20, // Skip first 20
   order: [['id', 'ASC']],
@@ -265,12 +265,12 @@ Specify which columns to include or exclude in the result.
 
 ```dart
 // Include specific columns
-Users.instance.findAll(
+Users.model.findAll(
   attributes: QueryAttributes.include(['id', 'email', 'firstName']),
 );
 
 // Exclude sensitive columns
-Users.instance.findAll(
+Users.model.findAll(
   attributes: QueryAttributes.exclude(['password', 'secretToken']),
 );
 ```
@@ -287,10 +287,10 @@ Count records matching the query conditions.
 
 ```dart
 // Count all records
-final totalCount = await Users.instance.count();
+final totalCount = await Users.model.count();
 
 // Count with conditions
-final activeCount = await Users.instance.count(
+final activeCount = await Users.model.count(
   where: (user) => user.isActive.eq(true),
 );
 ```
@@ -301,28 +301,28 @@ Calculate aggregate values with optional where clauses.
 
 ```dart
 // Sum - all records
-final totalLikes = await Post.instance.sum((post) => post.likes);
+final totalLikes = await Post.model.sum((post) => post.likes);
 
 // Sum - with where clause
-final totalViews = await Post.instance.sum(
+final totalViews = await Post.model.sum(
   (post) => post.views,
   where: (post) => post.userId.eq(1),
 );
 
 // Max - all records
-final maxScore = await Users.instance.max((user) => user.score);
+final maxScore = await Users.model.max((user) => user.score);
 
 // Max - with where clause
-final maxViews = await Post.instance.max(
+final maxViews = await Post.model.max(
   (post) => post.views,
   where: (post) => post.userId.eq(1),
 );
 
 // Min - all records
-final minAge = await Users.instance.min((user) => user.age);
+final minAge = await Users.model.min((user) => user.age);
 
 // Min - with where clause
-final minViews = await Post.instance.min(
+final minViews = await Post.model.min(
   (post) => post.views,
   where: (post) => post.views.gt(0),
 );
@@ -334,26 +334,26 @@ Increment or decrement numeric column values. These methods are only generated f
 
 ```dart
 // Increment a single field
-await Post.instance.increment(
+await Post.model.increment(
   views: 5,
   where: (post) => post.id.eq(1),
 );
 
 // Increment multiple fields
-await Post.instance.increment(
+await Post.model.increment(
   views: 10,
   likes: 2,
   where: (post) => post.userId.eq(1),
 );
 
 // Decrement a single field
-await Post.instance.decrement(
+await Post.model.decrement(
   views: 3,
   where: (post) => post.id.eq(2),
 );
 
 // Decrement with complex conditions
-await Post.instance.decrement(
+await Post.model.decrement(
   views: 1,
   where: (post) => and([
     post.userId.eq(1),

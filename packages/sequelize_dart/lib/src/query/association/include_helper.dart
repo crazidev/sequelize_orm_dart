@@ -5,7 +5,7 @@
 ///
 /// Example:
 /// ```dart
-/// Users.instance.findAll(
+/// Users.model.findAll(
 ///   include: (include) => [
 ///     include.posts(
 ///       where: (postColumns) => and([postColumns.id.eq(1)]),

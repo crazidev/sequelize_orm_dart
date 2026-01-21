@@ -18,7 +18,7 @@ class User {
   @HasMany(Post, foreignKey: 'userId', as: 'posts')
   List<Post>? posts;
 
-  static $User get instance => $User();
+  static UserModel get model => UserModel();
 }
 
 @Table(tableName: 'posts')
@@ -32,7 +32,7 @@ class Post {
 
   DataType title = DataType.STRING;
 
-  static $Post get instance => $Post();
+  static PostModel get model => PostModel();
 }
 ```
 
@@ -40,8 +40,8 @@ class Post {
 
 ```dart
 // Find user with all their posts
-final user = await User.instance.findOne(
-  where: User.instance.id.equals(1),
+final user = await User.model.findOne(
+  where: User.model.id.equals(1),
   include: (u) => [
     // highlight-next-line
     u.posts(),

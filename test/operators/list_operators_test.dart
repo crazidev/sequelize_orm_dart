@@ -22,7 +22,7 @@ void main() {
 
   group('List Operators', () {
     test('in_ produces WHERE "column" IN (values)', () async {
-      await Users.instance.findAll(where: (user) => user.id.in_([1, 2, 3]));
+      await Users.model.findAll(where: (user) => user.id.in_([1, 2, 3]));
 
       expect(
         lastSql,
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('notIn produces WHERE "column" NOT IN (values)', () async {
-      await Users.instance.findAll(where: (user) => user.id.notIn([1, 2, 3]));
+      await Users.model.findAll(where: (user) => user.id.notIn([1, 2, 3]));
 
       expect(
         lastSql,
@@ -44,7 +44,7 @@ void main() {
     test(
       'in_ with strings produces WHERE "column" IN (string values)',
       () async {
-        await Users.instance.findAll(
+        await Users.model.findAll(
           where: (user) => user.email.in_(['a@test.com', 'b@test.com']),
         );
 

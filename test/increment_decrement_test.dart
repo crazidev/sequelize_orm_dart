@@ -23,7 +23,7 @@ void main() {
 
   group('Increment/Decrement Methods - increment()', () {
     test('increment() with single field produces correct SQL', () async {
-      final result = await Post.instance.increment(
+      final result = await Post.model.increment(
         views: 5,
         where: (post) => post.id.eq(1),
       );
@@ -53,7 +53,7 @@ void main() {
     test('increment() with multiple fields produces correct SQL', () async {
       // Note: This test assumes there are multiple numeric fields
       // Currently only 'views' is available in Post model
-      final result = await Post.instance.increment(
+      final result = await Post.model.increment(
         views: 10,
         where: (post) => post.id.lt(5),
       );
@@ -77,7 +77,7 @@ void main() {
 
     test('increment() without where clause throws error', () async {
       expect(
-        () => Post.instance.increment(views: 5),
+        () => Post.model.increment(views: 5),
         throwsA(isA<ArgumentError>()),
         reason: 'increment() without where clause should throw ArgumentError',
       );
@@ -85,7 +85,7 @@ void main() {
 
     test('increment() with no fields throws error', () async {
       expect(
-        () => Post.instance.increment(where: (post) => post.id.eq(1)),
+        () => Post.model.increment(where: (post) => post.id.eq(1)),
         throwsA(isA<ArgumentError>()),
         reason: 'increment() without fields should throw ArgumentError',
       );
@@ -94,7 +94,7 @@ void main() {
 
   group('Increment/Decrement Methods - decrement()', () {
     test('decrement() with single field produces correct SQL', () async {
-      final result = await Post.instance.decrement(
+      final result = await Post.model.decrement(
         views: 3,
         where: (post) => post.id.eq(2),
       );
@@ -122,7 +122,7 @@ void main() {
     });
 
     test('decrement() with complex where clause', () async {
-      final result = await Post.instance.decrement(
+      final result = await Post.model.decrement(
         views: 2,
         where: (post) => and([
           post.id.gt(1),
@@ -150,7 +150,7 @@ void main() {
 
     test('decrement() without where clause throws error', () async {
       expect(
-        () => Post.instance.decrement(views: 5),
+        () => Post.model.decrement(views: 5),
         throwsA(isA<ArgumentError>()),
         reason: 'decrement() without where clause should throw ArgumentError',
       );
@@ -158,7 +158,7 @@ void main() {
 
     test('decrement() with no fields throws error', () async {
       expect(
-        () => Post.instance.decrement(where: (post) => post.id.eq(1)),
+        () => Post.model.decrement(where: (post) => post.id.eq(1)),
         throwsA(isA<ArgumentError>()),
         reason: 'decrement() without fields should throw ArgumentError',
       );
@@ -168,7 +168,7 @@ void main() {
   group('Increment/Decrement Methods - Combined Operations', () {
     test('increment and decrement work together', () async {
       // First increment
-      final incrementResult = await Post.instance.increment(
+      final incrementResult = await Post.model.increment(
         views: 10,
         where: (post) => post.id.eq(1),
       );
@@ -182,7 +182,7 @@ void main() {
       clearCapturedSql();
 
       // Then decrement
-      final decrementResult = await Post.instance.decrement(
+      final decrementResult = await Post.model.decrement(
         views: 5,
         where: (post) => post.id.eq(1),
       );
@@ -201,7 +201,7 @@ void main() {
 
     test('bulk increment and decrement operations', () async {
       // Bulk increment
-      final bulkIncrement = await Post.instance.increment(
+      final bulkIncrement = await Post.model.increment(
         views: 15,
         where: (post) => post.id.in_([1, 2, 3]),
       );
@@ -215,7 +215,7 @@ void main() {
       clearCapturedSql();
 
       // Bulk decrement
-      final bulkDecrement = await Post.instance.decrement(
+      final bulkDecrement = await Post.model.decrement(
         views: 7,
         where: (post) => post.id.in_([1, 2, 3]),
       );
@@ -235,7 +235,7 @@ void main() {
 
   group('Increment/Decrement Methods - Edge Cases', () {
     test('increment() with zero value', () async {
-      final result = await Post.instance.increment(
+      final result = await Post.model.increment(
         views: 0,
         where: (post) => post.id.eq(1),
       );
@@ -253,7 +253,7 @@ void main() {
     });
 
     test('decrement() with zero value', () async {
-      final result = await Post.instance.decrement(
+      final result = await Post.model.decrement(
         views: 0,
         where: (post) => post.id.eq(1),
       );
@@ -271,7 +271,7 @@ void main() {
     });
 
     test('increment() with negative value', () async {
-      final result = await Post.instance.increment(
+      final result = await Post.model.increment(
         views: -5,
         where: (post) => post.id.eq(1),
       );
@@ -289,7 +289,7 @@ void main() {
     });
 
     test('decrement() with negative value', () async {
-      final result = await Post.instance.decrement(
+      final result = await Post.model.decrement(
         views: -3,
         where: (post) => post.id.eq(1),
       );

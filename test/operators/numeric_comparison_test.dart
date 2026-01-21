@@ -22,7 +22,7 @@ void main() {
 
   group('Numeric Comparison Operators', () {
     test('gt produces WHERE "column" > value', () async {
-      await Users.instance.findAll(where: (user) => user.id.gt(10));
+      await Users.model.findAll(where: (user) => user.id.gt(10));
 
       expect(
         lastSql,
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('gte produces WHERE "column" >= value', () async {
-      await Users.instance.findAll(where: (user) => user.id.gte(10));
+      await Users.model.findAll(where: (user) => user.id.gte(10));
 
       expect(
         lastSql,
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('lt produces WHERE "column" < value', () async {
-      await Users.instance.findAll(where: (user) => user.id.lt(10));
+      await Users.model.findAll(where: (user) => user.id.lt(10));
 
       expect(
         lastSql,
@@ -52,7 +52,7 @@ void main() {
     });
 
     test('lte produces WHERE "column" <= value', () async {
-      await Users.instance.findAll(where: (user) => user.id.lte(10));
+      await Users.model.findAll(where: (user) => user.id.lte(10));
 
       expect(
         lastSql,
@@ -62,7 +62,7 @@ void main() {
     });
 
     test('between produces WHERE "column" BETWEEN x AND y', () async {
-      await Users.instance.findAll(where: (user) => user.id.between([1, 10]));
+      await Users.model.findAll(where: (user) => user.id.between([1, 10]));
 
       expect(
         lastSql,
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('notBetween produces WHERE "column" NOT BETWEEN x AND y', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.id.notBetween([1, 10]),
       );
 

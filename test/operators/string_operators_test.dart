@@ -22,7 +22,7 @@ void main() {
 
   group('String Operators', () {
     test('like produces WHERE "column" LIKE pattern', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.like('%@example.com'),
       );
 
@@ -39,7 +39,7 @@ void main() {
     });
 
     test('notLike produces WHERE "column" NOT LIKE pattern', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.notLike('%@spam.com'),
       );
 
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('startsWith produces WHERE "column" LIKE pattern%', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.startsWith('admin'),
       );
 
@@ -63,7 +63,7 @@ void main() {
     });
 
     test('endsWith produces WHERE "column" LIKE %pattern', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.endsWith('.com'),
       );
 
@@ -75,7 +75,7 @@ void main() {
     });
 
     test('substring produces WHERE "column" LIKE %pattern%', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.substring('example'),
       );
 
@@ -87,7 +87,7 @@ void main() {
     });
 
     test('iLike produces WHERE "column" ILIKE pattern (PostgreSQL)', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.iLike('%@EXAMPLE.COM'),
       );
 
@@ -101,7 +101,7 @@ void main() {
     test(
       'notILike produces WHERE "column" NOT ILIKE pattern (PostgreSQL)',
       () async {
-        await Users.instance.findAll(
+        await Users.model.findAll(
           where: (user) => user.email.notILike('%@SPAM.COM'),
         );
 

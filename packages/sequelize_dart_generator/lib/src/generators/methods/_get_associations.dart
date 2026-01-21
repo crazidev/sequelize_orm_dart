@@ -3,14 +3,14 @@ part of '../../sequelize_model_generator.dart';
 List<_AssociationInfo> _getAssociations(ClassElement element) {
   final associations = <_AssociationInfo>[];
   const hasOneChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/has_one.dart#HasOne',
+    'package:sequelize_dart/src/annotations/has_one.dart#HasOne',
   );
   const hasManyChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/has_many.dart#HasMany',
+    'package:sequelize_dart/src/annotations/has_many.dart#HasMany',
   );
 
   const tableChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#Table',
+    'package:sequelize_dart/src/annotations/table.dart#Table',
   );
 
   for (var field in element.fields) {

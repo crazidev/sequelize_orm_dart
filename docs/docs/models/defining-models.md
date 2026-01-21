@@ -32,7 +32,7 @@ class User {
   @AllowNull()
   DataType bio = DataType.TEXT;
 
-  static $User get instance => $User();
+  static UserModel get model => UserModel();
 }
 ```
 
@@ -54,28 +54,29 @@ The `@Table` annotation allows you to configure the table definition.
 <details>
 <summary>Click to see all @Table options</summary>
 
-| Option                 | Type               | Description                                                         |
-| ---------------------- | ------------------ | ------------------------------------------------------------------- |
-| `tableName`            | `String`           | The table name (required).                                          |
-| `omitNull`             | `bool?`            | Don't persist null values. Default `false`.                         |
-| `noPrimaryKey`         | `bool?`            | Disable automatic primary key. Default `false`.                     |
-| `timestamps`           | `bool?`            | Enable timestamps. Default `false`.                                 |
-| `paranoid`             | `bool?`            | Soft deletes (requires timestamps). Default `false`.                |
-| `underscored`          | `bool?`            | Snake_case columns. Default `false`.                                |
-| `hasTrigger`           | `bool?`            | Indicates table has trigger. Default `false`.                       |
-| `freezeTableName`      | `bool?`            | Stop Sequelize from pluc kkk. ralizing table name. Default `false`. |
-| `name`                 | `ModelNameOption?` | Singular/Plural model names.                                        |
-| `modelName`            | `String?`          | The name of the model.                                              |
-| `updatedAt`            | `TimestampOption?` | Custom name or disable `updatedAt`.                                 |
-| `deletedAt`            | `TimestampOption?` | Custom name or disable `deletedAt`.                                 |
-| `schema`               | `String?`          | Database schema.                                                    |
-| `schemaDelimiter`      | `String?`          | Delimiter for schema.                                               |
-| `engine`               | `String?`          | Storage engine (MySQL/MariaDB).                                     |
-| `charset`              | `String?`          | Charset (MySQL/MariaDB).                                            |
-| `comment`              | `String?`          | Table comment.                                                      |
-| `collate`              | `String?`          | Table collation.                                                    |
-| `initialAutoIncrement` | `String?`          | Initial auto-increment value (MySQL).                               |
-| `version`              | `VersionOption?`   | Optimistic locking version.                                         |
+| Option            | Type     | Description                                                  |
+| ----------------- | -------- | ------------------------------------------------------------ |
+| `tableName`       | `String` | The table name (required).                                   |
+| `omitNull`        | `bool?`  | Don't persist null values. Default `false`.                  |
+| `noPrimaryKey`    | `bool?`  | Disable automatic primary key. Default `false`.              |
+| `timestamps`      | `bool?`  | Enable timestamps. Default `false`.                          |
+| `paranoid`        | `bool?`  | Soft deletes (requires timestamps). Default `false`.         |
+| `underscored`     | `bool?`  | Snake_case columns. Default `false`.                         |
+| `hasTrigger`      | `bool?`  | Indicates table has trigger. Default `false`.                |
+| `freezeTableName` | `bool?`  | Stop Sequelize from pluralizing table name. Default `false`. |
+
+| `name` | `ModelNameOption?` | Singular/Plural model names. |
+| `modelName` | `String?` | The name of the model. |
+| `updatedAt` | `TimestampOption?` | Custom name or disable `updatedAt`. |
+| `deletedAt` | `TimestampOption?` | Custom name or disable `deletedAt`. |
+| `schema` | `String?` | Database schema. |
+| `schemaDelimiter` | `String?` | Delimiter for schema. |
+| `engine` | `String?` | Storage engine (MySQL/MariaDB). |
+| `charset` | `String?` | Charset (MySQL/MariaDB). |
+| `comment` | `String?` | Table comment. |
+| `collate` | `String?` | Table collation. |
+| `initialAutoIncrement` | `String?` | Initial auto-increment value (MySQL). |
+| `version` | `VersionOption?` | Optimistic locking version. |
 
 </details>
 

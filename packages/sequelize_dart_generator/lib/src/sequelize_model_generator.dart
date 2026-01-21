@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:sequelize_dart/src/annotations.dart';
 import 'package:sequelize_dart_generator/src/generator_naming_config.dart';
 import 'package:source_gen/source_gen.dart';
 

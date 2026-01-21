@@ -21,7 +21,7 @@ void main() {
     });
 
     test('should order by simple column', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         order: [
           ['id', 'DESC'],
         ],
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('should order by Sequelize.fn', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         order: [Sequelize.fn('max', Sequelize.col('id'))],
         group: ['id'], // Grouping required for aggregate function in order
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('should order by Sequelize.fn with direction', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         order: [
           [Sequelize.fn('max', Sequelize.col('id')), 'DESC'],
         ],
@@ -52,7 +52,7 @@ void main() {
     });
 
     test('should order by included model column', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         include: (include) => [include.post()],
         order: [
           ['post', 'id', 'DESC'],
@@ -63,7 +63,7 @@ void main() {
     });
 
     test('should combined multiple order clauses', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         include: (include) => [include.post()],
         order: [
           ['id', 'DESC'],
@@ -98,10 +98,10 @@ void main() {
         );
 
         await hoistSequelize.initialize(
-          models: [Users.instance, Post.instance, PostDetails.instance],
+          models: [Users.model, Post.model, PostDetails.model],
         );
 
-        await Users.instance.findAll(
+        await Users.model.findAll(
           include: (include) => [
             include.post(
               order: [

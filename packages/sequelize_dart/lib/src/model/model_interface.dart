@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:sequelize_dart/src/association/association_model.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:sequelize_dart/src/annotations.dart';
 
 abstract class ModelInterface<T> {
   @protected

@@ -13,8 +13,8 @@ dependencies:
   glob: ^2.1.2
   path: ^1.9.0
   source_gen: ^4.1.1
-  sequelize_dart_annotations:
-    path: ../sequelize_dart_annotations
+  sequelize_dart:
+    path: ../sequelize_dart
 
 dev_dependencies:
   build_runner: ^2.10.4

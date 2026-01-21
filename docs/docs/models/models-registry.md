@@ -15,7 +15,7 @@ The models registry is a generated class that provides convenient access to all 
 - **Single Import**: Import one file instead of multiple model files
 - **Automatic Discovery**: No need to manually list models - they're discovered automatically
 - **Clean Initialization**: Use `Db.allModels()` instead of manually creating lists
-- **Consistent Access**: Use `Db.users`, `Db.posts` instead of `Users.instance`, `Post.instance`
+- **Consistent Access**: Use `Db.users`, `Db.posts` instead of `Users.model`, `Post.model`
 - **Type Safety**: Full IDE autocomplete support
 - **Zero Configuration**: File name determines everything - no build.yaml config needed
 
@@ -30,14 +30,14 @@ import 'package:myapp/models/post_details.model.dart';
 
 await sequelize.initialize(
   models: [
-    Users.instance,
-    Post.instance,
-    PostDetails.instance,
+    Users.model,
+    Post.model,
+    PostDetails.model,
   ],
 );
 
-final user = await Users.instance.findOne(...);
-final post = await Post.instance.create(...);
+final user = await Users.model.findOne(...);
+final post = await Post.model.create(...);
 ```
 
 ### After (With Registry)
@@ -156,10 +156,10 @@ class Db {
   Db._();
 
   /// Returns the Post model instance
-  static $Post get post => $Post();
+  static PostModel get post => PostModel();
 
   /// Returns the Users model instance
-  static $Users get users => $Users();
+  static UsersModel get users => UsersModel();
 
   /// Returns a list of all model instances
   static List<Model> allModels() {
@@ -215,7 +215,7 @@ final posts = await Db.post.findAll(limit: 10);
 
 // Create records
 await Db.users.create(
-  $UsersCreate(
+  CreateUsers(
     email: 'user@example.com',
     firstName: 'John',
     lastName: 'Doe',
@@ -261,17 +261,17 @@ import 'package:myapp/models/db.dart';
 Future<void> seedDatabase() async {
   // Create a user with associated posts
   await Db.users.create(
-    $UsersCreate(
+    CreateUsers(
       email: 'john@example.com',
       firstName: 'John',
       lastName: 'Doe',
       posts: [
-        $PostCreate(
+        CreatePost(
           title: 'My First Post',
           content: 'This is the content',
           views: 0,
         ),
-        $PostCreate(
+        CreatePost(
           title: 'My Second Post',
           content: 'More content here',
           views: 0,
@@ -327,12 +327,12 @@ import 'package:myapp/models/db.dart';
 ```dart
 await sequelize.initialize(
   models: [
-    Users.instance,
-    Post.instance,
-    PostDetails.instance,
-    Comment.instance,
-    Category.instance,
-    // ... forgot to add Tag.instance? That's a runtime error!
+    Users.model,
+    Post.model,
+    PostDetails.model,
+    Comment.model,
+    Category.model,
+    // ... forgot to add Tag.model? That's a runtime error!
   ],
 );
 ```
@@ -351,9 +351,9 @@ await sequelize.initialize(
 
 ```dart
 final models = <Model>[
-  Users.instance,
-  Post.instance,
-  PostDetails.instance,
+  Users.model,
+  Post.model,
+  PostDetails.model,
   // ... maintain this list manually
 ];
 
@@ -371,9 +371,9 @@ await sequelize.initialize(models: Db.allModels());
 **Before:** Inconsistent access patterns:
 
 ```dart
-Users.instance.findOne(...)      // Users class
-Post.instance.create(...)        // Post class
-PostDetails.instance.delete(...) // PostDetails class
+Users.model.findOne(...)      // Users class
+Post.model.create(...)        // Post class
+PostDetails.model.delete(...) // PostDetails class
 ```
 
 **After:** Consistent, predictable access:
@@ -442,16 +442,16 @@ Future<void> main() async {
   // Manual model registration
   await sequelize.initialize(
     models: [
-      Users.instance,
-      Post.instance,
-      PostDetails.instance,
+      Users.model,
+      Post.model,
+      PostDetails.model,
     ],
   );
 
   // Inconsistent access pattern
-  final user = await Users.instance.findOne(...);
-  await Post.instance.create(...);
-  await PostDetails.instance.delete(...);
+  final user = await Users.model.findOne(...);
+  await Post.model.create(...);
+  await PostDetails.model.delete(...);
 
   await sequelize.close();
 }
@@ -491,7 +491,7 @@ Future<void> main() async {
 | Imports            | Multiple model imports | Single registry import  |
 | Model Registration | Manual list            | Automatic discovery     |
 | Initialization     | Verbose list           | One-line `allModels()`  |
-| Access Pattern     | `Model.instance`       | `Db.model` (consistent) |
+| Access Pattern     | `Model.model`          | `Db.model` (consistent) |
 | Configuration      | Required in build.yaml | Zero configuration      |
 | Refactoring        | Manual updates needed  | Automatic regeneration  |
 

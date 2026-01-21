@@ -24,7 +24,7 @@ class User {
   @HasMany(Post, foreignKey: 'userId', as: 'posts')
   List<Post>? posts;
 
-  static $User get instance => $User();
+  static UserModel get model => UserModel();
 }
 
 @Table(tableName: 'profiles')
@@ -38,7 +38,7 @@ class Profile {
 
   DataType bio = DataType.TEXT;
 
-  static $Profile get instance => $Profile();
+  static ProfileModel get model => ProfileModel();
 }
 
 @Table(tableName: 'posts')
@@ -52,7 +52,7 @@ class Post {
 
   DataType title = DataType.STRING;
 
-  static $Post get instance => $Post();
+  static PostModel get model => PostModel();
 }
 
 // Usage
@@ -60,15 +60,15 @@ Future<void> example() async {
   // Initialize models
   await sequelize.initialize(
     models: [
-      User.instance,
-      Profile.instance,
-      Post.instance,
+      User.model,
+      Profile.model,
+      Post.model,
     ],
   );
 
   // Find user with all associations
-  final user = await User.instance.findOne(
-    where: User.instance.id.equals(1),
+  final user = await User.model.findOne(
+    where: User.model.id.equals(1),
     include: (u) => [
       u.profile,
       u.posts,

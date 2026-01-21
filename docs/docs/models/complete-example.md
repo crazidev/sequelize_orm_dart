@@ -55,7 +55,8 @@ class Product {
   bool get isPublished => status == 'published';
 
   // Sequelize instance getter
-  static $Product get instance => $Product();
+  static ProductModel get model => ProductModel();
+
 }
 ```
 

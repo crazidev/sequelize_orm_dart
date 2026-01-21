@@ -24,7 +24,7 @@ Give the association an alias:
 Post? mainPost;
 
 // Use the alias when querying
-final user = await User.instance.findOne(
+final user = await User.model.findOne(
   include: (u) => [
     u.mainPost,
   ],

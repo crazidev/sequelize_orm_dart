@@ -50,7 +50,7 @@ void _generateIncludeHelper(
     buffer.writeln('    const incl = $inclClass();');
     buffer.writeln('    return IncludeBuilder<$modelClassName>(');
     buffer.writeln(
-      "      association: '$associationName', model: $modelClassName.instance,",
+      "      association: '$associationName', model: $modelClassName.model,",
     );
     if (generateSeparate) {
       buffer.writeln(

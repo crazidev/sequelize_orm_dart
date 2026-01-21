@@ -48,12 +48,12 @@ class GeneratorNamingConfig {
 
   /// Gets the generated create class name (e.g., UserCreate from User)
   String getModelCreateClassName(String className) {
-    return '${className}Create';
+    return 'Create$className';
   }
 
   /// Gets the generated update class name (e.g., UserUpdate from User)
   String getModelUpdateClassName(String className) {
-    return '${className}Update';
+    return 'Update$className';
   }
 
   /// Gets the generated columns class name (e.g., UserColumns from User)

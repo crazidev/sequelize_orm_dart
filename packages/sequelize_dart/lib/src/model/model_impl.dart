@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'package:sequelize_dart/src/annotations.dart';
 import 'package:sequelize_dart/src/association/association_model.dart';
 import 'package:sequelize_dart/src/model/model_interface.dart';
 import 'package:sequelize_dart/src/query/query/query.dart';
 import 'package:sequelize_dart/src/query/query_engine/query_engine.dart';
 import 'package:sequelize_dart/src/sequelize/sequelize.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
 /// Unified Model implementation for both Dart VM and dart2js.
 /// Both platforms now use the bridge pattern, so the implementation is identical.
@@ -29,17 +29,17 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 /// **Example:**
 /// ```dart
 /// // Find all users
-/// final users = await Users.instance.findAll();
+/// final users = await Users.model.findAll();
 ///
 /// // Find users with conditions
-/// final activeUsers = await Users.instance.findAll(
-///   where: Users.instance.email.isNotNull(),
+/// final activeUsers = await Users.model.findAll(
+///   where: Users.model.email.isNotNull(),
 ///   limit: 10,
 /// );
 ///
 /// // Find with associations
-/// final usersWithPosts = await Users.instance.findAll(
-///   include: [Users.instance.posts],
+/// final usersWithPosts = await Users.model.findAll(
+///   include: [Users.model.posts],
 /// );
 /// ```
 ///
@@ -61,14 +61,14 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 /// **Example:**
 /// ```dart
 /// // Find a user by email
-/// final user = await Users.instance.findOne(
-///   where: Users.instance.email.equals('user@example.com'),
+/// final user = await Users.model.findOne(
+///   where: Users.model.email.equals('user@example.com'),
 /// );
 ///
 /// // Find with associations
-/// final userWithPost = await Users.instance.findOne(
-///   where: Users.instance.id.equals(1),
-///   include: [Users.instance.post],
+/// final userWithPost = await Users.model.findOne(
+///   where: Users.model.id.equals(1),
+///   include: [Users.model.post],
 /// );
 /// ```
 ///
@@ -85,7 +85,7 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 /// **Example:**
 /// ```dart
 /// // Create using a map
-/// final newUser = await Users.instance.create({
+/// final newUser = await Users.model.create({
 ///   'email': 'user@example.com',
 ///   'firstName': 'John',
 ///   'lastName': 'Doe',
@@ -96,7 +96,7 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 ///   ..email = 'user@example.com'
 ///   ..firstName = 'John'
 ///   ..lastName = 'Doe';
-/// final created = await Users.instance.create(user);
+/// final created = await Users.model.create(user);
 /// ```
 ///
 ///
@@ -112,11 +112,11 @@ import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 /// **Example:**
 /// ```dart
 /// // Count all users
-/// final total = await Users.instance.count();
+/// final total = await Users.model.count();
 ///
 /// // Count with conditions
-/// final activeCount = await Users.instance.count(
-///   where: Users.instance.email.isNotNull(),
+/// final activeCount = await Users.model.count(
+///   where: Users.model.email.isNotNull(),
 /// );
 /// ```
 ///

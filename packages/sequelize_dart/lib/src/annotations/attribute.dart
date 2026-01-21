@@ -1,4 +1,4 @@
-import 'package:sequelize_dart_annotations/src/datatype.dart';
+import 'package:sequelize_dart/src/annotations/datatype.dart';
 
 /// Attribute class for model field definitions
 ///

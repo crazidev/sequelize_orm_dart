@@ -19,7 +19,7 @@ void main() {
     });
 
     test('Basic include with type-safe syntax', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.posts(),
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('Include with separate query', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.posts(separate: true),
@@ -47,7 +47,7 @@ void main() {
     });
 
     test('Include with filtering (where clause)', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.posts(
@@ -66,7 +66,7 @@ void main() {
     });
 
     test('Include with required (INNER JOIN)', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         include: (includeUser) => [
           includeUser.posts(required: true),
         ],
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('Include with pagination (limit and offset)', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.posts(
@@ -97,7 +97,7 @@ void main() {
     });
 
     test('Include with ordering', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.posts(
@@ -116,7 +116,7 @@ void main() {
     });
 
     test('HasOne association include', () async {
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.post(),
@@ -128,7 +128,7 @@ void main() {
 
     test('Nested includes support infinite levels', () async {
       // Test that nested includes can be chained infinitely
-      final users = await Users.instance.findAll(
+      final users = await Users.model.findAll(
         where: (user) => and([user.id.eq(1)]),
         include: (includeUser) => [
           includeUser.posts(

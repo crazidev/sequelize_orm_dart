@@ -1,4 +1,4 @@
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:sequelize_dart/src/annotations.dart';
 
 // Export all operator extensions for convenience
 export 'package:sequelize_dart/src/query/operators/extentions/extensions.dart';

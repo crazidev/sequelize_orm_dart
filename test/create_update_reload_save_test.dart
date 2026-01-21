@@ -25,12 +25,12 @@ void main() {
   group('Create Method - Static Implementation', () {
     test('create user with single post and increment post views', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_create_$timestamp@example.com',
           firstName: 'Test',
           lastName: 'User',
-          post: PostCreate(
+          post: CreatePost(
             title: 'test_post_$timestamp',
             content: 'Test Content',
             views: 1,
@@ -49,7 +49,7 @@ void main() {
 
       // Note: userId might be null in Dart instance but set in DB
       // Verify by fetching from database
-      final fetchedPost = await Post.instance.findOne(
+      final fetchedPost = await Post.model.findOne(
         where: (post) => post.id.eq(newUser.post?.id),
       );
       expect(
@@ -94,18 +94,18 @@ void main() {
       'create user with multiple posts and increment all post views',
       () async {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final newUser = await Users.instance.create(
-          UsersCreate(
+        final newUser = await Users.model.create(
+          CreateUsers(
             email: 'test_multi_$timestamp@example.com',
             firstName: 'Multi',
             lastName: 'Post',
             posts: [
-              PostCreate(
+              CreatePost(
                 title: 'post_1_$timestamp',
                 content: 'Content 1',
                 views: 10,
               ),
-              PostCreate(
+              CreatePost(
                 title: 'post_2_$timestamp',
                 content: 'Content 2',
                 views: 20,
@@ -133,7 +133,7 @@ void main() {
 
         // Verify all posts have user_id set in database
         for (final post in newUser.posts!) {
-          final fetchedPost = await Post.instance.findOne(
+          final fetchedPost = await Post.model.findOne(
             where: (p) => p.id.eq(post.id),
           );
           expect(
@@ -147,7 +147,7 @@ void main() {
 
         // Increment views for all posts using static method
         for (final post in newUser.posts!) {
-          final updatedPost = await Post.instance.increment(
+          final updatedPost = await Post.model.increment(
             views: 3,
             where: (p) => p.id.eq(post.id),
           );
@@ -176,12 +176,12 @@ void main() {
       'create user with post, modify and save post, then save user',
       () async {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final newUser = await Users.instance.create(
-          UsersCreate(
+        final newUser = await Users.model.create(
+          CreateUsers(
             email: 'test_save_$timestamp@example.com',
             firstName: 'Save',
             lastName: 'Test',
-            post: PostCreate(
+            post: CreatePost(
               title: 'save_post_$timestamp',
               content: 'Save Content',
               views: 5,
@@ -193,7 +193,7 @@ void main() {
         expect(newUser.post, isNotNull, reason: 'User should have a post');
 
         // Verify user_id is set in database
-        final fetchedPost = await Post.instance.findOne(
+        final fetchedPost = await Post.model.findOne(
           where: (post) => post.id.eq(newUser.post?.id),
         );
         expect(
@@ -259,7 +259,7 @@ void main() {
         );
 
         // Verify post still has correct user_id after user save
-        final postAfterUserSave = await Post.instance.findOne(
+        final postAfterUserSave = await Post.model.findOne(
           where: (post) => post.id.eq(newUser.post?.id),
         );
         expect(
@@ -272,12 +272,12 @@ void main() {
 
     test('verify associated post has user_id after create', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_fk_$timestamp@example.com',
           firstName: 'FK',
           lastName: 'Test',
-          post: PostCreate(
+          post: CreatePost(
             title: 'fk_post_$timestamp',
             content: 'FK Content',
             views: 0,
@@ -289,7 +289,7 @@ void main() {
       expect(newUser.post, isNotNull, reason: 'User should have a post');
 
       // Verify user_id is set in database (may be null in Dart instance)
-      final verifyPost = await Post.instance.findOne(
+      final verifyPost = await Post.model.findOne(
         where: (post) => post.id.eq(newUser.post?.id),
       );
       expect(
@@ -310,8 +310,8 @@ void main() {
   group('Update Method - Static Implementation', () {
     test('static update() with named parameters', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_update_$timestamp@example.com',
           firstName: 'Update',
           lastName: 'Test',
@@ -320,7 +320,7 @@ void main() {
 
       clearCapturedSql();
 
-      final affectedRows = await Users.instance.update(
+      final affectedRows = await Users.model.update(
         email: 'updated_$timestamp@example.com',
         firstName: 'Updated',
         lastName: 'Name',
@@ -346,7 +346,7 @@ void main() {
       // Verify the update
       clearCapturedSql();
 
-      final updatedUser = await Users.instance.findOne(
+      final updatedUser = await Users.model.findOne(
         where: (user) => user.id.eq(newUser.id),
       );
 
@@ -369,15 +369,15 @@ void main() {
 
     test('static update() with where clause filters correctly', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final user1 = await Users.instance.create(
-        UsersCreate(
+      final user1 = await Users.model.create(
+        CreateUsers(
           email: 'user1_$timestamp@example.com',
           firstName: 'User1',
           lastName: 'Test',
         ),
       );
-      final user2 = await Users.instance.create(
-        UsersCreate(
+      final user2 = await Users.model.create(
+        CreateUsers(
           email: 'user2_$timestamp@example.com',
           firstName: 'User2',
           lastName: 'Test',
@@ -386,7 +386,7 @@ void main() {
 
       clearCapturedSql();
 
-      final affectedRows = await Users.instance.update(
+      final affectedRows = await Users.model.update(
         lastName: 'Updated',
         where: (user) => user.id.eq(user1.id),
       );
@@ -398,10 +398,10 @@ void main() {
       );
 
       // Verify only user1 was updated
-      final fetchedUser1 = await Users.instance.findOne(
+      final fetchedUser1 = await Users.model.findOne(
         where: (user) => user.id.eq(user1.id),
       );
-      final fetchedUser2 = await Users.instance.findOne(
+      final fetchedUser2 = await Users.model.findOne(
         where: (user) => user.id.eq(user2.id),
       );
 
@@ -421,8 +421,8 @@ void main() {
   group('Update Method - Instance Implementation', () {
     test('instance update() method', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_instance_update_$timestamp@example.com',
           firstName: 'Instance',
           lastName: 'Update',
@@ -469,8 +469,8 @@ void main() {
   group('Reload Method', () {
     test('reload() updates instance with latest database values', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_reload_$timestamp@example.com',
           firstName: 'Reload',
           lastName: 'Test',
@@ -515,12 +515,12 @@ void main() {
 
     test('reload() with associations preserves includes', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_reload_include_$timestamp@example.com',
           firstName: 'Reload',
           lastName: 'Include',
-          post: PostCreate(
+          post: CreatePost(
             title: 'reload_post_$timestamp',
             content: 'Reload Content',
             views: 100,
@@ -529,7 +529,7 @@ void main() {
       );
 
       // Fetch with include
-      final userWithPost = await Users.instance.findOne(
+      final userWithPost = await Users.model.findOne(
         where: (user) => user.id.eq(newUser.id),
         include: (includeUsers) => [includeUsers.post()],
       );
@@ -541,7 +541,7 @@ void main() {
       );
 
       // Modify post views in database using static update
-      await Post.instance.update(
+      await Post.model.update(
         views: 200,
         where: (post) => post.id.eq(userWithPost?.post?.id),
       );
@@ -610,8 +610,8 @@ void main() {
 
     test('save() updates existing record when primary key exists', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_save_update_$timestamp@example.com',
           firstName: 'Save',
           lastName: 'Update',
@@ -656,12 +656,12 @@ void main() {
       'save() preserves foreign keys when saving associated instances',
       () async {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final newUser = await Users.instance.create(
-          UsersCreate(
+        final newUser = await Users.model.create(
+          CreateUsers(
             email: 'test_save_fk_$timestamp@example.com',
             firstName: 'Save',
             lastName: 'FK',
-            post: PostCreate(
+            post: CreatePost(
               title: 'save_fk_post_$timestamp',
               content: 'Save FK Content',
               views: 50,
@@ -670,7 +670,7 @@ void main() {
         );
 
         // Verify user_id is set in database
-        final initialPost = await Post.instance.findOne(
+        final initialPost = await Post.model.findOne(
           where: (post) => post.id.eq(newUser.post?.id),
         );
         expect(
@@ -698,7 +698,7 @@ void main() {
           reason: 'Post save() should return 1',
         );
         // Verify post user_id is preserved in database
-        final postAfterSave = await Post.instance.findOne(
+        final postAfterSave = await Post.model.findOne(
           where: (post) => post.id.eq(newUser.post?.id),
         );
         expect(
@@ -723,8 +723,8 @@ void main() {
 
     test('save() with fields parameter saves only specified fields', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_save_fields_$timestamp@example.com',
           firstName: 'Save',
           lastName: 'Fields',
@@ -782,12 +782,12 @@ void main() {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
 
       // 1. Create
-      final newUser = await Users.instance.create(
-        UsersCreate(
+      final newUser = await Users.model.create(
+        CreateUsers(
           email: 'test_workflow_$timestamp@example.com',
           firstName: 'Workflow',
           lastName: 'Test',
-          post: PostCreate(
+          post: CreatePost(
             title: 'workflow_post_$timestamp',
             content: 'Workflow Content',
             views: 1,
@@ -801,7 +801,7 @@ void main() {
       // 2. Update using static method
       clearCapturedSql();
 
-      final updateResult = await Users.instance.update(
+      final updateResult = await Users.model.update(
         firstName: 'Updated',
         where: (user) => user.id.eq(newUser.id),
       );
@@ -850,7 +850,7 @@ void main() {
         reason: 'lastName should be saved',
       );
       // Verify post user_id is still correct in database
-      final finalPost = await Post.instance.findOne(
+      final finalPost = await Post.model.findOne(
         where: (post) => post.id.eq(newUser.post?.id),
       );
       expect(

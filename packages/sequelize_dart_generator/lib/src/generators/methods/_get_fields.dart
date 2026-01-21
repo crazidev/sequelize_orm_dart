@@ -6,36 +6,36 @@ Future<List<_FieldInfo>> _getFields(
 ) async {
   final fields = <_FieldInfo>[];
   const columnDefinitionChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/model_attribute.dart#ColumnDefinition',
+    'package:sequelize_dart/src/annotations/model_attribute.dart#ColumnDefinition',
   );
 
   // Decorator checkers
   const primaryKeyChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#PrimaryKey',
+    'package:sequelize_dart/src/annotations/table.dart#PrimaryKey',
   );
   const validatorChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/model_attribute.dart#Validator',
+    'package:sequelize_dart/src/annotations/model_attribute.dart#Validator',
   );
   const autoIncrementChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#AutoIncrement',
+    'package:sequelize_dart/src/annotations/table.dart#AutoIncrement',
   );
   const notNullChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#NotNull',
+    'package:sequelize_dart/src/annotations/table.dart#NotNull',
   );
   const columnNameChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#ColumnName',
+    'package:sequelize_dart/src/annotations/table.dart#ColumnName',
   );
   const defaultChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#Default',
+    'package:sequelize_dart/src/annotations/table.dart#Default',
   );
   const commentChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#Comment',
+    'package:sequelize_dart/src/annotations/table.dart#Comment',
   );
   const uniqueChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#Unique',
+    'package:sequelize_dart/src/annotations/table.dart#Unique',
   );
   const indexChecker = TypeChecker.fromUrl(
-    'package:sequelize_dart_annotations/src/table.dart#Index',
+    'package:sequelize_dart/src/annotations/table.dart#Index',
   );
 
   for (var field in element.fields) {
@@ -157,7 +157,7 @@ Future<List<_FieldInfo>> _getFields(
     if (fieldType.element != null &&
         fieldType.element!.name == 'Attribute' &&
         fieldType.element!.library?.identifier ==
-            'package:sequelize_dart_annotations/src/attribute.dart') {
+            'package:sequelize_dart/src/annotations/attribute.dart') {
       final fieldInfo = await _extractFromAttributeField(
         field,
         buildStep,
@@ -181,7 +181,7 @@ Future<List<_FieldInfo>> _getFields(
     if (fieldType.element != null &&
         fieldType.element!.name == 'DataType' &&
         fieldType.element!.library?.identifier ==
-            'package:sequelize_dart_annotations/src/datatype.dart') {
+            'package:sequelize_dart/src/annotations/datatype.dart') {
       final fieldInfo = await _extractFromDataTypeField(
         field,
         buildStep,

@@ -1,6 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:meta/meta_meta.dart';
-import 'package:sequelize_dart_annotations/src/datatype.dart';
+import 'package:sequelize_dart/src/annotations/datatype.dart';
 
 /// Referential action for foreign key constraints
 enum ReferentialAction {

@@ -23,7 +23,7 @@ void main() {
 
   group('Logical Operators', () {
     test('AND combines conditions with AND', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => and([
           user.id.eq(1),
           user.email.eq('test@example.com'),
@@ -48,7 +48,7 @@ void main() {
     });
 
     test('OR combines conditions with OR', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => or([
           user.id.eq(1),
           user.id.eq(2),
@@ -73,7 +73,7 @@ void main() {
     });
 
     test('NOT negates a condition', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => not([
           user.id.eq(1),
         ]),
@@ -87,7 +87,7 @@ void main() {
     });
 
     test('Nested AND inside OR', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => or([
           and([
             user.id.eq(1),
@@ -113,7 +113,7 @@ void main() {
     });
 
     test('Nested OR inside AND', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => and([
           or([
             user.id.eq(1),

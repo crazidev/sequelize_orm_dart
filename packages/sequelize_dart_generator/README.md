@@ -1,47 +1,52 @@
 # sequelize_dart_generator
 
-Code generator for Sequelize Dart. This package automatically generates model implementations from annotated classes, providing type-safe query builders and CRUD operations.
+Code generator for Sequelize Dart. Automatically generates model implementations from annotated classes, providing type-safe query builders and CRUD operations.
 
 ## Installation
+
+Add to your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
   sequelize_dart_generator:
-    path: ../sequelize_dart_generator
+    path: ../packages/sequelize_dart_generator # For local development
   build_runner: ^2.10.4
 ```
 
-## Usage
+Then run:
+
+```bash
+dart pub get
+```
+
+## Setup
 
 ### 1. Define Your Model
 
-Create a model file with annotations:
-
 ```dart
-// lib/models/user.model.dart
+// lib/models/users.model.dart
 import 'package:sequelize_dart/sequelize_dart.dart';
 
-part 'user.model.g.dart';
+part 'users.model.g.dart';
 
-@Table(tableName: 'users', underscored: true)
-class User {
+@Table(tableName: 'users', timestamps: false)
+class Users {
   @PrimaryKey()
   @AutoIncrement()
+  @NotNull()
   DataType id = DataType.INTEGER;
 
   @NotNull()
-  DataType username = DataType.STRING;
-
-  @ColumnName('email_address')
   DataType email = DataType.STRING;
 
-  static $User get instance => $User();
+  @ColumnName('first_name')
+  DataType firstName = DataType.STRING;
+
+  static UsersModel get model => UsersModel();
 }
 ```
 
 ### 2. Run Code Generation
-
-Generate the model implementation:
 
 ```bash
 # One-time generation
@@ -51,196 +56,259 @@ dart run build_runner build --delete-conflicting-outputs
 dart run build_runner watch --delete-conflicting-outputs
 ```
 
-This creates `user.model.g.dart` with the generated `$User` class.
+This creates `users.model.g.dart` with the generated implementation.
 
-### 3. Use the Generated Model
+## Generated Classes
+
+For a model class named `Users`, the generator creates:
+
+### 1. `UsersModel` (extends `Model`)
+
+The main model class with static singleton access:
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'models/user.model.dart';
-
-void main() async {
-  final sequelize = Sequelize().createInstance(
-    PostgressConnection(
-      url: 'postgresql://user:password@localhost:5432/dbname',
-    ),
-  );
-
-  await sequelize.initialize(
-    models: [User.instance],
-  );
-
-  // Use the generated model
-  final users = await User.instance.findAll();
-  final user = await User.instance.findOne(
-    where: (user) => user.email.equals('user@example.com'),
-  );
-
-  await sequelize.close();
+class UsersModel extends Model {
+  // Access via: Users.model
+  static UsersModel get model => UsersModel();
 }
 ```
 
-## What Gets Generated
+**Methods:**
 
-The generator creates a `$ClassName` class (e.g., `$User`) that extends `Model` and includes:
+- `Future<List<UsersValues>> findAll({...})` - Find all records
+- `Future<UsersValues?> findOne({...})` - Find single record
+- `Future<UsersValues?> findByPrimaryKey(dynamic id)` - Find by primary key
+- `Future<UsersValues> create(CreateUsers data)` - Create new record
+- `Future<int> update({...})` - Update records
+- `Future<int> count({...})` - Count records
+- `Future<num?> max(Column Function(UsersColumns) columnFn, {...})` - Get maximum value
+- `Future<num?> min(Column Function(UsersColumns) columnFn, {...})` - Get minimum value
+- `Future<num?> sum(Column Function(UsersColumns) columnFn, {...})` - Sum column values
+- `Future<void> associateModel()` - Setup associations
 
-### 1. Query Methods
+### 2. `UsersValues`
 
-- `findAll()` - Find all records with optional conditions
-- `findOne()` - Find a single record
-- `findByPk()` - Find by primary key
-- `count()` - Count records
-- `create()` - Create new records
-- `update()` - Update records
-- `save()` - Save model instance
-- `reload()` - Reload instance from database
-- `delete()` - Delete instance
-
-### 2. Aggregation Methods
-
-- `sum()` - Sum values of a numeric column
-- `max()` - Maximum value of a column
-- `min()` - Minimum value of a column
-- `increment()` - Increment numeric fields (if model has numeric fields)
-- `decrement()` - Decrement numeric fields (if model has numeric fields)
-
-### 3. Type-Safe Query Builders
-
-Type-safe column accessors for building queries:
+Model instance class with data fields and methods:
 
 ```dart
-// Type-safe where clauses
-User.instance.findAll(
-  where: (user) => user.email.equals('user@example.com'),
-);
+class UsersValues with ReloadableMixin<UsersValues> {
+  int? id;
+  String? email;
+  String? firstName;
+  // ... other fields
 
-// With logical operators
-User.instance.findAll(
-  where: (user) => and([
-    user.email.isNotNull(),
-    user.id.gt(0),
-  ]),
+  // Methods
+  Future<UsersValues?> reload() - Reload from database
+  Future<int> save({List<String>? fields}) - Save changes
+  Future<int> update(Map<String, dynamic> data) - Update instance
+  Map<String, dynamic> toJson() - Convert to JSON
+  factory UsersValues.fromJson(Map<String, dynamic>) - Create from JSON
+}
+```
+
+### 3. `CreateUsers`
+
+Type-safe create helper class with named parameters:
+
+```dart
+class CreateUsers {
+  final String? email;
+  final String? firstName;
+  // ... other fields
+
+  CreateUsers({
+    this.email,
+    this.firstName,
+    // ...
+  });
+}
+
+// Usage
+await Users.model.create(CreateUsers(
+  email: 'user@example.com',
+  firstName: 'John',
+));
+```
+
+### 4. `UpdateUsers`
+
+Type-safe update helper class (optional, based on configuration):
+
+```dart
+class UpdateUsers {
+  final String? email;
+  final String? firstName;
+  // ...
+}
+```
+
+### 5. `UsersColumns`
+
+Type-safe column accessors for query building:
+
+```dart
+class UsersColumns {
+  Column<int> get id => Column('id');
+  Column<String> get email => Column('email');
+  Column<String> get firstName => Column('first_name');
+  // ... other columns
+}
+
+// Usage in queries
+Users.model.findAll(
+  where: (users) => users.email.equals('user@example.com'),
 );
 ```
 
-### 4. Create Helper Classes
+### 6. `UsersQuery` (extends `UsersColumns`)
 
-For type-safe record creation:
+Advanced query builder with additional helper methods:
 
 ```dart
-final user = await User.instance.create(
-  $UserCreate(
-    username: 'johndoe',
-    email: 'john@example.com',
-  ),
-);
+class UsersQuery extends UsersColumns {
+  // Additional query building methods
+}
 ```
 
-### 5. Column Definitions
+### 7. `UsersIncludeHelper`
 
-Type-safe column accessors for each field:
-
-```dart
-// In where clauses
-where: (user) => user.id.eq(1)
-where: (user) => user.email.like('%@example.com')
-where: (user) => user.age.between(18, 65)
-```
-
-### 6. Include Helpers
-
-For eager loading associations:
+Helper for building association includes:
 
 ```dart
-User.instance.findAll(
+class UsersIncludeHelper {
+  // Methods for each association
+  IncludeBuilder post() { /* ... */ }
+  IncludeBuilder posts() { /* ... */ }
+}
+
+// Usage
+Users.model.findAll(
   include: (include) => [include.post()],
 );
 ```
 
-## Generated File Structure
+## Generated Methods Reference
 
-The generator creates `.g.dart` files next to your model files:
+### Query Methods
 
+All query methods support:
+
+- `where: QueryOperator Function(UsersColumns)` - Filter conditions
+- `include: List<IncludeBuilder> Function(UsersIncludeHelper)` - Eager load associations
+- `order: dynamic` - Sorting (array of `[column, 'ASC'|'DESC']`)
+- `limit: int?` - Limit results
+- `offset: int?` - Skip results
+- `attributes: QueryAttributes?` - Select specific columns
+
+**findAll**
+
+```dart
+Future<List<UsersValues>> findAll({
+  QueryOperator Function(UsersColumns)? where,
+  List<IncludeBuilder> Function(UsersIncludeHelper)? include,
+  dynamic order,
+  int? limit,
+  int? offset,
+  // ...
+})
 ```
-lib/
-  models/
-    user.model.dart      # Your model definition
-    user.model.g.dart    # Generated implementation
+
+**findOne**
+
+```dart
+Future<UsersValues?> findOne({
+  QueryOperator Function(UsersColumns)? where,
+  List<IncludeBuilder> Function(UsersIncludeHelper)? include,
+  // ...
+})
 ```
 
-The generated file contains:
+**create**
 
-1. **Model Class** (`$User`) - Extends `Model`, implements all query methods
-2. **Create Helper** (`$UserCreate`) - Type-safe create method with named parameters
-3. **Query Columns** - Type-safe column accessors for building queries
-4. **Attribute Definitions** - Converts annotations to Sequelize attribute definitions
+```dart
+Future<UsersValues> create(CreateUsers createData)
+// or
+Future<UsersValues> create(Map<String, dynamic> data)
+```
 
-## Code Generation Details
+**update**
 
-### Model Definition
+```dart
+Future<int> update({
+  String? email,
+  String? firstName,
+  // ... other fields as named parameters
+  QueryOperator Function(UsersColumns)? where,
+})
+```
 
-The generator extracts:
+**count**
 
-- Table name and options from `@Table` annotation
-- Column definitions from field annotations
-- Data types, constraints, and validators
-- Foreign keys and relationships
+```dart
+Future<int> count({
+  QueryOperator Function(UsersColumns)? where,
+})
+```
 
-### Attribute Mapping
+**max / min / sum**
 
-- Converts `DataType` enum to Sequelize data types
-- Processes `@PrimaryKey`, `@AutoIncrement`, `@NotNull` annotations
-- Handles `@ColumnName` for custom column names
-- Maps validators to Sequelize validation rules
+```dart
+Future<num?> max(
+  Column Function(UsersColumns) columnFn, {
+  QueryOperator Function(UsersColumns)? where,
+})
 
-### Query Generation
+Future<num?> min(
+  Column Function(UsersColumns) columnFn, {
+  QueryOperator Function(UsersColumns)? where,
+})
 
-- Generates type-safe column accessors with all operators
-- Creates `where` callback with full type safety
-- Generates `include` helpers for associations
-- Creates `order`, `limit`, `offset` builders
+Future<num?> sum(
+  Column Function(UsersColumns) columnFn, {
+  QueryOperator Function(UsersColumns)? where,
+})
+```
 
-### Instance Methods
+### Instance Methods (UsersValues)
 
-Generates instance methods for:
+**reload**
 
-- `save()` - Persist changes to database
-- `reload()` - Refresh from database
-- `delete()` - Remove from database
-- Attribute getters/setters with type safety
+```dart
+Future<UsersValues?> reload()
+```
+
+**save**
+
+```dart
+Future<int> save({List<String>? fields})
+```
+
+**update**
+
+```dart
+Future<int> update(Map<String, dynamic> data)
+```
 
 ## Configuration
 
-The generator uses `build.yaml` configuration. No additional configuration is typically needed.
+The generator uses `build.yaml` in your project root:
 
-## Generated Code Example
-
-Here's what gets generated for a simple model:
-
-```dart
-// Generated: user.model.g.dart
-class $User extends Model {
-  @override
-  String get tableName => 'users';
-
-  // Column accessors for type-safe queries
-  Column<int> get id => Column('id');
-  Column<String> get username => Column('username');
-  Column<String> get email => Column('email_address');
-
-  // Query methods
-  Future<List<User>> findAll({...});
-  Future<User?> findOne({...});
-  Future<User> create($UserCreate data);
-  // ... and more
-}
+```yaml
+targets:
+  $default:
+    builders:
+      sequelize_dart_generator|sequelize_model_builder:
+        enabled: true
+      sequelize_dart_generator|models_registry_builder:
+        enabled: true
+        options:
+          className: Models
+          outputFileName: models
 ```
 
 ## Troubleshooting
 
 ### Generated files not updating
-
-Delete generated files and rebuild:
 
 ```bash
 dart run build_runner clean
@@ -252,22 +320,16 @@ dart run build_runner build --delete-conflicting-outputs
 Ensure your model file has the correct `part` directive:
 
 ```dart
-part 'user.model.g.dart';  // Must match filename exactly
+part 'users.model.g.dart';  // Must match filename exactly
 ```
 
 ### Build errors
 
-- Ensure all annotations are imported correctly
+- Ensure all annotations are imported from `package:sequelize_dart/sequelize_dart.dart`
 - Check that field types use `DataType` enum
 - Verify `@Table` annotation has required `tableName` parameter
-
-### Type errors
-
-- Generated code depends on model annotations being correct
-- Ensure `build_runner` is up to date
-- Check that `sequelize_dart` and `sequelize_dart_annotations` are compatible versions
 
 ## See Also
 
 - [sequelize_dart](../sequelize_dart/README.md) - Main package
-- [sequelize_dart_annotations](../sequelize_dart_annotations/README.md) - Annotations package
+- [Documentation](../../docs/) - Full documentation

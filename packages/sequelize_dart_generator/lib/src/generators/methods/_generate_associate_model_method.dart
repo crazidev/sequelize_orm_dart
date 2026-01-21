@@ -14,7 +14,7 @@ void _generateAssociateModelMethod(
     buffer.writeln('    // No associations defined');
   } else {
     for (var assoc in associations) {
-      final modelInstanceName = '${assoc.modelClassName}.instance';
+      final modelInstanceName = '${assoc.modelClassName}.model';
       if (assoc.associationType == 'hasOne') {
         buffer.write('    await hasOne(');
       } else {

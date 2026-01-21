@@ -23,7 +23,7 @@ void main() {
 
   group('Regex Operators', () {
     test('regexp produces WHERE "column" ~ pattern (PostgreSQL)', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.regexp('^admin'),
       );
 
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('notRegexp produces WHERE "column" !~ pattern (PostgreSQL)', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.notRegexp('^spam'),
       );
 
@@ -47,7 +47,7 @@ void main() {
     });
 
     test('iRegexp produces WHERE "column" ~* pattern (PostgreSQL)', () async {
-      await Users.instance.findAll(
+      await Users.model.findAll(
         where: (user) => user.email.iRegexp('^ADMIN'),
       );
 
@@ -61,7 +61,7 @@ void main() {
     test(
       'notIRegexp produces WHERE "column" !~* pattern (PostgreSQL)',
       () async {
-        await Users.instance.findAll(
+        await Users.model.findAll(
           where: (user) => user.email.notIRegexp('^SPAM'),
         );
 

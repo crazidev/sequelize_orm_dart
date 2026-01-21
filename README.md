@@ -4,211 +4,152 @@ A Dart ORM for Sequelize.js integration with code generation support. Works seam
 
 ## Features
 
-- 🚀 **Dual Platform Support**: Works on Dart server and dart2js
-- 📦 **Code Generation**: Automatic model implementation generation
-- 🔌 **Multiple Databases**: PostgreSQL, MySQL, MariaDB support
-- 🎯 **Type-Safe Queries**: Strongly-typed query builders
-- 🔄 **Connection Pooling**: Built-in connection pool management
-- 📝 **Annotations**: Simple, declarative model definitions
+- **Dual Platform Support**: Works on Dart server and dart2js
+- **Code Generation**: Automatic model implementation generation
+- **Multiple Databases**: PostgreSQL, MySQL, MariaDB support
+- **Type-Safe Queries**: Strongly-typed query builders
+- **Connection Pooling**: Built-in connection pool management
+- **Annotations**: Simple, declarative model definitions
 
-## Packages
+## Package Structure
 
-- **[sequelize_dart](./packages/sequelize_dart/README.md)** - Main ORM package with Sequelize.js integration
-- **[sequelize_dart_annotations](./packages/sequelize_dart_annotations/README.md)** - Platform-independent annotations
-- **[sequelize_dart_generator](./packages/sequelize_dart_generator/README.md)** - Code generator for model implementations
+This is a monorepo containing the following packages:
 
-## How It Works
+- **[sequelize_dart](./packages/sequelize_dart/)** - Main ORM package with Sequelize.js integration
+- **[sequelize_dart_generator](./packages/sequelize_dart_generator/)** - Code generator for model implementations
+- **[example](./example/)** - Example application demonstrating usage
 
-Sequelize Dart uses a **unified Node.js bridge** for both Dart VM and dart2js platforms. The bridge handles all Sequelize.js operations, ensuring consistent behavior across platforms.
+## Project Structure
 
-## Quick Start
-
-### 1. Add Dependencies
-
-```yaml
-# pubspec.yaml
-dependencies:
-  sequelize_dart: letest
-  sequelize_dart_annotations: letest
-
-dev_dependencies:
-  sequelize_dart_generator:
-    path: sequelize_dart_generator
-  build_runner: ^2.10.4
+```
+my_dart_server/
+├── packages/
+│   ├── sequelize_dart/              # Main ORM package
+│   └── sequelize_dart_generator/    # Code generator
+├── example/                          # Example application
+├── docs/                            # Documentation (Docusaurus)
+├── tools/                           # Development scripts
+└── test/                            # Integration tests
 ```
 
-### 2. Create a Model
+## Getting Started
 
-```dart
-// lib/models/user.model.dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+For quick start guide and usage examples, see:
 
-part 'user.model.g.dart';
+- **[Main Package README](./packages/sequelize_dart/README.md)** - Quick start
+- **[Documentation Site](./docs/)** - Full documentation (hosted on Vercel)
 
-@Table(tableName: 'users', underscored: true)
-class User {
-  @PrimaryKey()
-  @AutoIncrement()
-  DataType id = DataType.INTEGER;
+## Development Tools
 
-  @NotNull()
-  DataType username = DataType.STRING;
+### Available Scripts
 
-  @ColumnName('email_address')
-  DataType email = DataType.STRING;
+The `tools/` directory contains development scripts:
 
-  @ColumnName('is_active')
-  DataType isActive = DataType.BOOLEAN;
+- **`watch.sh`** - Watch models, compile to JS, and run with auto-reload
+- **`watch_models.sh`** - Watch model files and regenerate code
+- **`watch_dart.sh`** - Watch Dart files and restart Dart VM server
+- **`watch_js.sh`** - Watch Dart files and recompile to JavaScript
+- **`watch_bridge.sh`** - Watch TypeScript files and rebuild bridge bundles
+- **`setup_bridge.sh`** - Build bridge server bundles
+- **`build.sh`** - Compile Dart to JavaScript
+- **`format.sh`** - Format all Dart files
 
-  static $User get instance => $User();
-}
-```
+### VSCode Tasks
 
-### 3. Generate Model Code
+Pre-configured tasks are available in `.vscode/tasks.json`:
+
+#### Watch Tasks
+
+- **1. Watch Models** - Regenerate code on model file changes
+- **2. Watch Dart VM** - Restart Dart VM server on file changes
+- **3. Watch dart2js** - Recompile to JavaScript on file changes
+- **4. Watch Bridge** - Rebuild bridge bundles on TypeScript changes
+
+#### Build Tasks
+
+- **Build: Models** - Generate model code once
+- **Build: Bridge** - Build bridge server bundles
+- **Build: dart2js** - Compile main.dart to JavaScript
+- **Build: Full** - Build everything (bridge → models → dart2js)
+
+#### Run Tasks
+
+- **Run: Dart VM** - Run example with Dart VM
+- **Run: dart2js** - Run compiled JavaScript with Node.js
+- **Run: Benchmark (Dart VM)** - Run performance benchmark
+- **Run: Benchmark (dart2js)** - Run benchmark with Node.js
+
+#### Compound Tasks
+
+- **Watch: All** - Watch models, compile to JS, and run with auto-reload
+- **Watch: Full Dev** - Watch models and run Dart VM server
+
+Access tasks via: `Cmd+Shift+P` → "Tasks: Run Task"
+
+## Development Guide
+
+### Prerequisites
+
+1. **Dart SDK**: Install [Dart SDK](https://dart.dev/get-dart) (^3.9.2 or higher)
+2. **Node.js**: Install [Node.js](https://nodejs.org/) (v18+ recommended)
+3. **Database**: PostgreSQL, MySQL, or MariaDB
+
+### Setup
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone <repository-url>
+   cd my_dart_server
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   dart pub get
+   ```
+
+3. **Build the bridge server**:
+
+   ```bash
+   ./tools/setup_bridge.sh
+   ```
+
+4. **Generate model code**:
+
+   ```bash
+   cd example
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+5. **Run the example**:
+   ```bash
+   dart run lib/main.dart
+   ```
+
+### Development Workflow
+
+1. **Use VSCode Tasks** for automated workflows (recommended)
+   - Run "Watch: Full Dev" for complete development environment
+   - Or use individual watch tasks as needed
+
+2. **Manual workflow**:
+
+   ```bash
+   # Watch mode (regenerates on file changes)
+   ./tools/watch_models.sh
+
+   # In another terminal, run your app
+   dart run example/lib/main.dart
+   ```
+
+### Running Tests
 
 ```bash
-# Generate model implementations
-dart run build_runner build
-
-# Or watch for changes
-dart run build_runner watch
+# Run all tests
+dart test
 ```
 
-This creates `user.model.g.dart` with the generated `$User` class.
+## Contributing
 
-### 4. Create Database Connection
-
-```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-
-void main() async {
-  // Create Sequelize instance with PostgreSQL connection
-  final sequelize = Sequelize().createInstance(
-    PostgressConnection(
-      url: 'postgresql://username:password@localhost:5432/database_name',
-      // Optional: Enable SQL logging
-      logging: (String sql) => print(sql),
-    ),
-  );
-
-  // Initialize with your models
-  await sequelize.initialize(
-    models: [
-      User.instance,
-    ],
-  );
-
-  // Create a new user
-  final newUser = await User.instance.create(
-    $UserCreate(
-      username: 'johndoe',
-      email: 'john@example.com',
-      isActive: true,
-    ),
-  );
-
-  // Find users
-  final users = await User.instance.findAll();
-
-  // Find one user
-  final user = await User.instance.findOne(
-    where: (user) => user.id.equals(1),
-  );
-
-  // Close connection when done
-  await sequelize.close();
-}
-```
-
-## Basic Querying
-
-### Find Records
-
-```dart
-// Find all users
-final users = await User.instance.findAll();
-
-// Find users with conditions
-final activeUsers = await User.instance.findAll(
-  where: (user) => user.email.isNotNull(),
-  limit: 10,
-);
-
-// Find one user
-final user = await User.instance.findOne(
-  where: (user) => user.email.equals('user@example.com'),
-);
-```
-
-### Create Records
-
-```dart
-// Create using the generated helper class (Recommended)
-final user = await User.instance.create(
-  $UserCreate(
-    username: 'johndoe',
-    email: 'user@example.com',
-    isActive: true,
-  ),
-);
-```
-
-### Update Records
-
-```dart
-// Update with named parameters
-final affected = await User.instance.update(
-  firstName: 'Jane',
-  where: (user) => user.email.equals('user@example.com'),
-);
-
-// Update multiple fields
-await User.instance.update(
-  isActive: false,
-  firstName: 'Jane',
-  where: (user) => user.id.equals(1),
-);
-```
-
-### Updating Instances
-
-You can also update a model instance directly.
-
-```dart
-final user = await User.instance.findOne(where: (user) => user.id.eq(1));
-
-if (user != null) {
-  user.username = 'Updated Name';
-  await user.save();
-}
-```
-
-## Connection Pooling
-
-Configure connection pooling for better performance and concurrency:
-
-```dart
-pool: SequelizePoolOptions(
-  max: 10,        // Maximum connections in pool
-  min: 2,         // Minimum connections in pool
-  idle: 10000,    // Idle timeout in milliseconds
-  acquire: 60000, // Maximum time to get connection (ms)
-  evict: 1000,    // Check for idle connections (ms)
-)
-```
-
-## Documentation
-
-The documentation is built with [Docusaurus](https://docusaurus.io/) and includes comprehensive guides:
-
-- **[Get Started](./docs/docs/get-started.md)** - Installation, database connection, and basic usage
-- **[Database Connection](./docs/docs/databases.md)** - Connecting to PostgreSQL, MySQL, and MariaDB
-- **[Models & Tables](./docs/docs/models.md)** - Model definitions and configuration
-- **[Associations](./docs/docs/associations.md)** - Model relationships
-- **[Querying](./docs/docs/querying.md)** - Data querying and manipulation
-
-### Package Documentation
-
-- **[sequelize_dart](./packages/sequelize_dart/README.md)** - Main package documentation
-- **[sequelize_dart_annotations](./packages/sequelize_dart_annotations/README.md)** - Annotations reference
-- **[sequelize_dart_generator](./packages/sequelize_dart_generator/README.md)** - Code generator guide
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.

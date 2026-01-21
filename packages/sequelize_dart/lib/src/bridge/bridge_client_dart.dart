@@ -298,7 +298,6 @@ class BridgeClient implements BridgeClientInterface {
           String errorMessage = 'Unknown error';
           int? errorCode;
           String? errorStack;
-          String? errorName;
 
           if (error is Map) {
             completer.completeError(

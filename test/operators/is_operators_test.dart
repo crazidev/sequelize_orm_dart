@@ -22,7 +22,7 @@ void main() {
 
   group('IS Operators', () {
     test('isNull produces WHERE "column" IS NULL', () async {
-      await Users.instance.findAll(where: (user) => user.email.isNull());
+      await Users.model.findAll(where: (user) => user.email.isNull());
 
       expect(
         lastSql,
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('isNotNull produces WHERE "column" IS NOT NULL', () async {
-      await Users.instance.findAll(where: (user) => user.email.isNotNull());
+      await Users.model.findAll(where: (user) => user.email.isNotNull());
 
       expect(
         lastSql,

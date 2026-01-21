@@ -31,7 +31,7 @@ void _generateCreateMethod(
     buffer.writeln('      includeList.add(');
     buffer.writeln('        IncludeBuilder(');
     buffer.writeln('          association: \'$assocName\',');
-    buffer.writeln('          model: $modelClassName.instance,');
+    buffer.writeln('          model: $modelClassName.model,');
     buffer.writeln('        ),');
     buffer.writeln('      );');
     buffer.writeln('    }');

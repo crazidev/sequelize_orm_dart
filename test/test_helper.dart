@@ -42,7 +42,7 @@ Future<void> initTestEnvironment() async {
 
   // Initialize with all models
   await sequelize.initialize(
-    models: [Users.instance, Post.instance, PostDetails.instance],
+    models: [Users.model, Post.model, PostDetails.model],
   );
 }
 

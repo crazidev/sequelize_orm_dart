@@ -39,7 +39,7 @@ This creates a bundled JavaScript file that allows Dart to communicate with Sequ
 
 ## Database Connection
 
-Sequelize Dart supports PostgreSQL, MySQL, and MariaDB. Here's how to set up a connection:
+Sequelize Dart supports PostgreSQL, MySQL, MariaDB, SQLite, MS SQL Server, and DB2. Here's how to set up a connection:
 
 ```dart
 import 'package:sequelize_dart/sequelize_dart.dart';
@@ -47,11 +47,11 @@ import 'package:sequelize_dart/sequelize_dart.dart';
 void main() async {
   // Create Sequelize instance with PostgreSQL connection
   final sequelize = Sequelize().createInstance(
-    PostgressConnection(
+    connection: SequelizeConnection.postgres(
       url: 'postgresql://username:password@localhost:5432/database_name',
-      // Optional: Enable SQL logging
-      logging: (String sql) => print(sql),
     ),
+    // Optional: Enable SQL logging
+    logging: (sql) => SqlFormatter.printFormatted(sql),
   );
 
   // Initialize with your models
@@ -89,8 +89,9 @@ class User {
   @ColumnName('is_active')
   DataType isActive = DataType.BOOLEAN;
 
-  static $User get instance => $User();
+  static UserModel get model => UserModel();
 }
+
 ```
 
 ### Generating Model Code
@@ -108,7 +109,7 @@ This generates the `*.model.g.dart` file that contains the model implementation.
 ### Create a Record
 
 ```dart
-final newUser = await User.instance.create({
+final newUser = await User.model.create({
   'username': 'johndoe',
   'isActive': true,
 });
@@ -118,20 +119,20 @@ final newUser = await User.instance.create({
 
 ```dart
 // Find all users
-final users = await User.instance.findAll();
+final users = await User.model.findAll();
 
 // Find one user
-final user = await User.instance.findOne(
-  where: User.instance.id.equals(1),
+final user = await User.model.findOne(
+  where: User.model.id.equals(1),
 );
 ```
 
 ### Update a Record
 
 ```dart
-await User.instance.update(
+await User.model.update(
   data: {'isActive': false},
-  where: User.instance.id.equals(1),
+  where: User.model.id.equals(1),
 );
 ```
 
@@ -148,40 +149,38 @@ const connectionString = 'postgresql://postgres:postgres@localhost:5432/postgres
 Future<void> main() async {
   // Create Sequelize instance
   final sequelize = Sequelize().createInstance(
-    PostgressConnection(
-      url: connectionString,
-      logging: (String sql) => SqlFormatter.printFormatted(sql),
-    ),
+    connection: SequelizeConnection.postgres(url: connectionString),
+    logging: (sql) => SqlFormatter.printFormatted(sql),
   );
 
   // Initialize with models
   await sequelize.initialize(
     models: [
-      User.instance,
+      User.model,
     ],
   );
 
   // Create a new user
-  final newUser = await User.instance.create({
+  final newUser = await User.model.create({
     'username': 'johndoe',
     'isActive': true,
   });
 
   // Find the user
-  final user = await User.instance.findOne(
-    where: User.instance.id.equals(newUser.id),
+  final user = await User.model.findOne(
+    where: User.model.id.equals(newUser.id),
   );
 
   print('Found user: ${user?.username}');
 
   // Update the user
-  await User.instance.update(
+  await User.model.update(
     data: {'isActive': false},
-    where: User.instance.id.equals(newUser.id),
+    where: User.model.id.equals(newUser.id),
   );
 
   // Find all users
-  final allUsers = await User.instance.findAll();
+  final allUsers = await User.model.findAll();
   print('Total users: ${allUsers.length}');
 
   // Close connection

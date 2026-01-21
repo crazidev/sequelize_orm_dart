@@ -62,18 +62,14 @@ Future<void> main() async {
   final initStopwatch = Stopwatch()..start();
 
   final sequelize = Sequelize().createInstance(
-    PostgressConnection(
-      url: connectionString,
-      // Disable SQL logging for accurate benchmarks
-      // logging: (String sql) => print('SQL: $sql'),
-    ),
+    connection: PostgressConnection(url: connectionString),
   );
 
   await sequelize.initialize(
     models: [
-      Users.instance,
-      Post.instance,
-      PostDetails.instance,
+      Users.model,
+      Post.model,
+      PostDetails.model,
     ],
   );
 
@@ -83,7 +79,7 @@ Future<void> main() async {
 
   // Warmup query (first query is always slower due to connection pooling)
   print('Warming up...');
-  await Post.instance.findAll();
+  await Post.model.findAll();
   print('');
 
   // Run benchmarks
@@ -97,7 +93,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'findAll (all posts)',
-      () => Post.instance.findAll(),
+      () => Post.model.findAll(),
     ),
   );
 
@@ -105,7 +101,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'findAll (limit 10)',
-      () => Post.instance.findAll(limit: 10),
+      () => Post.model.findAll(limit: 10),
     ),
   );
 
@@ -113,7 +109,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'findOne',
-      () => Post.instance.findOne(where: (p) => p.id.eq(1)),
+      () => Post.model.findOne(where: (p) => p.id.eq(1)),
       rowCounter: (r) => r != null ? 1 : 0,
     ),
   );
@@ -122,7 +118,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'count',
-      () => Post.instance.count(),
+      () => Post.model.count(),
       rowCounter: (r) => r,
     ),
   );
@@ -131,7 +127,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'findAll (where id < 5)',
-      () => Post.instance.findAll(where: (p) => p.id.lt(5)),
+      () => Post.model.findAll(where: (p) => p.id.lt(5)),
     ),
   );
 
@@ -139,7 +135,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'findAll with include (postDetails)',
-      () => Post.instance.findAll(
+      () => Post.model.findAll(
         limit: 10,
         include: (post) => [post.postDetails()],
       ),
@@ -150,7 +146,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'max (views)',
-      () => Post.instance.max((p) => p.views),
+      () => Post.model.max((p) => p.views),
       rowCounter: (r) => r != null ? 1 : 0,
     ),
   );
@@ -159,7 +155,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'sum (views)',
-      () => Post.instance.sum((p) => p.views),
+      () => Post.model.sum((p) => p.views),
       rowCounter: (r) => r != null ? 1 : 0,
     ),
   );
@@ -170,7 +166,7 @@ Future<void> main() async {
       '5 sequential findOnes',
       () async {
         for (var i = 1; i <= 5; i++) {
-          await Post.instance.findOne(where: (p) => p.id.eq(i));
+          await Post.model.findOne(where: (p) => p.id.eq(i));
         }
         return 5;
       },
@@ -182,7 +178,7 @@ Future<void> main() async {
   results.add(
     await runBenchmark(
       'findAll (complex where)',
-      () => Post.instance.findAll(
+      () => Post.model.findAll(
         where: (p) => and([
           p.id.gt(0),
           p.id.lt(100),

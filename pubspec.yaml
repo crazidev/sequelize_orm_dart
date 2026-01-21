@@ -5,7 +5,6 @@ environment:
 
 workspace:
   - packages/sequelize_dart
-  - packages/sequelize_dart_annotations
   - packages/sequelize_dart_generator
   - example
   

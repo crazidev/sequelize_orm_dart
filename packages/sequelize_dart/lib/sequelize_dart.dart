@@ -2,17 +2,22 @@
 library;
 
 export 'package:meta/meta.dart';
-export 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
 
+export 'src/annotations.dart';
 export 'src/association/association_model.dart';
 export 'src/bridge/bridge_exception.dart';
 export 'src/bridge/sequelize_exceptions.dart';
 // Connection exports
 export 'src/connection/core_options.dart';
+export 'src/connection/dialects/db2.dart';
 export 'src/connection/dialects/mariadb.dart';
+export 'src/connection/dialects/mssql.dart';
 export 'src/connection/dialects/mysql.dart';
 export 'src/connection/dialects/postgres.dart';
+export 'src/connection/dialects/sqlite.dart';
 export 'src/connection/query_options.dart';
+export 'src/connection/sequelize_connection.dart';
+export 'src/connection/ssl_config.dart';
 // Model exports
 export 'src/model/model.dart';
 export 'src/model/model_instance_data.dart';

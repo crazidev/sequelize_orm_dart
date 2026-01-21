@@ -16,7 +16,7 @@ void _generateQueryBuilder(
   );
   buffer.writeln('class $queryBuilderClassName extends $columnsClassName {');
 
-  // Can't use const if we have associations (AssociationReference uses .instance which isn't const)
+  // Can't use const if we have associations (AssociationReference uses .model which isn't const)
   if (associations.isEmpty) {
     buffer.writeln('  const $queryBuilderClassName();');
   } else {
@@ -30,7 +30,7 @@ void _generateQueryBuilder(
       final modelClassName = assoc.modelClassName;
       final associationName = assoc.as ?? assoc.fieldName;
       buffer.writeln(
-        "  final ${assoc.fieldName} = AssociationReference<$modelClassName>('$associationName', $modelClassName.instance);",
+        "  final ${assoc.fieldName} = AssociationReference<$modelClassName>('$associationName', $modelClassName.model);",
       );
     }
   }

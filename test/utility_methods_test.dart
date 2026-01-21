@@ -23,7 +23,7 @@ void main() {
 
   group('Utility Methods - count()', () {
     test('count() with where clause produces correct SQL', () async {
-      final result = await Users.instance.count(
+      final result = await Users.model.count(
         where: (user) => user.id.gt(10),
       );
 
@@ -49,7 +49,7 @@ void main() {
     test('max() with where clause filters results', () async {
       clearCapturedSql();
 
-      final result = await Users.instance.max(
+      final result = await Users.model.max(
         (user) => user.id,
         where: (user) => user.id.lt(50),
       );
@@ -76,7 +76,7 @@ void main() {
     test('min() with where clause filters results', () async {
       clearCapturedSql();
 
-      final result = await Users.instance.min(
+      final result = await Users.model.min(
         (user) => user.id,
         where: (user) => user.id.gte(10),
       );
@@ -103,7 +103,7 @@ void main() {
     test('sum() with where clause filters results', () async {
       clearCapturedSql();
 
-      final result = await Users.instance.sum(
+      final result = await Users.model.sum(
         (user) => user.id,
         where: (user) => user.id.lte(20),
       );
@@ -128,21 +128,21 @@ void main() {
 
   group('Utility Methods - Combined', () {
     test('all utility methods work together', () async {
-      final count = await Users.instance.count(
+      final count = await Users.model.count(
         where: (user) => user.id.gt(0),
       );
 
-      final max = await Users.instance.max(
+      final max = await Users.model.max(
         (user) => user.id,
         where: (user) => user.id.gt(0),
       );
 
-      final min = await Users.instance.min(
+      final min = await Users.model.min(
         (user) => user.id,
         where: (user) => user.id.gt(0),
       );
 
-      final sum = await Users.instance.sum(
+      final sum = await Users.model.sum(
         (user) => user.id,
         where: (user) => user.id.gt(0),
       );

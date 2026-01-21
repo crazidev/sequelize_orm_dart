@@ -30,5 +30,5 @@ class Users {
   @HasMany(Post, foreignKey: 'userId', as: 'posts')
   List<Post>? posts;
 
-  static UsersModel get instance => UsersModel();
+  static UsersModel get model => UsersModel();
 }

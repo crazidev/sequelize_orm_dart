@@ -12,7 +12,7 @@ To eager load associations, use the `include` option.
 
 ```dart
 // Fetch users and their posts in a single query
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     u.posts(),
   ],
@@ -24,7 +24,7 @@ final users = await User.instance.findAll(
 By default, Sequelize uses a `LEFT OUTER JOIN`, returning the main model records even if they have no associated records. To force an `INNER JOIN` (only return records that _have_ the association), set `required: true`.
 
 ```dart
-final usersWithPosts = await User.instance.findAll(
+final usersWithPosts = await User.model.findAll(
   include: (u) => [
     u.posts(
       required: true, // Only return users who have posts
@@ -38,7 +38,7 @@ final usersWithPosts = await User.instance.findAll(
 You can filter the associated records using the `where` option within the include.
 
 ```dart
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     u.posts(
       where: (p) => p.title.like('%Sequelize%'),
@@ -54,7 +54,7 @@ If you combine `where` with `required: false` (default), it acts like a `LEFT JO
 You can perform a `RIGHT JOIN` by setting `right: true`. This will return all associated records (posts), and the main records (users) only if they match.
 
 ```dart
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     u.posts(
       right: true, // RIGHT OUTER JOIN
@@ -68,7 +68,7 @@ final users = await User.instance.findAll(
 To load associations of associations (e.g., User -> Posts -> Comments), nest the `include`.
 
 ```dart
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     u.posts(
       include: (p) => [
@@ -84,7 +84,7 @@ final users = await User.instance.findAll(
 To include all associations of a model, you can use the `all: true` option with a manual `IncludeBuilder`.
 
 ```dart
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     IncludeBuilder(all: true),
   ],
@@ -94,7 +94,7 @@ final users = await User.instance.findAll(
 To recursively include _everything_ (not recommended for large schemas):
 
 ```dart
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     IncludeBuilder(all: true, nested: true),
   ],
@@ -106,7 +106,7 @@ final users = await User.instance.findAll(
 For one-to-many or many-to-many relationships, `JOIN`s can sometimes result in duplicated data or performance issues with limits. You can use `separate: true` to run the association query separately.
 
 ```dart
-final users = await User.instance.findAll(
+final users = await User.model.findAll(
   include: (u) => [
     u.posts(
       separate: true, // Runs a separate query for posts

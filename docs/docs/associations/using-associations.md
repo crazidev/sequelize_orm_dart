@@ -14,8 +14,8 @@ Use the generated methods on the include builder (like `.post()` or `.posts()`) 
 
 ```dart
 // Single association
-final user = await User.instance.findOne(
-  where: User.instance.id.equals(1),
+final user = await User.model.findOne(
+  where: User.model.id.equals(1),
   include: (u) => [
     // highlight-next-line
     u.post(), // Includes the 'post' association
@@ -23,8 +23,8 @@ final user = await User.instance.findOne(
 );
 
 // Multiple associations
-final user = await User.instance.findOne(
-  where: User.instance.id.equals(1),
+final user = await User.model.findOne(
+  where: User.model.id.equals(1),
   include: (u) => [
     // highlight-start
     u.post(),
@@ -41,8 +41,8 @@ final user = await User.instance.findOne(
 You can filter associated records by passing options to the include method.
 
 ```dart
-final user = await User.instance.findOne(
-  where: User.instance.id.equals(1),
+final user = await User.model.findOne(
+  where: User.model.id.equals(1),
   include: (u) => [
     // Include the 'post' association where post.id is 1
     // highlight-start
@@ -61,9 +61,10 @@ For more dynamic or complex scenarios, you can manually create an `IncludeBuilde
 ```dart
 // Manually create an include builder for the 'post' association
 // highlight-next-line
-var postInclude = IncludeBuilder<$Post>(association: 'post');
+var postInclude = IncludeBuilder<PostModel>(association: 'post');
 
-final user = await User.instance.findOne(
+
+final user = await User.model.findOne(
   include: (u) => [
     // Use the manual builder
     // highlight-start
@@ -81,8 +82,8 @@ You can nest includes to load deep relationships (associations of associations).
 
 ```dart
 // User -> Posts -> Comments
-final user = await User.instance.findOne(
-  where: User.instance.id.equals(1),
+final user = await User.model.findOne(
+  where: User.model.id.equals(1),
   include: (u) => [
     u.posts(
       include: (p) => [

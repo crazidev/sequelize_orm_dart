@@ -1,7 +1,10 @@
 enum SequelizeDialects {
   postgres('postgres'),
   mysql('mysql'),
-  sqlite('sqlite');
+  mariadb('mariadb'),
+  sqlite('sqlite'),
+  mssql('mssql'),
+  db2('db2');
 
   final String value;
   const SequelizeDialects(this.value);
@@ -53,12 +56,6 @@ class SequelizeCoreOptions {
   final String? password;
   final int? port;
 
-  /// A function that gets executed while running the query to log the sql.
-  final Function(String sql)? logging;
-
-  /// Connection pool configuration
-  final SequelizePoolOptions? pool;
-
   /// Whether to hoist order and group from joined includes to the top level.
   /// Normally Sequelize ignores 'order' and 'group' inside joined includes.
   /// Default is false.
@@ -71,8 +68,6 @@ class SequelizeCoreOptions {
     this.user,
     this.password,
     this.port,
-    this.logging,
-    this.pool,
     this.hoistIncludeOptions = false,
   });
 
@@ -84,9 +79,7 @@ class SequelizeCoreOptions {
       'port': port,
       'database': database,
       'url': url,
-      'logging': logging,
       'hoistIncludeOptions': hoistIncludeOptions,
-      if (pool != null) 'pool': pool!.toJson(),
     };
   }
 }

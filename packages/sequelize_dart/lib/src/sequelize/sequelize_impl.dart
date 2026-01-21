@@ -23,23 +23,32 @@ class Sequelize extends SequelizeInterface {
   }
 
   @override
-  SequelizeInterface createInstance(SequelizeCoreOptions input) {
+  SequelizeInterface createInstance({
+    required SequelizeCoreOptions connection,
+    Function(String sql)? logging,
+    SequelizePoolOptions? pool,
+  }) {
     final Map<String, dynamic> config = Map<String, dynamic>.from(
-      input.toJson(),
+      connection.toJson(),
     );
 
     // Store the logging callback in the bridge client
-    if (input.logging != null) {
-      _bridge.setLoggingCallback(input.logging);
+    if (logging != null) {
+      _bridge.setLoggingCallback(logging);
     }
 
     // Remove logging function (can't serialize) - just send boolean
-    final logging = config['logging'].runtimeType.toString() != 'Null';
+    final hasLogging = logging != null;
     config.remove('logging');
-    config.addEntries([MapEntry('logging', logging)]);
+    config.addEntries([MapEntry('logging', hasLogging)]);
+
+    // Handle pool options
+    if (pool != null) {
+      config['pool'] = pool.toJson();
+    }
 
     // If URL is provided, remove individual connection parameters
-    if (input.url != null) {
+    if (connection.url != null) {
       final keysToRemove = [
         'host',
         'password',

@@ -1,4 +1,4 @@
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart';
+import 'package:sequelize_dart/src/annotations.dart';
 
 /// Utility class for converting ColumnDefinition to JSON format for Sequelize
 class AttributeConverter {

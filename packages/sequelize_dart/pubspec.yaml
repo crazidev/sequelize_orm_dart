@@ -9,8 +9,6 @@ environment:
 dependencies:
   meta: ^1.17.0
   path: ^1.9.0
-  sequelize_dart_annotations:
-    path: ../sequelize_dart_annotations
 
 dev_dependencies:
   lints: ^6.0.0
