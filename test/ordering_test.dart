@@ -88,13 +88,13 @@ void main() {
         clearCapturedSql();
 
         final hoistSequelize = Sequelize().createInstance(
-          PostgressConnection(
+          connection: PostgressConnection(
             url: testConnectionString,
-            logging: (String sql) {
-              capturedSql.add(sql);
-            },
             hoistIncludeOptions: true,
           ),
+          logging: (String sql) {
+            capturedSql.add(sql);
+          },
         );
 
         await hoistSequelize.initialize(

@@ -21,22 +21,22 @@ Future<void> initTestEnvironment() async {
 
   // Create Sequelize instance with SQL capture
   sequelize = Sequelize().createInstance(
-    PostgressConnection(
+    connection: PostgressConnection(
       url: testConnectionString,
-      logging: (String sql) {
-        // SqlFormatter.printFormatted(
-        //   sql,
-        //   colorScheme: SqlFormatterColors.defaultColors,
-        // );
-        capturedSql.add(sql);
-      },
-      pool: SequelizePoolOptions(
-        max: 5,
-        min: 1,
-        idle: 10000,
-        acquire: 60000,
-        evict: 1000,
-      ),
+    ),
+    logging: (String sql) {
+      // SqlFormatter.printFormatted(
+      //   sql,
+      //   colorScheme: SqlFormatterColors.defaultColors,
+      // );
+      capturedSql.add(sql);
+    },
+    pool: SequelizePoolOptions(
+      max: 5,
+      min: 1,
+      idle: 10000,
+      acquire: 60000,
+      evict: 1000,
     ),
   );
 

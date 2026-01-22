@@ -23,7 +23,7 @@ class Sequelize extends SequelizeInterface {
   }
 
   @override
-  SequelizeInterface createInstance({
+  Sequelize createInstance({
     required SequelizeCoreOptions connection,
     Function(String sql)? logging,
     SequelizePoolOptions? pool,
