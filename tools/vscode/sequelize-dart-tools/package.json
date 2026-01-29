@@ -1,0 +1,64 @@
+{
+  "name": "sequelize-dart-tools",
+  "displayName": "Sequelize Dart Tools",
+  "description": "Generate Sequelize Dart model outputs (build_runner) from context menu and Ctrl+.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:dart",
+    "workspaceContains:**/*.model.dart",
+    "onCommand:sequelizeDart.generateModelForFile",
+    "onCommand:sequelizeDart.generateModelsForFolder"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "sequelizeDart.generateModelForFile",
+        "title": "Sequelize Dart: Generate model (this file)"
+      },
+      {
+        "command": "sequelizeDart.generateModelsForFolder",
+        "title": "Sequelize Dart: Generate models (this folder)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "sequelizeDart.generateModelForFile",
+          "when": "resourceExtname == .dart && resourceFilename =~ /.*\\.model\\.dart$/",
+          "group": "navigation@sequelizeDart"
+        },
+        {
+          "command": "sequelizeDart.generateModelsForFolder",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation@sequelizeDart"
+        },
+        {
+          "command": "sequelizeDart.generateModelsForFolder",
+          "when": "resourceExtname == .dart && resourceFilename =~ /.*\\.model\\.dart$/",
+          "group": "navigation@sequelizeDart"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -p . -w",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.7.3"
+  }
+}
+

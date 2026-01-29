@@ -3,11 +3,8 @@ import 'package:sequelize_dart_example/models/post.model.dart';
 
 part 'users.model.g.dart';
 
-@Table(
-  tableName: 'users',
-  timestamps: false,
-)
-class Users {
+@Table(tableName: 'users', timestamps: false)
+abstract class Users {
   @PrimaryKey()
   @AutoIncrement()
   @NotNull()

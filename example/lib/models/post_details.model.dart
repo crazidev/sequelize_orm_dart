@@ -6,7 +6,7 @@ part 'post_details.model.g.dart';
   tableName: 'post_details',
   underscored: true,
 )
-class PostDetails {
+abstract class PostDetails {
   @ColumnDefinition(
     name: 'id',
     type: DataType.INTEGER,

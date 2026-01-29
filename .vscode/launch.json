@@ -2,12 +2,24 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Sequelize Dart Tools Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/tools/vscode/sequelize-dart-tools",
+        "${workspaceFolder}"
+      ]
+    },
+    {
       "name": "Debug Dart Server",
       "type": "dart",
       "request": "launch",
       "program": "${workspaceFolder}/example/lib/main.dart",
       "cwd": "${workspaceFolder}/example",
-      "vmAdditionalArgs": ["--enable-asserts"],
+      "vmAdditionalArgs": [
+        "--enable-asserts"
+      ],
       "console": "debugConsole"
     },
     {
@@ -18,8 +30,12 @@
       "cwd": "${workspaceFolder}/example",
       "sourceMaps": true,
       "preLaunchTask": "Build: dart2js",
-      "outFiles": ["${workspaceFolder}/example/build/**/*.js"],
-      "skipFiles": ["<node_internals>/**"]
+      "outFiles": [
+        "${workspaceFolder}/example/build/**/*.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     },
     {
       "cwd": "${workspaceFolder}",

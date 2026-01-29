@@ -7,6 +7,6 @@ workspace:
   - packages/sequelize_dart
   - packages/sequelize_dart_generator
   - example
-  
+  - packages/sequelize_dart_analyzer_plugin
 dev_dependencies:
   test: ^1.28.0
