@@ -66,10 +66,7 @@ class Sequelize extends SequelizeInterface {
 
   /// Initialize Sequelize with models
   ///
-  /// This method properly sequences the initialization:
-  /// 1. Starts the bridge and connects to the database
-  /// 2. Defines all models in the bridge (awaited)
-  /// 3. Sets up all associations (awaited)
+  /// Start up and connect to the database, define all models, and set up all associations.
   @override
   Future<void> initialize({required List<Model> models}) async {
     if (_connectionConfig == null) {
@@ -80,7 +77,7 @@ class Sequelize extends SequelizeInterface {
 
     await _bridge.start(connectionConfig: _connectionConfig!);
 
-    print('[Sequelize] Defining ${models.length} models...');
+    // print('[Sequelize] Defining ${models.length} models...');
     for (final model in models) {
       model.define(model.name, this);
       _models[model.name] = model;
@@ -97,13 +94,13 @@ class Sequelize extends SequelizeInterface {
         model.primaryKeys = primaryKeys.cast<String>();
       }
     }
-    print('[Sequelize] All models defined.');
+    // print('[Sequelize] All models defined.');
 
-    print('[Sequelize] Setting up associations...');
+    // print('[Sequelize] Setting up associations...');
     for (final model in models) {
       await model.associateModel();
     }
-    print('[Sequelize] All associations configured.');
+    // print('[Sequelize] All associations configured.');
   }
 
   @override
