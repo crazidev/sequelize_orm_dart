@@ -8,13 +8,16 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "main": "./out/extension.js",
   "activationEvents": [
     "onLanguage:dart",
     "workspaceContains:**/*.model.dart",
     "onCommand:sequelizeDart.generateModelForFile",
-    "onCommand:sequelizeDart.generateModelsForFolder"
+    "onCommand:sequelizeDart.generateModelsForFolder",
+    "onCommand:sequelizeDart.generateRegistry"
   ],
   "contributes": {
     "commands": [
@@ -25,6 +28,10 @@
       {
         "command": "sequelizeDart.generateModelsForFolder",
         "title": "Sequelize Dart: Generate models (this folder)"
+      },
+      {
+        "command": "sequelizeDart.generateRegistry",
+        "title": "Sequelize Dart: Generate registry"
       }
     ],
     "menus": {
@@ -42,6 +49,16 @@
         {
           "command": "sequelizeDart.generateModelsForFolder",
           "when": "resourceExtname == .dart && resourceFilename =~ /.*\\.model\\.dart$/",
+          "group": "navigation@sequelizeDart"
+        },
+        {
+          "command": "sequelizeDart.generateRegistry",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation@sequelizeDart"
+        },
+        {
+          "command": "sequelizeDart.generateRegistry",
+          "when": "resourceExtname == .dart && resourceFilename =~ /.*\\.registry\\.dart$/",
           "group": "navigation@sequelizeDart"
         }
       ]
@@ -61,4 +78,3 @@
     "typescript": "^5.7.3"
   }
 }
-

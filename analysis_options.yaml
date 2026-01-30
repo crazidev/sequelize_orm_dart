@@ -89,3 +89,6 @@ plugins:
     path: packages/sequelize_dart_analyzer_plugin
     diagnostics:
       table_must_be_abstract: true
+      suggest_association_foreign_key: true
+      suggest_association_alias: true
+      missing_foreign_key_column: true

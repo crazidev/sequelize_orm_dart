@@ -1,5 +1,13 @@
 export type SequelizeDartToolsConfig = {
+  generator?: {
+    mode?: 'buildRunner' | 'analyzerServer';
+  };
   buildRunner?: {
+    command?: string;
+    args?: string[];
+    extraArgs?: string[];
+  };
+  analyzerServer?: {
     command?: string;
     args?: string[];
     extraArgs?: string[];
@@ -13,7 +21,15 @@ export type SequelizeDartToolsConfig = {
 };
 
 export type ResolvedConfig = {
+  generator: {
+    mode: 'buildRunner' | 'analyzerServer';
+  };
   buildRunner: {
+    command: string;
+    args: string[];
+    extraArgs: string[];
+  };
+  analyzerServer: {
     command: string;
     args: string[];
     extraArgs: string[];

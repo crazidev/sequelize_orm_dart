@@ -51,6 +51,225 @@ part 'generators/methods/_get_model_class_name.dart';
 part 'generators/methods/_models.dart';
 part 'generators/methods/_to_camel_case.dart';
 
+/// Provides the source of a field's initializer expression, if available.
+///
+/// This is used to support non-const initializers without depending on
+/// `BuildStep.resolver.astNodeFor(...)` (e.g. in a standalone analyzer CLI).
+typedef InitializerSourceProvider =
+    Future<String?> Function(FieldElement field);
+
+/// Shared implementation used by both build_runner and the standalone CLI.
+Future<String> _generateForClassElement(
+  ClassElement element,
+  ConstantReader annotation,
+  BuilderOptions options, {
+  required InitializerSourceProvider initializerSourceProvider,
+}) async {
+  final className = element.name ?? 'Unknown';
+  final tableAnnotation = _extractTableAnnotation(annotation);
+
+  final fields = await _getFields(element, initializerSourceProvider);
+  final associations = _getAssociations(element);
+  final namingConfig = GeneratorNamingConfig.fromOptions(options);
+  final generatedClassName = namingConfig.getModelClassName(className);
+  final valuesClassName = namingConfig.getModelValuesClassName(className);
+  final createClassName = namingConfig.getModelCreateClassName(className);
+  final updateClassName = namingConfig.getModelUpdateClassName(className);
+
+  final buffer = StringBuffer();
+
+  _generateClassDefinition(
+    buffer,
+    generatedClassName,
+    className,
+    namingConfig,
+  );
+  _generateDefineMethod(
+    buffer,
+    generatedClassName,
+    associations,
+  );
+  _generateGetAttributesMethod(
+    buffer,
+    fields,
+  );
+  _generateGetAttributesJsonMethod(buffer);
+  _generateGetOptionsJsonMethod(
+    buffer,
+    tableAnnotation,
+  );
+
+  final singularName =
+      (tableAnnotation['name']?['singular'] as String?) ??
+      _toCamelCase(className);
+  final pluralName =
+      (tableAnnotation['name']?['plural'] as String?) ??
+      _toCamelCase(className);
+
+  final baseCallbackName = namingConfig.getWhereCallbackName(
+    singular: singularName,
+    plural: pluralName,
+  );
+  final includeParamName = namingConfig.getIncludeCallbackName(
+    singular: singularName,
+    plural: pluralName,
+  );
+
+  _generateFindAllMethod(
+    buffer,
+    className,
+    valuesClassName,
+    baseCallbackName,
+    includeParamName,
+    namingConfig,
+  );
+  _generateFindOneMethod(
+    buffer,
+    className,
+    valuesClassName,
+    baseCallbackName,
+    includeParamName,
+    namingConfig,
+  );
+  _generateCreateMethod(
+    buffer,
+    className,
+    valuesClassName,
+    baseCallbackName,
+    includeParamName,
+    fields,
+    associations,
+    namingConfig,
+  );
+  _generateUpdateMethod(
+    buffer,
+    className,
+    baseCallbackName,
+    fields,
+    namingConfig,
+  );
+  _generateCountMethod(
+    buffer,
+    className,
+    baseCallbackName,
+    namingConfig,
+  );
+  _generateMaxMethod(
+    buffer,
+    className,
+    baseCallbackName,
+    namingConfig,
+  );
+  _generateMinMethod(
+    buffer,
+    className,
+    baseCallbackName,
+    namingConfig,
+  );
+  _generateSumMethod(
+    buffer,
+    className,
+    baseCallbackName,
+    namingConfig,
+  );
+  _generateIncrementMethod(
+    buffer,
+    className,
+    valuesClassName,
+    baseCallbackName,
+    fields,
+    namingConfig,
+  );
+  _generateDecrementMethod(
+    buffer,
+    className,
+    valuesClassName,
+    baseCallbackName,
+    fields,
+    namingConfig,
+  );
+  _generateGetQueryBuilderMethod(
+    buffer,
+    className,
+    namingConfig,
+  );
+  _generateAssociateModelMethod(
+    buffer,
+    generatedClassName,
+    associations,
+  );
+
+  buffer.writeln('}');
+  buffer.writeln();
+
+  _generateClassValues(
+    buffer,
+    valuesClassName,
+    fields,
+    associations,
+    className: className,
+    generatedClassName: generatedClassName,
+    namingConfig: namingConfig,
+  );
+
+  // Conditionally generate ModelCreate class based on config
+  if (namingConfig.generateCreateClass) {
+    _generateClassCreate(
+      buffer,
+      createClassName,
+      fields,
+      associations,
+      namingConfig,
+    );
+    // Also generate Update class (same structure but without associations)
+    _generateClassUpdate(
+      buffer,
+      updateClassName,
+      fields,
+    );
+  }
+
+  _generateColumns(
+    buffer,
+    className,
+    fields,
+    namingConfig,
+  );
+  _generateQueryBuilder(
+    buffer,
+    className,
+    fields,
+    associations,
+    namingConfig,
+  );
+  _generateIncludeHelper(
+    buffer,
+    className,
+    associations,
+    namingConfig,
+  );
+
+  return buffer.toString();
+}
+
+/// Standalone API: generate code for a resolved `ClassElement` annotated with `@Table`
+/// without requiring a `BuildStep`.
+///
+/// Used by the analyzer-based CLI to generate `*.model.g.dart` directly.
+Future<String> generateSequelizeModelStandalone({
+  required ClassElement element,
+  required ConstantReader annotation,
+  required BuilderOptions options,
+  required InitializerSourceProvider initializerSourceProvider,
+}) {
+  return _generateForClassElement(
+    element,
+    annotation,
+    options,
+    initializerSourceProvider: initializerSourceProvider,
+  );
+}
+
 class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
   final BuilderOptions options;
 
@@ -68,188 +287,24 @@ class SequelizeModelGenerator extends GeneratorForAnnotation<Table> {
       );
     }
 
-    final className = element.name ?? 'Unknown';
-    final tableAnnotation = _extractTableAnnotation(annotation);
-
-    final fields = await _getFields(element, buildStep);
-    final associations = _getAssociations(element);
-    final namingConfig = GeneratorNamingConfig.fromOptions(options);
-    final generatedClassName = namingConfig.getModelClassName(className);
-    final valuesClassName = namingConfig.getModelValuesClassName(className);
-    final createClassName = namingConfig.getModelCreateClassName(className);
-    final updateClassName = namingConfig.getModelUpdateClassName(className);
-
-    final buffer = StringBuffer();
-
-    _generateClassDefinition(
-      buffer,
-      generatedClassName,
-      className,
-      namingConfig,
+    return _generateForClassElement(
+      element,
+      annotation,
+      options,
+      initializerSourceProvider: (field) async {
+        try {
+          final dynamic node = await buildStep.resolver.astNodeFor(
+            field.firstFragment,
+            resolve: true,
+          );
+          final dynamic initializer = node?.initializer;
+          return (initializer != null)
+              ? (initializer.toSource() as String)
+              : null;
+        } catch (_) {
+          return null;
+        }
+      },
     );
-    _generateDefineMethod(
-      buffer,
-      generatedClassName,
-      associations,
-    );
-    _generateGetAttributesMethod(
-      buffer,
-      fields,
-    );
-    _generateGetAttributesJsonMethod(buffer);
-    _generateGetOptionsJsonMethod(
-      buffer,
-      tableAnnotation,
-    );
-
-    final singularName =
-        (tableAnnotation['name']?['singular'] as String?) ??
-        _toCamelCase(className);
-    final pluralName =
-        (tableAnnotation['name']?['plural'] as String?) ??
-        _toCamelCase(className);
-
-    final baseCallbackName = namingConfig.getWhereCallbackName(
-      singular: singularName,
-      plural: pluralName,
-    );
-    final includeParamName = namingConfig.getIncludeCallbackName(
-      singular: singularName,
-      plural: pluralName,
-    );
-
-    _generateFindAllMethod(
-      buffer,
-      className,
-      valuesClassName,
-      baseCallbackName,
-      includeParamName,
-      namingConfig,
-    );
-    _generateFindOneMethod(
-      buffer,
-      className,
-      valuesClassName,
-      baseCallbackName,
-      includeParamName,
-      namingConfig,
-    );
-    _generateCreateMethod(
-      buffer,
-      className,
-      valuesClassName,
-      baseCallbackName,
-      includeParamName,
-      fields,
-      associations,
-      namingConfig,
-    );
-    _generateUpdateMethod(
-      buffer,
-      className,
-      baseCallbackName,
-      fields,
-      namingConfig,
-    );
-    _generateCountMethod(
-      buffer,
-      className,
-      baseCallbackName,
-      namingConfig,
-    );
-    _generateMaxMethod(
-      buffer,
-      className,
-      baseCallbackName,
-      namingConfig,
-    );
-    _generateMinMethod(
-      buffer,
-      className,
-      baseCallbackName,
-      namingConfig,
-    );
-    _generateSumMethod(
-      buffer,
-      className,
-      baseCallbackName,
-      namingConfig,
-    );
-    _generateIncrementMethod(
-      buffer,
-      className,
-      valuesClassName,
-      baseCallbackName,
-      fields,
-      namingConfig,
-    );
-    _generateDecrementMethod(
-      buffer,
-      className,
-      valuesClassName,
-      baseCallbackName,
-      fields,
-      namingConfig,
-    );
-    _generateGetQueryBuilderMethod(
-      buffer,
-      className,
-      namingConfig,
-    );
-    _generateAssociateModelMethod(
-      buffer,
-      generatedClassName,
-      associations,
-    );
-
-    buffer.writeln('}');
-    buffer.writeln();
-
-    _generateClassValues(
-      buffer,
-      valuesClassName,
-      fields,
-      associations,
-      className: className,
-      generatedClassName: generatedClassName,
-      namingConfig: namingConfig,
-    );
-    // Conditionally generate ModelCreate class based on config
-    if (namingConfig.generateCreateClass) {
-      _generateClassCreate(
-        buffer,
-        createClassName,
-        fields,
-        associations,
-        namingConfig,
-      );
-      // Also generate Update class (same structure but without associations)
-      _generateClassUpdate(
-        buffer,
-        updateClassName,
-        fields,
-      );
-    }
-    _generateColumns(
-      buffer,
-      className,
-      fields,
-      namingConfig,
-    );
-    _generateQueryBuilder(
-      buffer,
-      className,
-      fields,
-      associations,
-      namingConfig,
-    );
-    _generateIncludeHelper(
-      buffer,
-      className,
-      associations,
-      namingConfig,
-    );
-
-    return buffer.toString();
   }
 }

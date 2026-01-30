@@ -117,8 +117,11 @@ class ModelsRegistryBuilder implements Builder {
             );
 
             // Get the import path relative to lib/
-            final importPath = p.withoutExtension(
-              p.relative(assetId.path, from: 'lib'),
+            // IMPORTANT: Dart import URIs must use forward slashes, regardless of OS.
+            // `package:path` defaults to the host platform style, which is `\` on Windows.
+            final assetPathPosix = assetId.path.replaceAll('\\', '/');
+            final importPath = p.posix.withoutExtension(
+              p.posix.relative(assetPathPosix, from: 'lib'),
             );
 
             return _ModelInfo(
@@ -162,8 +165,9 @@ class ModelsRegistryBuilder implements Builder {
 
     // Generate imports
     for (final model in models) {
+      final importPathPosix = model.importPath.replaceAll('\\', '/');
       buffer.writeln(
-        "import 'package:${model.packageName}/${model.importPath}.dart';",
+        "import 'package:${model.packageName}/$importPathPosix.dart';",
       );
     }
     buffer.writeln();

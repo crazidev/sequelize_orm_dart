@@ -4,9 +4,17 @@ import { exists } from './fsUtil';
 import type { ResolvedConfig, SequelizeDartToolsConfig } from './types';
 
 const DEFAULT_CONFIG: ResolvedConfig = {
+  generator: {
+    mode: 'analyzerServer',
+  },
   buildRunner: {
     command: 'dart',
     args: ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+    extraArgs: [],
+  },
+  analyzerServer: {
+    command: 'dart',
+    args: ['run', 'sequelize_dart_generator:generate', '--server'],
     extraArgs: [],
   },
   model: {
@@ -25,6 +33,13 @@ function mergeConfig(user: SequelizeDartToolsConfig | undefined): ResolvedConfig
   const cfg: ResolvedConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
   if (!user) return cfg;
 
+  if (
+    user.generator?.mode === 'buildRunner' ||
+    user.generator?.mode === 'analyzerServer'
+  ) {
+    cfg.generator.mode = user.generator.mode;
+  }
+
   if (user.buildRunner?.command && typeof user.buildRunner.command === 'string') {
     cfg.buildRunner.command = user.buildRunner.command;
   }
@@ -33,6 +48,16 @@ function mergeConfig(user: SequelizeDartToolsConfig | undefined): ResolvedConfig
   }
   if (isStringArray(user.buildRunner?.extraArgs)) {
     cfg.buildRunner.extraArgs = user.buildRunner!.extraArgs!;
+  }
+
+  if (user.analyzerServer?.command && typeof user.analyzerServer.command === 'string') {
+    cfg.analyzerServer.command = user.analyzerServer.command;
+  }
+  if (isStringArray(user.analyzerServer?.args)) {
+    cfg.analyzerServer.args = user.analyzerServer!.args!;
+  }
+  if (isStringArray(user.analyzerServer?.extraArgs)) {
+    cfg.analyzerServer.extraArgs = user.analyzerServer!.extraArgs!;
   }
 
   if (isStringArray(user.model?.includeGlobs)) {

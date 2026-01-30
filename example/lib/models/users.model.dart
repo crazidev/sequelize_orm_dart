@@ -15,13 +15,14 @@ abstract class Users {
   DataType email = DataType.STRING;
 
   @ColumnName('first_name')
+  @Validate.Min(4)
   @NotNull()
   DataType firstName = DataType.STRING;
 
   @ColumnName('last_name')
   DataType lastName = DataType.STRING;
 
-  @HasOne(Post, foreignKey: 'userId', as: 'post')
+  @HasOne(Post, foreignKey: 'user_id', as: 'post')
   Post? post;
 
   @HasMany(Post, foreignKey: 'userId', as: 'posts')

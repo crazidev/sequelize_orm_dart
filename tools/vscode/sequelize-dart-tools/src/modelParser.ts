@@ -8,7 +8,9 @@ export function getExpectedGeneratedBasenameFromPartDirective(
   text: string,
 ): string | undefined {
   // Example: part 'users.model.g.dart';
-  const m = /part\s+['"]([^'"]+\.model\.g\.dart)['"]\s*;/.exec(text);
+  // Be permissive about the exact basename, but restrict to `*.g.dart` since
+  // model files may have other `part` directives unrelated to codegen.
+  const m = /^\s*part\s+['"]([^'"]+\.g\.dart)['"]\s*;\s*$/m.exec(text);
   return m?.[1];
 }
 

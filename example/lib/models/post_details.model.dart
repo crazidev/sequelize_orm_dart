@@ -6,7 +6,7 @@ part 'post_details.model.g.dart';
   tableName: 'post_details',
   underscored: true,
 )
-abstract class PostDetails {
+ abstract class PostDetails {
   @ColumnDefinition(
     name: 'id',
     type: DataType.INTEGER,
@@ -14,18 +14,6 @@ abstract class PostDetails {
     autoIncrement: true,
   )
   dynamic id;
-
-  @ColumnDefinition(
-    name: 'post_id',
-    type: DataType.INTEGER,
-  )
-  dynamic postId;
-
-  @ColumnDefinition(
-    name: 'views',
-    type: DataType.INTEGER,
-  )
-  dynamic views;
 
   @ColumnDefinition(
     name: 'likes',

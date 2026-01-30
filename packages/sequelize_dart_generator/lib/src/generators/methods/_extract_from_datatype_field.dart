@@ -2,7 +2,7 @@ part of '../../sequelize_model_generator.dart';
 
 Future<_FieldInfo?> _extractFromDataTypeField(
   FieldElement field,
-  BuildStep buildStep,
+  InitializerSourceProvider initializerSourceProvider,
   TypeChecker primaryKeyChecker,
   TypeChecker autoIncrementChecker,
   TypeChecker notNullChecker,
@@ -39,60 +39,38 @@ Future<_FieldInfo?> _extractFromDataTypeField(
   // If the field is not const, try to get the constant value from the initializer
   if (constantValue == null) {
     try {
-      final dynamic node = await buildStep.resolver.astNodeFor(
-        field.firstFragment,
-        resolve: true,
-      );
-      if (node != null) {
-        // We use dynamic access here to avoid issues with VariableDeclaration type promotion/imports
-        try {
-          final dynamic initializer = node.initializer;
-          if (initializer != null) {
-            final String source = initializer.toSource() as String;
-            // Extract the DataType from DataType.XXX or DataType.XXX_method(params)
-            if (source.contains('DataType.')) {
-              // Match patterns like:
-              // - DataType.STRING
-              // - DataType.TINYINT_length(2)
-              // - DataType.DECIMAL_precision(10, 2)
-              final match = RegExp(
-                r'DataType\.([a-zA-Z0-9_]+)\s*(\([^)]*\))?',
-              ).firstMatch(source);
-              if (match != null) {
-                final typeName = match.group(1)!;
-                final params = match.group(2);
+      final String? source = await initializerSourceProvider(field);
+      if (source != null && source.contains('DataType.')) {
+        // Match patterns like:
+        // - DataType.STRING
+        // - DataType.TINYINT_length(2)
+        // - DataType.DECIMAL_precision(10, 2)
+        final match = RegExp(
+          r'DataType\.([a-zA-Z0-9_]+)\s*(\([^)]*\))?',
+        ).firstMatch(source);
+        if (match != null) {
+          final typeName = match.group(1)!;
+          final params = match.group(2);
 
-                // Match patterns like:
-                // - DataType.STRING
-                // - DataType.INTEGER(10)
-                // - DataType.DECIMAL(10, 2)
-                if (params != null) {
-                  // Extract parameters (e.g., "10" from "(10)")
-                  final paramValues = params.substring(1, params.length - 1);
-
-                  // Handle both legacy DataType.INTEGER_length(10) and new DataType.INTEGER(10)
-                  final baseType = typeName.split('_')[0];
-                  dataType = '$baseType($paramValues)';
-                } else {
-                  dataType = typeName;
-                }
-              }
-
-              // Extract chained properties from source like .UNSIGNED.ZEROFILL
-              if (source.contains('.UNSIGNED')) unsigned = true;
-              if (source.contains('.ZEROFILL')) zerofill = true;
-              if (source.contains('.BINARY')) binary = true;
-
-              // Handle TEXT variants from getters like .long, .medium, .tiny
-              if (dataType == 'TEXT') {
-                if (source.contains('.tiny')) dataType = "TEXT('tiny')";
-                if (source.contains('.medium')) dataType = "TEXT('medium')";
-                if (source.contains('.long')) dataType = "TEXT('long')";
-              }
-            }
+          if (params != null) {
+            final paramValues = params.substring(1, params.length - 1);
+            final baseType = typeName.split('_')[0];
+            dataType = '$baseType($paramValues)';
+          } else {
+            dataType = typeName;
           }
-        } catch (e) {
-          // The node might not be a VariableDeclaration
+        }
+
+        // Extract chained properties from source like .UNSIGNED.ZEROFILL
+        if (source.contains('.UNSIGNED')) unsigned = true;
+        if (source.contains('.ZEROFILL')) zerofill = true;
+        if (source.contains('.BINARY')) binary = true;
+
+        // Handle TEXT variants from getters like .long, .medium, .tiny
+        if (dataType == 'TEXT') {
+          if (source.contains('.tiny')) dataType = "TEXT('tiny')";
+          if (source.contains('.medium')) dataType = "TEXT('medium')";
+          if (source.contains('.long')) dataType = "TEXT('long')";
         }
       }
     } catch (e) {
