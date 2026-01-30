@@ -5,8 +5,7 @@ import 'package:sequelize_dart_example/models/post.model.dart';
 import 'package:sequelize_dart_example/models/post_details.model.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 
-const connectionString =
-    'postgresql://postgres:postgres@localhost:5432/postgres';
+const connectionString = 'mysql://root@localhost:3306/sequelize_dart';
 
 /// Benchmark results holder
 class BenchmarkResult {
@@ -62,7 +61,7 @@ Future<void> main() async {
   final initStopwatch = Stopwatch()..start();
 
   final sequelize = Sequelize().createInstance(
-    connection: PostgressConnection(url: connectionString),
+    connection: MysqlConnection(url: connectionString),
   );
 
   await sequelize.initialize(

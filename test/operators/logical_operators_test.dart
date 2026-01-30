@@ -32,17 +32,17 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" = 1'),
-        reason: 'SQL should contain "id" = 1',
+        containsSql('id = 1'),
+        reason: 'SQL should contain id = 1',
       );
       expect(
         lastSql,
-        contains('"email" = \'test@example.com\''),
-        reason: 'SQL should contain "email" = \'test@example.com\'',
+        containsSql("email = 'test@example.com'"),
+        reason: "SQL should contain email = 'test@example.com'",
       );
       expect(
         lastSql,
-        contains('AND'),
+        containsSql('AND'),
         reason: 'SQL should contain AND',
       );
     });
@@ -57,17 +57,17 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" = 1'),
-        reason: 'SQL should contain "id" = 1',
+        containsSql('id = 1'),
+        reason: 'SQL should contain id = 1',
       );
       expect(
         lastSql,
-        contains('"id" = 2'),
-        reason: 'SQL should contain "id" = 2',
+        containsSql('id = 2'),
+        reason: 'SQL should contain id = 2',
       );
       expect(
         lastSql,
-        contains('OR'),
+        containsSql('OR'),
         reason: 'SQL should contain OR',
       );
     });
@@ -81,7 +81,7 @@ void main() {
 
       expect(
         lastSql,
-        contains('NOT'),
+        containsSql('NOT'),
         reason: 'SQL should contain NOT',
       );
     });
@@ -102,12 +102,12 @@ void main() {
 
       expect(
         lastSql,
-        contains('OR'),
+        containsSql('OR'),
         reason: 'SQL should contain OR',
       );
       expect(
         lastSql,
-        contains('AND'),
+        containsSql('AND'),
         reason: 'SQL should contain AND',
       );
     });
@@ -125,12 +125,12 @@ void main() {
 
       expect(
         lastSql,
-        contains('AND'),
+        containsSql('AND'),
         reason: 'SQL should contain AND',
       );
       expect(
         lastSql,
-        contains('OR'),
+        containsSql('OR'),
         reason: 'SQL should contain OR',
       );
     });

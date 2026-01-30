@@ -8,6 +8,7 @@ void main() {
   group('Include Query Tests', () {
     setUpAll(() async {
       await initTestEnvironment();
+      await seedInitialData();
     });
 
     tearDownAll(() async {
@@ -28,7 +29,7 @@ void main() {
 
       expect(users, isNotEmpty);
       expect(lastSql, isNotNull);
-      expect(lastSql, contains('SELECT'));
+      expect(lastSql, containsSql('SELECT'));
       // Verify that include was processed
       expect(selectQueries.length, greaterThan(0));
     });
@@ -62,7 +63,7 @@ void main() {
       expect(users, isNotEmpty);
       // Verify that where clause was included in the query
       final sql = selectQueries.last;
-      expect(sql, contains('WHERE'));
+      expect(sql, containsSql('WHERE'));
     });
 
     test('Include with required (INNER JOIN)', () async {
@@ -75,7 +76,7 @@ void main() {
       expect(users, isNotEmpty);
       // With required: true, should use INNER JOIN
       final sql = selectQueries.first;
-      expect(sql.contains('INNER JOIN') || sql.contains('JOIN'), isTrue);
+      expect(sql, anyOf(containsSql('INNER JOIN'), containsSql('JOIN')));
     });
 
     test('Include with pagination (limit and offset)', () async {
@@ -93,7 +94,7 @@ void main() {
       expect(users, isNotEmpty);
       // Verify limit was applied
       final sql = selectQueries.last;
-      expect(sql.contains('LIMIT') || sql.contains('limit'), isTrue);
+      expect(sql, containsSql('LIMIT'));
     });
 
     test('Include with ordering', () async {
@@ -112,7 +113,7 @@ void main() {
       expect(users, isNotEmpty);
       // Verify order was applied
       final sql = selectQueries.last;
-      expect(sql.contains('ORDER BY') || sql.contains('order'), isTrue);
+      expect(sql, containsSql('ORDER BY'));
     });
 
     test('HasOne association include', () async {

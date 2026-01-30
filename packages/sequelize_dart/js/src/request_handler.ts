@@ -17,6 +17,7 @@ import { handleIncrement } from './handlers/increment';
 import { handleDecrement } from './handlers/decrement';
 import { handleUpdate } from './handlers/update';
 import { handleSave } from './handlers/save';
+import { handleSync } from './handlers/sync';
 
 export type JsonRpcRequest = {
   id: unknown;
@@ -106,6 +107,10 @@ export async function processRequest(
 
       case 'save':
         result = await handleSave(params);
+        break;
+
+      case 'sync':
+        result = await handleSync(params);
         break;
 
       case 'close':

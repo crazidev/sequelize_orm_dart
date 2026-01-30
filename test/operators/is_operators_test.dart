@@ -26,7 +26,7 @@ void main() {
 
       expect(
         lastSql,
-        contains('IS NULL'),
+        containsSql('IS NULL'),
         reason: 'SQL should contain IS NULL',
       );
     });
@@ -36,7 +36,7 @@ void main() {
 
       expect(
         lastSql,
-        contains('IS NOT NULL'),
+        containsSql('IS NOT NULL'),
         reason: 'SQL should contain IS NOT NULL',
       );
     });

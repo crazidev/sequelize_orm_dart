@@ -305,7 +305,7 @@ class BridgeClient implements BridgeClientInterface {
             );
           } else {
             completer.completeError(
-              BridgeException(errorMessage, code: errorCode, stack: errorStack),
+              BridgeException(error?.toString() ?? 'Unknown error'),
             );
           }
         } else {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:test/test.dart';
@@ -28,12 +30,12 @@ void main() {
 
       expect(
         lastSql,
-        contains('LIKE'),
+        containsSql('LIKE'),
         reason: 'SQL should contain LIKE',
       );
       expect(
         lastSql,
-        contains('%@example.com'),
+        containsSql('%@example.com'),
         reason: 'SQL should contain the pattern',
       );
     });
@@ -45,7 +47,7 @@ void main() {
 
       expect(
         lastSql,
-        contains('NOT LIKE \'%@spam.com\''),
+        containsSql("NOT LIKE '%@spam.com'"),
         reason: 'SQL should contain NOT LIKE',
       );
     });
@@ -57,7 +59,7 @@ void main() {
 
       expect(
         lastSql,
-        contains('LIKE \'admin%\''),
+        containsSql("LIKE 'admin%'"),
         reason: 'SQL should contain LIKE for startsWith',
       );
     });
@@ -69,7 +71,7 @@ void main() {
 
       expect(
         lastSql,
-        contains('LIKE \'%.com\''),
+        containsSql("LIKE '%.com'"),
         reason: 'SQL should contain LIKE for endsWith',
       );
     });
@@ -81,36 +83,39 @@ void main() {
 
       expect(
         lastSql,
-        contains('LIKE \'%example%\''),
+        containsSql("LIKE '%example%'"),
         reason: 'SQL should contain LIKE for substring',
       );
     });
 
-    test('iLike produces WHERE "column" ILIKE pattern (PostgreSQL)', () async {
+    test('iLike produces correct SQL', () async {
       await Users.model.findAll(
         where: (user) => user.email.iLike('%@EXAMPLE.COM'),
       );
 
-      expect(
-        lastSql,
-        contains('ILIKE \'%@EXAMPLE.COM\''),
-        reason: 'SQL should contain ILIKE for case-insensitive match',
-      );
+      final dbType =
+          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        expect(lastSql, containsSql("LIKE '%@EXAMPLE.COM'"));
+      } else {
+        expect(lastSql, containsSql("ILIKE '%@EXAMPLE.COM'"));
+      }
     });
 
-    test(
-      'notILike produces WHERE "column" NOT ILIKE pattern (PostgreSQL)',
-      () async {
-        await Users.model.findAll(
-          where: (user) => user.email.notILike('%@SPAM.COM'),
-        );
+    test('notILike produces correct SQL', () async {
+      await Users.model.findAll(
+        where: (user) => user.email.notILike('%@SPAM.COM'),
+      );
 
-        expect(
-          lastSql,
-          contains('NOT ILIKE \'%@SPAM.COM\''),
-          reason: 'SQL should contain NOT ILIKE',
-        );
-      },
-    );
+      final dbType =
+          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        expect(lastSql, containsSql("NOT LIKE '%@SPAM.COM'"));
+      } else {
+        expect(lastSql, containsSql("NOT ILIKE '%@SPAM.COM'"));
+      }
+    });
   });
 }

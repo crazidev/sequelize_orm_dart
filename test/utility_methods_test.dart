@@ -34,12 +34,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('count(*)'),
+        containsSql('count(*)'),
         reason: 'SQL should contain count(*)',
       );
       expect(
         lastSql,
-        contains('WHERE'),
+        containsSql('WHERE'),
         reason: 'SQL should contain WHERE clause',
       );
     });
@@ -61,12 +61,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('max('),
+        containsSql('max('),
         reason: 'SQL should contain max() function',
       );
       expect(
         lastSql,
-        contains('WHERE'),
+        containsSql('WHERE'),
         reason: 'SQL should contain WHERE clause',
       );
     });
@@ -88,12 +88,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('min('),
+        containsSql('min('),
         reason: 'SQL should contain min() function',
       );
       expect(
         lastSql,
-        contains('WHERE'),
+        containsSql('WHERE'),
         reason: 'SQL should contain WHERE clause',
       );
     });
@@ -115,12 +115,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('sum('),
+        containsSql('sum('),
         reason: 'SQL should contain sum() function',
       );
       expect(
         lastSql,
-        contains('WHERE'),
+        containsSql('WHERE'),
         reason: 'SQL should contain WHERE clause',
       );
     });

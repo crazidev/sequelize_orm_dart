@@ -27,8 +27,8 @@ void main() {
       await Users.model.findAll(where: (user) => user.id.eq(1));
       expect(
         lastSql,
-        contains('"id" = 1'),
-        reason: 'SQL should contain "id" = 1',
+        containsSql('id = 1'),
+        reason: 'SQL should contain id = 1',
       );
 
       clearCapturedSql();
@@ -39,8 +39,8 @@ void main() {
       );
       expect(
         lastSql,
-        contains('"email" = \'test@example.com\''),
-        reason: 'SQL should contain "email" = \'test@example.com\'',
+        containsSql("email = 'test@example.com'"),
+        reason: "SQL should contain email = 'test@example.com'",
       );
     });
 
@@ -49,8 +49,8 @@ void main() {
       await Users.model.findAll(where: (user) => user.id.ne(1));
       expect(
         lastSql,
-        contains('"id" != 1'),
-        reason: 'SQL should contain "id" != 1',
+        containsSql('id != 1'),
+        reason: 'SQL should contain id != 1',
       );
 
       clearCapturedSql();
@@ -61,8 +61,8 @@ void main() {
       );
       expect(
         lastSql,
-        contains('"email" != \'test@example.com\''),
-        reason: 'SQL should contain "email" != \'test@example.com\'',
+        containsSql("email != 'test@example.com'"),
+        reason: "SQL should contain email != 'test@example.com'",
       );
     });
 
@@ -76,15 +76,15 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" != 0'),
-        reason: 'SQL should contain "id" != 0',
+        containsSql('id != 0'),
+        reason: 'SQL should contain id != 0',
       );
       expect(
         lastSql,
-        contains('"email" = \'admin@example.com\''),
-        reason: 'SQL should contain "email" = \'admin@example.com\'',
+        containsSql("email = 'admin@example.com'"),
+        reason: "SQL should contain email = 'admin@example.com'",
       );
-      expect(lastSql, contains('AND'), reason: 'SQL should contain AND');
+      expect(lastSql, containsSql('AND'), reason: 'SQL should contain AND');
     });
   });
 }

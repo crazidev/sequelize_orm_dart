@@ -37,5 +37,11 @@ abstract class SequelizeInterface {
 
   void addModels(List<Model> models);
 
+  /// Synchronize all models in the database.
+  ///
+  /// If [force] is true, tables will be dropped and recreated.
+  /// If [alter] is true, tables will be altered to match the model definition.
+  Future<void> sync({bool force = false, bool alter = false});
+
   Future<void> close();
 }

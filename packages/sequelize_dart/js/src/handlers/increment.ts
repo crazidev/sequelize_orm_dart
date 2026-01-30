@@ -26,31 +26,30 @@ export async function handleIncrement(params: IncrementParams): Promise<ModelRes
   }
 
   const result = await model.increment(fields, options);
-  
-  // Increment returns [affectedRows, affectedCount] where affectedRows can be:
-  // - Array of Model instances (PostgreSQL with RETURNING)
-  // - Array containing an array of plain objects [[{...}]]
-  // We need to handle both cases
+
+  // result is typically [affectedRows, affectedCount]
+  if (!result || !Array.isArray(result)) {
+    return [];
+  }
+
   let rows = result[0];
-  
+
+  // If rows is an affected count (number/bigint/null), MySQL doesn't return updated rows (expected).
+  // Returning [] keeps the bridge JSON-safe (BigInt cannot be JSON-stringified).
+  if (rows === null || rows === undefined || typeof rows === 'number' || typeof rows === 'bigint') {
+    return [];
+  }
+
   // If first element is an array, unwrap it (some dialects wrap results)
   if (Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])) {
     rows = rows[0];
   }
-  
-  // Check if we have Model instances or plain objects
-  if (rows.length > 0 && typeof rows[0]?.toJSON === 'function') {
-    // Model instances - use the standard converter
-    return toModelResponseArray(rows);
+
+  // Ensure rows is an array for mapping
+  if (!Array.isArray(rows)) {
+    rows = [rows];
   }
-  
-  // Plain objects - wrap them in the response format
-  // TODO: Enable isNewRecord, changed & previous
-  return rows.map((row: any) => ({
-    data: row,
-    // previous: {},
-    // changed: false,
-    // isNewRecord: false,
-  }));
+
+  return toModelResponseArray(rows);
 }
 

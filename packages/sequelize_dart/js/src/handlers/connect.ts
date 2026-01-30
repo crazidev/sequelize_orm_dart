@@ -10,7 +10,12 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
   const config = params.config;
   const { logging, dialect, pool, hoistIncludeOptions, ...sequelizeConfig } = config;
 
-  setOptions({ hoistIncludeOptions: !!hoistIncludeOptions });
+  const normalizedDialect = typeof dialect === 'string' ? dialect.toLowerCase() : 'postgres';
+
+  setOptions({
+    hoistIncludeOptions: !!hoistIncludeOptions,
+    dialect: normalizedDialect,
+  });
 
   const poolConfig: any = {};
 
@@ -44,7 +49,75 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
 
   const sequelize = new Sequelize(sequelizeOptions);
 
-  await sequelize.authenticate();
+  function isUnknownDatabaseError(err: any): boolean {
+    const original = err?.original ?? err?.parent ?? err;
+    const errno = original?.errno ?? original?.errno;
+    const code = original?.code;
+    return errno === 1049 || code === 'ER_BAD_DB_ERROR';
+  }
+
+  async function tryCreateDatabaseIfMissing(): Promise<boolean> {
+    if (normalizedDialect !== 'mysql' && normalizedDialect !== 'mariadb') return false;
+
+    const dbName =
+      typeof sequelizeConfig.database === 'string'
+        ? sequelizeConfig.database
+        : typeof sequelizeConfig.url === 'string'
+          ? (() => {
+              try {
+                const u = new URL(sequelizeConfig.url);
+                const name = u.pathname?.replace(/^\//, '') ?? '';
+                return name || undefined;
+              } catch {
+                return undefined;
+              }
+            })()
+          : undefined;
+
+    if (!dbName) return false;
+
+    let adminOptions: any = { ...sequelizeOptions };
+
+    if (typeof sequelizeConfig.url === 'string') {
+      try {
+        const u = new URL(sequelizeConfig.url);
+        u.pathname = '/';
+        u.search = '';
+        u.hash = '';
+        adminOptions = { ...adminOptions, url: u.toString() };
+      } catch {
+        // fall back to clearing database below
+      }
+    }
+
+    // If we were using discrete connection params, clear database to connect without selecting one.
+    adminOptions.database = undefined;
+
+    const adminSequelize = new Sequelize(adminOptions);
+    try {
+      await adminSequelize.authenticate();
+      // Use identifier quoting to avoid injection/invalid names
+      await adminSequelize.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+      return true;
+    } finally {
+      await adminSequelize.close().catch(() => undefined);
+    }
+  }
+
+  try {
+    await sequelize.authenticate();
+  } catch (err: any) {
+    if (isUnknownDatabaseError(err)) {
+      const created = await tryCreateDatabaseIfMissing();
+      if (created) {
+        await sequelize.authenticate();
+      } else {
+        throw err;
+      }
+    } else {
+      throw err;
+    }
+  }
 
   setSequelize(sequelize);
 

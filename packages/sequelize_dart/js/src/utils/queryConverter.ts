@@ -218,10 +218,20 @@ export function convertWhereClause(where: any): any {
               converted[Op.substring] = convertedValue;
               break;
             case '$ilike':
-              converted[Op.iLike] = convertedValue;
+              // Postgres supports ILIKE. MySQL/MariaDB don't, so fall back to LIKE (collation controls case-sensitivity).
+              if (getOptions().dialect === 'postgres') {
+                converted[Op.iLike] = convertedValue;
+              } else {
+                converted[Op.like] = convertedValue;
+              }
               break;
             case '$notILike':
-              converted[Op.notILike] = convertedValue;
+              // Postgres supports NOT ILIKE. MySQL/MariaDB don't, so fall back to NOT LIKE.
+              if (getOptions().dialect === 'postgres') {
+                converted[Op.notILike] = convertedValue;
+              } else {
+                converted[Op.notLike] = convertedValue;
+              }
               break;
             case '$regexp':
               converted[Op.regexp] = convertedValue;
@@ -230,10 +240,20 @@ export function convertWhereClause(where: any): any {
               converted[Op.notRegexp] = convertedValue;
               break;
             case '$iRegexp':
-              converted[Op.iRegexp] = convertedValue;
+              // Postgres supports case-insensitive regexp (~*). MySQL/MariaDB don't, so fall back to REGEXP.
+              if (getOptions().dialect === 'postgres') {
+                converted[Op.iRegexp] = convertedValue;
+              } else {
+                converted[Op.regexp] = convertedValue;
+              }
               break;
             case '$notIRegexp':
-              converted[Op.notIRegexp] = convertedValue;
+              // Postgres supports case-insensitive regexp (!~*). MySQL/MariaDB don't, so fall back to NOT REGEXP.
+              if (getOptions().dialect === 'postgres') {
+                converted[Op.notIRegexp] = convertedValue;
+              } else {
+                converted[Op.notRegexp] = convertedValue;
+              }
               break;
             case '$col':
               converted[Op.col] = convertedValue;

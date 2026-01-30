@@ -26,8 +26,8 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" > 10'),
-        reason: 'SQL should contain "id" > 10',
+        containsSql('id > 10'),
+        reason: 'SQL should contain id > 10',
       );
     });
 
@@ -36,8 +36,8 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" >= 10'),
-        reason: 'SQL should contain "id" >= 10',
+        containsSql('id >= 10'),
+        reason: 'SQL should contain id >= 10',
       );
     });
 
@@ -46,8 +46,8 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" < 10'),
-        reason: 'SQL should contain "id" < 10',
+        containsSql('id < 10'),
+        reason: 'SQL should contain id < 10',
       );
     });
 
@@ -56,8 +56,8 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" <= 10'),
-        reason: 'SQL should contain "id" <= 10',
+        containsSql('id <= 10'),
+        reason: 'SQL should contain id <= 10',
       );
     });
 

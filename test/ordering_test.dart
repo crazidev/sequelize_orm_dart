@@ -10,6 +10,7 @@ void main() {
   group('Ordering Queries', () {
     setUpAll(() async {
       await initTestEnvironment();
+      await seedInitialData();
     });
 
     tearDownAll(() async {
@@ -27,8 +28,8 @@ void main() {
         ],
       );
 
-      expect(lastSql, contains('ORDER BY'));
-      expect(lastSql, contains('"id" DESC'));
+      expect(lastSql, containsSql('ORDER BY'));
+      expect(lastSql, containsSql('id DESC'));
     });
 
     test('should order by Sequelize.fn', () async {
@@ -37,7 +38,7 @@ void main() {
         group: ['id'], // Grouping required for aggregate function in order
       );
 
-      expect(lastSql, contains('ORDER BY max("id")'));
+      expect(lastSql, containsSql('ORDER BY max(id)'));
     });
 
     test('should order by Sequelize.fn with direction', () async {
@@ -48,7 +49,7 @@ void main() {
         group: ['id'],
       );
 
-      expect(lastSql, contains('ORDER BY max("id") DESC'));
+      expect(lastSql, containsSql('ORDER BY max(id) DESC'));
     });
 
     test('should order by included model column', () async {
@@ -59,7 +60,7 @@ void main() {
         ],
       );
 
-      expect(lastSql, contains('ORDER BY "post"."id" DESC'));
+      expect(lastSql, containsSql('ORDER BY post.id DESC'));
     });
 
     test('should combined multiple order clauses', () async {
@@ -74,10 +75,10 @@ void main() {
         group: ['Users.id', 'post.id'], // Fix ambiguity and satisfy aggregate
       );
 
-      expect(lastSql, contains('ORDER BY'));
-      expect(lastSql, contains('max("Users"."id")'));
-      expect(lastSql, contains('max("Users"."id") DESC'));
-      expect(lastSql, contains('"post"."id" DESC'));
+      expect(lastSql, containsSql('ORDER BY'));
+      expect(lastSql, containsSql('max(Users.id)'));
+      expect(lastSql, containsSql('max(Users.id) DESC'));
+      expect(lastSql, containsSql('post.id DESC'));
     });
 
     test(
@@ -88,8 +89,8 @@ void main() {
         clearCapturedSql();
 
         final hoistSequelize = Sequelize().createInstance(
-          connection: PostgressConnection(
-            url: testConnectionString,
+          connection: PostgresConnection(
+            url: postgresUrl,
             hoistIncludeOptions: true,
           ),
           logging: (String sql) {
@@ -112,7 +113,7 @@ void main() {
         );
 
         // When hoisted, the order from include should be in the main query
-        expect(lastSql, contains('ORDER BY "post"."id" DESC'));
+        expect(lastSql, containsSql('ORDER BY post.id DESC'));
 
         await hoistSequelize.close();
 

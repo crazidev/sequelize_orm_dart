@@ -9,7 +9,7 @@ const connectionString =
 Future<void> main() async {
   // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
-    connection: SequelizeConnection.mysql(url: connectionString),
+    connection: SequelizeConnection.postgres(url: connectionString),
     logging: (sql) => SqlFormatter.printFormatted(
       sql,
       colorScheme: SqlFormatterColors.redTheme,

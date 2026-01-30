@@ -10,14 +10,14 @@
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.47",
-    "@sequelize/postgres": "^7.0.0-alpha.47",
-    "@sequelize/mysql": "^7.0.0-alpha.47",
     "@sequelize/mariadb": "^7.0.0-alpha.47",
+    "@sequelize/mysql": "^7.0.0-alpha.47",
+    "@sequelize/postgres": "^7.0.0-alpha.47",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
+    "@types/node": "^20.10.6",
     "esbuild": "^0.19.0",
-    "typescript": "^5.3.3",
-    "@types/node": "^20.10.6"
+    "typescript": "^5.3.3"
   }
 }

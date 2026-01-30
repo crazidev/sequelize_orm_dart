@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
 import 'package:test/test.dart';
@@ -22,55 +24,65 @@ void main() {
   });
 
   group('Regex Operators', () {
-    test('regexp produces WHERE "column" ~ pattern (PostgreSQL)', () async {
+    test('regexp produces correct SQL', () async {
       await Users.model.findAll(
         where: (user) => user.email.regexp('^admin'),
       );
 
-      expect(
-        lastSql,
-        contains('~'),
-        reason: 'SQL should contain ~ for PostgreSQL regex',
-      );
+      final dbType =
+          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        expect(lastSql, containsSql('REGEXP'));
+      } else {
+        expect(lastSql, containsSql('~'));
+      }
     });
 
-    test('notRegexp produces WHERE "column" !~ pattern (PostgreSQL)', () async {
+    test('notRegexp produces correct SQL', () async {
       await Users.model.findAll(
         where: (user) => user.email.notRegexp('^spam'),
       );
 
-      expect(
-        lastSql,
-        contains('!~'),
-        reason: 'SQL should contain !~ for PostgreSQL not regex',
-      );
+      final dbType =
+          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        expect(lastSql, containsSql('NOT REGEXP'));
+      } else {
+        expect(lastSql, containsSql('!~'));
+      }
     });
 
-    test('iRegexp produces WHERE "column" ~* pattern (PostgreSQL)', () async {
+    test('iRegexp produces correct SQL', () async {
+      // In MySQL, REGEXP is usually case-insensitive depending on collation
       await Users.model.findAll(
         where: (user) => user.email.iRegexp('^ADMIN'),
       );
 
-      expect(
-        lastSql,
-        contains('~*'),
-        reason: 'SQL should contain ~* for case-insensitive regex',
-      );
+      final dbType =
+          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        expect(lastSql, containsSql('REGEXP'));
+      } else {
+        expect(lastSql, containsSql('~*'));
+      }
     });
 
-    test(
-      'notIRegexp produces WHERE "column" !~* pattern (PostgreSQL)',
-      () async {
-        await Users.model.findAll(
-          where: (user) => user.email.notIRegexp('^SPAM'),
-        );
+    test('notIRegexp produces correct SQL', () async {
+      await Users.model.findAll(
+        where: (user) => user.email.notIRegexp('^SPAM'),
+      );
 
-        expect(
-          lastSql,
-          contains('!~*'),
-          reason: 'SQL should contain !~* for case-insensitive not regex',
-        );
-      },
-    );
+      final dbType =
+          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        expect(lastSql, containsSql('NOT REGEXP'));
+      } else {
+        expect(lastSql, containsSql('!~*'));
+      }
+    });
   });
 }

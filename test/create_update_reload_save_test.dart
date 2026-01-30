@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:sequelize_dart_example/models/post.model.dart';
 import 'package:sequelize_dart_example/models/users.model.dart';
@@ -74,19 +76,26 @@ void main() {
         reason: 'increment() should return PostValues instance',
       );
       expect(
-        newUser.post?.views,
-        equals(6),
-        reason: 'Post views should be incremented to 6',
-      );
-      expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
       expect(
         lastSql,
-        contains('views'),
+        containsSql('views'),
         reason: 'SQL should contain views field',
+      );
+
+      final dbType = Platform.environment['DB_TYPE']?.toLowerCase();
+      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+      if (isMysqlFamily) {
+        await newUser.post?.reload();
+      }
+
+      expect(
+        newUser.post?.views,
+        equals(6),
+        reason: 'Post views should be incremented to 6',
       );
     });
 
@@ -152,21 +161,25 @@ void main() {
             where: (p) => p.id.eq(post.id),
           );
 
-          expect(
-            updatedPost,
-            isA<List<PostValues>>(),
-            reason: 'increment() should return list of PostValues',
-          );
-          expect(
-            updatedPost.isNotEmpty,
-            isTrue,
-            reason: 'increment() should return at least one result',
-          );
+          final dbType = Platform.environment['DB_TYPE']?.toLowerCase();
+          final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
+          if (!isMysqlFamily) {
+            expect(
+              updatedPost,
+              isA<List<PostValues>>(),
+              reason: 'increment() should return list of PostValues',
+            );
+            expect(
+              updatedPost.isNotEmpty,
+              isTrue,
+              reason: 'increment() should return at least one result',
+            );
+          }
         }
 
         expect(
           lastSql,
-          contains('UPDATE'),
+          containsSql('UPDATE'),
           reason: 'SQL should contain UPDATE statement',
         );
       },
@@ -224,7 +237,7 @@ void main() {
         );
         expect(
           lastSql,
-          contains('UPDATE'),
+          containsSql('UPDATE'),
           reason: 'SQL should contain UPDATE statement for post',
         );
 
@@ -254,7 +267,7 @@ void main() {
         );
         expect(
           lastSql,
-          contains('UPDATE'),
+          containsSql('UPDATE'),
           reason: 'SQL should contain UPDATE statement for user',
         );
 
@@ -334,12 +347,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
 
@@ -446,7 +459,7 @@ void main() {
       // The actual UPDATE happens in the static method
       expect(
         lastSql,
-        contains('SELECT'),
+        containsSql('SELECT'),
         reason: 'SQL should contain SELECT statement from reload',
       );
 
@@ -508,7 +521,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('SELECT'),
+        containsSql('SELECT'),
         reason: 'SQL should contain SELECT statement',
       );
     });
@@ -603,7 +616,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('INSERT'),
+        containsSql('INSERT'),
         reason: 'SQL should contain INSERT statement for new record',
       );
     });
@@ -633,7 +646,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement for existing record',
       );
 
@@ -715,7 +728,7 @@ void main() {
         // So we check for either UPDATE or SELECT (from reload)
         expect(
           lastSql,
-          anyOf(contains('UPDATE'), contains('SELECT')),
+          anyOf(containsSql('UPDATE'), containsSql('SELECT')),
           reason: 'SQL should contain UPDATE or SELECT statement',
         );
       },

@@ -3,8 +3,9 @@ import Sequelize, { ModelStatic } from "@sequelize/core";
 let sequelize: Sequelize | null = null;
 const models = new Map<string, ModelStatic>();
 
-let options: { hoistIncludeOptions: boolean } = {
+let options: { hoistIncludeOptions: boolean; dialect: string } = {
   hoistIncludeOptions: false,
+  dialect: 'postgres',
 };
 
 // Notification callback for SQL logging
@@ -21,11 +22,13 @@ export function sendNotification(notification: any): void {
   }
 }
 
-export function getOptions(): { hoistIncludeOptions: boolean } {
+export function getOptions(): { hoistIncludeOptions: boolean; dialect: string } {
   return options;
 }
 
-export function setOptions(newOptions: Partial<{ hoistIncludeOptions: boolean }>): void {
+export function setOptions(
+  newOptions: Partial<{ hoistIncludeOptions: boolean; dialect: string }>,
+): void {
   options = { ...options, ...newOptions };
 }
 

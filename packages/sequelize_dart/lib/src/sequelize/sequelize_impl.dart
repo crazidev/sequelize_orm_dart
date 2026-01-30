@@ -151,6 +151,14 @@ class Sequelize extends SequelizeInterface {
   Model? getModel(String name) => _models[name];
 
   @override
+  Future<void> sync({bool force = false, bool alter = false}) async {
+    await _bridge.call('sync', {
+      'force': force,
+      'alter': alter,
+    });
+  }
+
+  @override
   Future<void> close() async {
     await _bridge.close();
   }

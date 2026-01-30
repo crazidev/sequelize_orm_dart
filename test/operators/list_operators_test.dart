@@ -26,8 +26,8 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" IN (1, 2, 3)'),
-        reason: 'SQL should contain "id" IN (1, 2, 3)',
+        containsSql('id IN (1, 2, 3)'),
+        reason: 'SQL should contain id IN (1, 2, 3)',
       );
     });
 
@@ -36,8 +36,8 @@ void main() {
 
       expect(
         lastSql,
-        contains('"id" NOT IN (1, 2, 3)'),
-        reason: 'SQL should contain "id" NOT IN (1, 2, 3)',
+        containsSql('id NOT IN (1, 2, 3)'),
+        reason: 'SQL should contain id NOT IN (1, 2, 3)',
       );
     });
 
@@ -50,12 +50,12 @@ void main() {
 
         expect(
           lastSql,
-          contains('IN'),
+          containsSql('IN'),
           reason: 'SQL should contain IN clause',
         );
         expect(
           lastSql,
-          contains('\'a@test.com\''),
+          containsSql("'a@test.com'"),
           reason: 'SQL should contain string values',
         );
       },

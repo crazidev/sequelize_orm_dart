@@ -35,17 +35,17 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
       expect(
         lastSql,
-        contains('views'),
+        containsSql('views'),
         reason: 'SQL should contain the views field',
       );
       expect(
         lastSql,
-        contains('WHERE'),
+        containsSql('WHERE'),
         reason: 'SQL should contain WHERE clause',
       );
     });
@@ -65,12 +65,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
       expect(
         lastSql,
-        contains('views'),
+        containsSql('views'),
         reason: 'SQL should contain the views field',
       );
     });
@@ -106,17 +106,17 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
       expect(
         lastSql,
-        contains('views'),
+        containsSql('views'),
         reason: 'SQL should contain the views field',
       );
       expect(
         lastSql,
-        contains('WHERE'),
+        containsSql('WHERE'),
         reason: 'SQL should contain WHERE clause',
       );
     });
@@ -138,12 +138,12 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
       expect(
         lastSql,
-        contains('AND'),
+        containsSql('AND'),
         reason: 'SQL should contain AND operator for complex conditions',
       );
     });
@@ -194,7 +194,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
     });
@@ -227,7 +227,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('IN'),
+        containsSql('IN'),
         reason: 'SQL should contain IN operator for bulk operations',
       );
     });
@@ -247,7 +247,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement even with zero increment',
       );
     });
@@ -265,7 +265,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement even with zero decrement',
       );
     });
@@ -283,7 +283,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
     });
@@ -301,7 +301,7 @@ void main() {
       );
       expect(
         lastSql,
-        contains('UPDATE'),
+        containsSql('UPDATE'),
         reason: 'SQL should contain UPDATE statement',
       );
     });

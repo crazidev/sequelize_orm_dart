@@ -1,16 +1,16 @@
-import { PostgresDialect } from '@sequelize/postgres';
-import { MySqlDialect } from '@sequelize/mysql';
-import { MariaDbDialect } from '@sequelize/mariadb';
-
 export function selectDialect(dialect: string): any {
   switch (dialect) {
     case 'postgres':
-      return PostgresDialect;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('@sequelize/postgres').PostgresDialect;
     case 'mysql':
-      return MySqlDialect;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('@sequelize/mysql').MySqlDialect;
     case 'mariadb':
-      return MariaDbDialect;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('@sequelize/mariadb').MariaDbDialect;
     default:
-      return PostgresDialect;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('@sequelize/postgres').PostgresDialect;
   }
 }
