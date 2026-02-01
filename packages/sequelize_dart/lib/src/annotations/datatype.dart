@@ -10,6 +10,12 @@ abstract class DataType {
 
   const DataType._(this.name);
 
+  /// Public accessor for the datatype name.
+  ///
+  /// The underlying [name] field is `@protected`, so generated / helper code
+  /// should use this getter instead.
+  String get typeName => name;
+
   // --- Integer Types ---
   static const IntegerDataType TINYINT = IntegerDataType._('TINYINT');
   static const IntegerDataType SMALLINT = IntegerDataType._('SMALLINT');

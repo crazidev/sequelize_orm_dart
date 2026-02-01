@@ -1,0 +1,9 @@
+models_path: lib/db/models
+seeders_path: lib/db/seeders
+
+# Optional database profiles for the CLI (--seed)
+# You can omit these and instead pass --url or set DATABASE_URL.
+databases:
+  default:
+    dialect: postgres
+    url: postgresql://postgres@localhost:5432/postgres

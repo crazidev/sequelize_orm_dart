@@ -10,3 +10,5 @@ workspace:
   - packages/sequelize_dart_analyzer_plugin
 dev_dependencies:
   test: ^1.28.0
+dependencies:
+  sequelize_dart_example: ^1.0.0

@@ -781,7 +781,7 @@ class ColumnDefinition {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
-      'type': type.name,
+      'type': type.typeName,
     };
 
     // Use columnName if provided, otherwise use name

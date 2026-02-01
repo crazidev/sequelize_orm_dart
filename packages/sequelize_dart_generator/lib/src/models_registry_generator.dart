@@ -45,6 +45,10 @@ class ModelsRegistryBuilder implements Builder {
       '',
     ); // e.g., "models"
 
+    final inputPathPosix = inputPath.replaceAll('\\', '/');
+    final isSeedersRegistry =
+        baseName == 'seeders' || inputPathPosix.contains('/seeders/');
+
     // Generate class name: capitalize first letter
     // models -> Models, db -> Db, database -> Database
     final className = _capitalizeFirst(baseName);
@@ -57,28 +61,45 @@ class ModelsRegistryBuilder implements Builder {
       '$outputFileName.dart',
     ); // e.g., "lib/models/models.dart"
 
-    // Find all .model.dart files in the package
-    final modelFiles = await _findModelFiles(buildStep);
+    late final String content;
 
-    if (modelFiles.isEmpty) {
-      return;
-    }
+    if (isSeedersRegistry) {
+      final seederFiles = await _findSeederFiles(buildStep);
+      if (seederFiles.isEmpty) return;
 
-    // Extract model information from each file
-    final models = <_ModelInfo>[];
-    for (final modelFile in modelFiles) {
-      final info = await _extractModelInfo(modelFile, buildStep);
-      if (info != null) {
-        models.add(info);
+      final seeders = <_SeederInfo>[];
+      for (final seederFile in seederFiles) {
+        final infos = await _extractSeederInfos(seederFile, buildStep);
+        seeders.addAll(infos);
       }
-    }
+      if (seeders.isEmpty) return;
 
-    if (models.isEmpty) {
-      return;
-    }
+      seeders.sort((a, b) => a.className.compareTo(b.className));
+      content = _generateSeedersRegistryClass(seeders, className);
+    } else {
+      // Find all .model.dart files in the package
+      final modelFiles = await _findModelFiles(buildStep);
 
-    // Generate the registry class with the derived class name
-    final content = _generateRegistryClass(models, className);
+      if (modelFiles.isEmpty) {
+        return;
+      }
+
+      // Extract model information from each file
+      final models = <_ModelInfo>[];
+      for (final modelFile in modelFiles) {
+        final info = await _extractModelInfo(modelFile, buildStep);
+        if (info != null) {
+          models.add(info);
+        }
+      }
+
+      if (models.isEmpty) {
+        return;
+      }
+
+      // Generate the registry class with the derived class name
+      content = _generateRegistryClass(models, className);
+    }
 
     // Write to the output file in the same directory as the registry file
     final outputId = AssetId(
@@ -92,6 +113,79 @@ class ModelsRegistryBuilder implements Builder {
   Future<List<AssetId>> _findModelFiles(BuildStep buildStep) async {
     final modelGlob = Glob('lib/**/*.model.dart');
     return await buildStep.findAssets(modelGlob).toList();
+  }
+
+  Future<List<AssetId>> _findSeederFiles(BuildStep buildStep) async {
+    final seederGlob = Glob('lib/**/*.seeder.dart');
+    return await buildStep.findAssets(seederGlob).toList();
+  }
+
+  Future<List<_SeederInfo>> _extractSeederInfos(
+    AssetId assetId,
+    BuildStep buildStep,
+  ) async {
+    try {
+      final libraryReader = LibraryReader(
+        await buildStep.resolver.libraryFor(assetId),
+      );
+
+      // Get the import path relative to lib/
+      final assetPathPosix = assetId.path.replaceAll('\\', '/');
+      final importPath = p.posix.withoutExtension(
+        p.posix.relative(assetPathPosix, from: 'lib'),
+      );
+
+      final seeders = <_SeederInfo>[];
+      for (final element in libraryReader.allElements) {
+        if (element is! ClassElement) continue;
+        final superType = element.supertype;
+        final superName = superType?.element.displayName;
+        if (superName != 'SequelizeSeeding') continue;
+
+        seeders.add(
+          _SeederInfo(
+            className: element.displayName,
+            importPath: importPath,
+            packageName: assetId.package,
+          ),
+        );
+      }
+      return seeders;
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  String _generateSeedersRegistryClass(
+    List<_SeederInfo> seeders,
+    String className,
+  ) {
+    final buffer = StringBuffer();
+
+    for (final seeder in seeders) {
+      final importPathPosix = seeder.importPath.replaceAll('\\', '/');
+      buffer.writeln(
+        "import 'package:${seeder.packageName}/$importPathPosix.dart';",
+      );
+    }
+    buffer.writeln();
+    buffer.writeln("import 'package:sequelize_dart/sequelize_dart.dart';");
+    buffer.writeln();
+
+    buffer.writeln('/// Registry class for accessing all seeders');
+    buffer.writeln('class $className {');
+    buffer.writeln('  $className._();');
+    buffer.writeln();
+    buffer.writeln('  static List<SequelizeSeeding> all() {');
+    buffer.writeln('    return [');
+    for (final seeder in seeders) {
+      buffer.writeln('      ${seeder.className}(),');
+    }
+    buffer.writeln('    ];');
+    buffer.writeln('  }');
+    buffer.writeln('}');
+
+    return buffer.toString();
   }
 
   Future<_ModelInfo?> _extractModelInfo(
@@ -225,6 +319,18 @@ class _ModelInfo {
   _ModelInfo({
     required this.className,
     required this.generatedClassName,
+    required this.importPath,
+    required this.packageName,
+  });
+}
+
+class _SeederInfo {
+  final String className;
+  final String importPath;
+  final String packageName;
+
+  _SeederInfo({
+    required this.className,
     required this.importPath,
     required this.packageName,
   });
