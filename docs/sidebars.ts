@@ -48,6 +48,7 @@ const sidebars: SidebarsConfig = {
       ],
     },
     'querying',
+    'seeding-and-cli',
   ],
 };
 
