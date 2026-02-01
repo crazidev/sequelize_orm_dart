@@ -150,6 +150,33 @@ Access tasks via: `Cmd+Shift+P` → "Tasks: Run Task"
 dart test
 ```
 
+## Seeding (experimental)
+
+### Folder layout
+
+- Models: `lib/db/models`
+- Seeders: `lib/db/seeders` (files must end with `*.seeder.dart`)
+
+### `pubspec.yaml` config
+
+Add this to your package `pubspec.yaml`:
+
+```yaml
+sequelize_orm:
+  models_path: lib/db/models
+  seeders_path: lib/db/seeders
+```
+
+### Run seeders
+
+```bash
+# Generates Db registry + Seeders registry and then runs:
+# - sequelize.initialize(models: Db.allModels())
+# - sequelize.sync(alter: true)
+# - runs Seeders.all() in order
+dart run sequelize_dart_generator:generate --seed --url "postgresql://user:pass@localhost:5432/db"
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
