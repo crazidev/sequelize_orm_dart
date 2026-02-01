@@ -21,9 +21,9 @@ Future<void> main() async {
     models: Db.allModels(),
   );
 
-  await sequelize.sync(alter: true, force: true);
   await sequelize.seed(
     seeders: Db.allSeeders(),
+    syncTableMode: SyncTableMode.force,
   );
 
   // Run queries - all query logic is in queries.dart
