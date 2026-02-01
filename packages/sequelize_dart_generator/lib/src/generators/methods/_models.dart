@@ -41,12 +41,13 @@ class _FieldInfo {
 }
 
 class _AssociationInfo {
-  final String associationType; // 'hasOne' or 'hasMany'
+  final String associationType; // 'hasOne' | 'hasMany' | 'belongsTo'
   final String modelClassName;
   final String fieldName;
   final String? foreignKey;
   final String? as;
   final String? sourceKey;
+  final String? targetKey;
   final String? singularName;
   final String? pluralName;
 
@@ -57,6 +58,7 @@ class _AssociationInfo {
     this.foreignKey,
     this.as,
     this.sourceKey,
+    this.targetKey,
     this.singularName,
     this.pluralName,
   });

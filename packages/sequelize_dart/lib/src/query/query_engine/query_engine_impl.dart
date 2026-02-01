@@ -426,4 +426,96 @@ class QueryEngine extends QueryEngineInterface {
       );
     }
   }
+
+  @override
+  Future<ModelInstanceData?> belongsToGet({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call('belongsToGet', {
+        'sourceModel': sourceModel,
+        'primaryKeyValues': primaryKeyValues,
+        'associationName': associationName,
+        'options': options,
+      });
+      if (result == null) return null;
+      return _toModelInstanceData(result);
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute belongsToGet()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute belongsToGet()',
+      );
+    }
+  }
+
+  @override
+  Future<void> belongsToSet({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    required dynamic targetOrKey,
+    bool? save,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      await getBridge(sequelize).call('belongsToSet', {
+        'sourceModel': sourceModel,
+        'primaryKeyValues': primaryKeyValues,
+        'associationName': associationName,
+        'targetOrKey': targetOrKey,
+        'save': save,
+        'options': options,
+      });
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute belongsToSet()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute belongsToSet()',
+      );
+    }
+  }
+
+  @override
+  Future<ModelInstanceData> belongsToCreate({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    required Map<String, dynamic> data,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call('belongsToCreate', {
+        'sourceModel': sourceModel,
+        'primaryKeyValues': primaryKeyValues,
+        'associationName': associationName,
+        'data': data,
+        'options': options,
+      });
+      return _toModelInstanceData(result);
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext(
+          'Exception: failed to execute belongsToCreate()',
+        );
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute belongsToCreate()',
+      );
+    }
+  }
 }

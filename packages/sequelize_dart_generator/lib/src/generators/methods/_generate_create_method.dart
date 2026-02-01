@@ -32,6 +32,15 @@ void _generateCreateMethod(
     buffer.writeln('        IncludeBuilder(');
     buffer.writeln('          association: \'$assocName\',');
     buffer.writeln('          model: $modelClassName.model,');
+    buffer.writeln(
+      '          // Allow nested create (e.g. create PostDetails with Post, and Post with User)',
+    );
+    buffer.writeln(
+      '          // This tells Sequelize to accept nested association objects inside the payload.',
+    );
+    buffer.writeln(
+      '          include: [IncludeBuilder(all: true, nested: true)],',
+    );
     buffer.writeln('        ),');
     buffer.writeln('      );');
     buffer.writeln('    }');

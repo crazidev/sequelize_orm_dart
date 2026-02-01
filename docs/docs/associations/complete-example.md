@@ -38,6 +38,10 @@ class Profile {
 
   DataType bio = DataType.TEXT;
 
+  // Child to one: Belongs to one Parent
+  @BelongsTo(Post, foreignKey: 'user_id', as: 'post')
+  User? user;
+
   static ProfileModel get model => ProfileModel();
 }
 
@@ -49,6 +53,10 @@ class Post {
 
   @ColumnName('user_id')
   DataType userId = DataType.INTEGER;
+
+  // Child to one: Belongs to one Parent
+  @BelongsTo(Post, foreignKey: 'user_id', as: 'post')
+  User? user;
 
   DataType title = DataType.STRING;
 

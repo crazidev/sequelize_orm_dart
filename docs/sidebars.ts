@@ -40,6 +40,7 @@ const sidebars: SidebarsConfig = {
         'associations',
         'associations/hasone',
         'associations/hasmany',
+        'associations/belongsto',
         'associations/using-associations',
         'associations/eager-loading',
         'associations/association-options',

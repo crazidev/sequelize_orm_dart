@@ -43,6 +43,13 @@ abstract class ModelInterface<T> {
     String? sourceKey,
   });
 
+  Future<Association> belongsTo(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? targetKey,
+  });
+
   /// Get the query builder for this model
   /// Returns a typed query builder (generated class)
   @protected
@@ -60,7 +67,7 @@ abstract class ModelInterface<T> {
 extension ColumnDefinitionJson on ColumnDefinition {
   Map<String, Map<String, dynamic>> toJsonForBridge() {
     final attr = <String, dynamic>{
-      'type': type.name,
+      'type': type.typeName,
     };
 
     // Column name (maps to 'field' in Sequelize)

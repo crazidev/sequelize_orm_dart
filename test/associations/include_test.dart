@@ -1,5 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/db/models/users.model.dart';
 import 'package:test/test.dart';
 
 import '../test_helper.dart';
@@ -174,7 +174,7 @@ void main() {
 
     test('AssociationReference col method', () async {
       // Test that we can get column references from associations
-      final queryBuilder = UsersQuery();
+      const queryBuilder = UsersQuery();
       final colRef = queryBuilder.posts.col('title');
       expect(colRef, equals('posts.title'));
     });

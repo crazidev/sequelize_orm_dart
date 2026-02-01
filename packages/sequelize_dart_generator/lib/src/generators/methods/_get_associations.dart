@@ -8,6 +8,9 @@ List<_AssociationInfo> _getAssociations(ClassElement element) {
   const hasManyChecker = TypeChecker.fromUrl(
     'package:sequelize_dart/src/annotations/has_many.dart#HasMany',
   );
+  const belongsToChecker = TypeChecker.fromUrl(
+    'package:sequelize_dart/src/annotations/belongs_to.dart#BelongsTo',
+  );
 
   const tableChecker = TypeChecker.fromUrl(
     'package:sequelize_dart/src/annotations/table.dart#Table',
@@ -16,11 +19,14 @@ List<_AssociationInfo> _getAssociations(ClassElement element) {
   for (var field in element.fields) {
     final isHasOne = hasOneChecker.hasAnnotationOfExact(field);
     final isHasMany = hasManyChecker.hasAnnotationOfExact(field);
+    final isBelongsTo = belongsToChecker.hasAnnotationOfExact(field);
 
-    if (isHasOne || isHasMany) {
+    if (isHasOne || isHasMany || isBelongsTo) {
       final annotation = isHasOne
           ? hasOneChecker.firstAnnotationOfExact(field)
-          : hasManyChecker.firstAnnotationOfExact(field);
+          : isHasMany
+          ? hasManyChecker.firstAnnotationOfExact(field)
+          : belongsToChecker.firstAnnotationOfExact(field);
 
       if (annotation != null) {
         final reader = ConstantReader(annotation);
@@ -30,6 +36,7 @@ List<_AssociationInfo> _getAssociations(ClassElement element) {
         final foreignKey = reader.peek('foreignKey')?.stringValue;
         final as = reader.peek('as')?.stringValue;
         final sourceKey = reader.peek('sourceKey')?.stringValue;
+        final targetKey = reader.peek('targetKey')?.stringValue;
 
         // Try to get singular/plural names from the target model's @Table annotation
         String? singularName;
@@ -50,18 +57,23 @@ List<_AssociationInfo> _getAssociations(ClassElement element) {
 
         // Fallbacks
         singularName ??= _toCamelCase(
-          isHasOne ? modelClassName : (as ?? fieldName),
+          isHasOne || isBelongsTo ? modelClassName : (as ?? fieldName),
         );
         pluralName ??= isHasMany ? (as ?? fieldName) : modelClassName;
 
         associations.add(
           _AssociationInfo(
-            associationType: isHasOne ? 'hasOne' : 'hasMany',
+            associationType: isHasOne
+                ? 'hasOne'
+                : isHasMany
+                ? 'hasMany'
+                : 'belongsTo',
             modelClassName: modelClassName,
             fieldName: fieldName,
             foreignKey: foreignKey,
             as: as,
             sourceKey: sourceKey,
+            targetKey: targetKey,
             singularName: singularName,
             pluralName: pluralName,
           ),

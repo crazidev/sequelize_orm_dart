@@ -14,6 +14,7 @@ Associations allow you to define relationships between models, enabling you to w
 
 - **[hasOne](./associations/hasone)** - One-to-one relationships
 - **[hasMany](./associations/hasmany)** - One-to-many relationships
+- **[belongsTo](./associations/belongsto)** - Foreign key (child → parent) relationships
 - **[Using Associations](./associations/using-associations)** - Loading and filtering with associations
 - **[Eager Loading](./associations/eager-loading)** - Performance optimization
 - **[Association Options](./associations/association-options)** - Configuration options

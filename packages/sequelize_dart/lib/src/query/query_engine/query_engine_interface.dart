@@ -110,4 +110,37 @@ abstract class QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   });
+
+  /// BelongsTo association getter (instance.getX)
+  Future<ModelInstanceData?> belongsToGet({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// BelongsTo association setter (instance.setX)
+  Future<void> belongsToSet({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    required dynamic targetOrKey,
+    bool? save,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// BelongsTo association creator (instance.createX)
+  Future<ModelInstanceData> belongsToCreate({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    required Map<String, dynamic> data,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
 }

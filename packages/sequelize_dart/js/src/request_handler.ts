@@ -18,6 +18,9 @@ import { handleDecrement } from './handlers/decrement';
 import { handleUpdate } from './handlers/update';
 import { handleSave } from './handlers/save';
 import { handleSync } from './handlers/sync';
+import { handleBelongsToGet } from './handlers/belongsToGet';
+import { handleBelongsToSet } from './handlers/belongsToSet';
+import { handleBelongsToCreate } from './handlers/belongsToCreate';
 
 export type JsonRpcRequest = {
   id: unknown;
@@ -111,6 +114,18 @@ export async function processRequest(
 
       case 'sync':
         result = await handleSync(params);
+        break;
+
+      case 'belongsToGet':
+        result = await handleBelongsToGet(params);
+        break;
+
+      case 'belongsToSet':
+        result = await handleBelongsToSet(params);
+        break;
+
+      case 'belongsToCreate':
+        result = await handleBelongsToCreate(params);
         break;
 
       case 'close':

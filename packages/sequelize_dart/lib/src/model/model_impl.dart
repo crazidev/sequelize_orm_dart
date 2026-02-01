@@ -75,6 +75,29 @@ abstract class Model<T> extends ModelInterface {
     return Association();
   }
 
+  @override
+  Future<Association> belongsTo(
+    ModelInterface model, {
+    String? foreignKey,
+    String? as,
+    String? targetKey,
+  }) async {
+    print('✅ $name belongsTo ${model.name}');
+
+    await sequelize.bridge.call('associateModel', {
+      'sourceModel': name,
+      'targetModel': model.name,
+      'associationType': 'belongsTo',
+      'options': {
+        'foreignKey': foreignKey,
+        'as': as,
+        'targetKey': targetKey,
+      },
+    });
+
+    return Association();
+  }
+
   /// Get model attributes for Sequelize
   @override
   @internal

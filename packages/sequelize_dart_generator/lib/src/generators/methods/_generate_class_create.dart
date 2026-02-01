@@ -20,7 +20,8 @@ void _generateClassCreate(
     final modelCreateClassName = namingConfig.getModelCreateClassName(
       assoc.modelClassName,
     );
-    if (assoc.associationType == 'hasOne') {
+    if (assoc.associationType == 'hasOne' ||
+        assoc.associationType == 'belongsTo') {
       buffer.writeln('  final $modelCreateClassName? ${assoc.fieldName};');
     } else {
       buffer.writeln(
@@ -56,7 +57,8 @@ void _generateClassCreate(
   // Add associations (nested in the data object for Sequelize)
   for (var assoc in associations) {
     final assocName = assoc.as ?? assoc.fieldName;
-    if (assoc.associationType == 'hasOne') {
+    if (assoc.associationType == 'hasOne' ||
+        assoc.associationType == 'belongsTo') {
       buffer.writeln('    if (${assoc.fieldName} != null) {');
       buffer.writeln(
         '      result[\'$assocName\'] = ${assoc.fieldName}!.toJson();',

@@ -31,6 +31,9 @@ export async function handleAssociateModel(
     case 'hasMany':
       source.hasMany(target, options || {});
       break;
+    case 'belongsTo':
+      source.belongsTo(target, options || {});
+      break;
     default:
       throw new Error(`Unknown association type: ${associationType}`);
   }
