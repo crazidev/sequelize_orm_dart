@@ -60,8 +60,7 @@ Future<void> initTestEnvironment() async {
     models: [Users.model, Post.model, PostDetails.model],
   );
 
-  // Sync database schema (migration)
-  await sequelize.sync(force: true);
+  await sequelize.sync(alter: true);
 }
 
 /// Seed initial data for tests
