@@ -641,7 +641,27 @@ Future<int> _runSeedCommand({
   final seedersRelPath =
       sequelizeOrmConfig.seedersPath ?? p.join('lib', 'seeders');
 
-  // 1) Generate `Db` model registry from the configured models folder.
+  // 0) Generate model *.g.dart files from models_path.
+  final modelsDirAbs = _toAbsolutePath(packageRoot, modelsRelPath);
+  final modelFiles = _findModelFiles(modelsDirAbs);
+  if (modelFiles.isEmpty) {
+    stderr.writeln('No *.model.dart files found under: $modelsRelPath');
+    return 1;
+  }
+
+  final collection = _createCollection(packageRoot);
+  for (final inputPath in modelFiles) {
+    final ok = await _generateOne(
+      collection: collection,
+      packageRoot: packageRoot,
+      inputPath: inputPath,
+      outputPathOverride: null,
+      quiet: true,
+    );
+    if (!ok) return 1;
+  }
+
+  // 1) Generate `Db` registry from the configured models folder.
   final okDb = await _generateDbRegistryFromModelsPath(
     packageRoot: packageRoot,
     packageName: packageName,
