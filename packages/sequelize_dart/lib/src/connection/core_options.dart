@@ -74,7 +74,7 @@ class SequelizeCoreOptions {
   Map<String, dynamic> toJson() {
     return {
       'host': host,
-      'username': user,
+      'user': user,
       'password': password,
       'port': port,
       'database': database,

@@ -1193,8 +1193,8 @@ _SequelizeOrmConfig? _tryReadConfigFromSequelizeYaml(File sequelizeYaml) {
         host: readString(map, 'host'),
         port: readInt(map, 'port'),
         database: readString(map, 'database'),
-        user: readString(map, 'user'),
-        pass: readString(map, 'pass'),
+        user: readString(map, 'user') ?? readString(map, 'username'),
+        pass: readString(map, 'pass') ?? readString(map, 'password'),
         ssl: readBool(map, 'ssl'),
       );
     }

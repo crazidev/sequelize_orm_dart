@@ -54,7 +54,7 @@ class Sequelize extends SequelizeInterface {
       final keysToRemove = [
         'host',
         'password',
-        'username',
+        'user',
         'database',
         'port',
         'schema',
