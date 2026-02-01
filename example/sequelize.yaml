@@ -1,9 +1,14 @@
 models_path: lib/db/models
 seeders_path: lib/db/seeders
 
-# Optional database profiles for the CLI (--seed)
-# You can omit these and instead pass --url or set DATABASE_URL.
-databases:
+connection:
   default:
+    url: postgres://postgres@localhost:5432/postgres
+  dev:
     dialect: postgres
-    url: postgresql://postgres@localhost:5432/postgres
+    host: env.DB_HOST
+    port: env.DB_PORT
+    user: env.DB_USER
+    pass: env.DB_PASS
+    database: env.DB_NAME
+    ssl: false

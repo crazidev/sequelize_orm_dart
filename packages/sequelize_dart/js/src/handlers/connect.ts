@@ -29,12 +29,12 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
 
   const loggingFn = logging
     ? (sql: any) => {
-        // Send notification via the bridge (works for both stdio and Worker Thread)
-        sendNotification({
-          notification: 'sql_log',
-          sql: typeof sql === 'string' ? sql : String(sql),
-        });
-      }
+      // Send notification via the bridge (works for both stdio and Worker Thread)
+      sendNotification({
+        notification: 'sql_log',
+        sql: typeof sql === 'string' ? sql : String(sql),
+      });
+    }
     : false;
 
   const sequelizeOptions: any = {
@@ -64,14 +64,14 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
         ? sequelizeConfig.database
         : typeof sequelizeConfig.url === 'string'
           ? (() => {
-              try {
-                const u = new URL(sequelizeConfig.url);
-                const name = u.pathname?.replace(/^\//, '') ?? '';
-                return name || undefined;
-              } catch {
-                return undefined;
-              }
-            })()
+            try {
+              const u = new URL(sequelizeConfig.url);
+              const name = u.pathname?.replace(/^\//, '') ?? '';
+              return name || undefined;
+            } catch {
+              return undefined;
+            }
+          })()
           : undefined;
 
     if (!dbName) return false;

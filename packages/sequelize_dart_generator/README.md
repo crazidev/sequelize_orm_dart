@@ -291,19 +291,60 @@ Future<int> update(Map<String, dynamic> data)
 
 ## Configuration
 
-The generator uses `build.yaml` in your project root:
+While the generator works with `build.yaml`, you can create a `sequelize.yaml` file in your project root for more advanced features like database connections and seeding.
+
+### sequelize.yaml
 
 ```yaml
-targets:
-  $default:
-    builders:
-      sequelize_dart_generator|sequelize_model_builder:
-        enabled: true
-      sequelize_dart_generator|models_registry_builder:
-        enabled: true
-        options:
-          className: Models
-          outputFileName: models
+models_path: lib/models
+seeders_path: lib/seeders # Optional: path to seeder classes
+registry_path: lib/db/db.dart # Optional: override generated registry path
+
+connection:
+  default:
+    dialect: postgres
+    host: env.DB_HOST
+    port: env.DB_PORT
+    database: env.DB_NAME
+    user: env.DB_USER
+    pass: env.DB_PASS
+    ssl: true
+  dev:
+    url: sqlite://dev.db
+```
+
+### Environment Variables (.env)
+
+The generator automatically loads a `.env` file from the project root. You can reference these variables in `sequelize.yaml` using the `env.` prefix.
+
+## CLI Tools
+
+The generator provides several CLI commands via `dart run sequelize_dart_generator:generate`.
+
+### Database Seeding
+
+You can run your database seeders directly from the CLI:
+
+```bash
+# Run seeders using the 'default' profile
+dart run sequelize_dart_generator:generate --seed
+
+# Run seeders using a specific profile from sequelize.yaml
+dart run sequelize_dart_generator:generate --seed --database dev
+
+# Verbose mode (shows SQL queries and status)
+dart run sequelize_dart_generator:generate --seed -v
+
+# Force sync before seeding (drops and recreates tables)
+dart run sequelize_dart_generator:generate --seed --force
+```
+
+### Manual Registry Generation
+
+Generate your `@db.dart` registry file manually:
+
+```bash
+dart run sequelize_dart_generator:generate --registry
 ```
 
 ## Troubleshooting

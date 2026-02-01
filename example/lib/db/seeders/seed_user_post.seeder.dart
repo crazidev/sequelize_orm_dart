@@ -1,5 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/models/db.dart';
+import 'package:sequelize_dart_example/db/db.dart';
 import 'package:sequelize_dart_example/db/models/post.model.dart';
 import 'package:sequelize_dart_example/db/models/post_details.model.dart';
 import 'package:sequelize_dart_example/db/models/users.model.dart';

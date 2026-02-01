@@ -174,7 +174,7 @@ void main() {
 
     test('AssociationReference col method', () async {
       // Test that we can get column references from associations
-      const queryBuilder = UsersQuery();
+      final queryBuilder = UsersQuery();
       final colRef = queryBuilder.posts.col('title');
       expect(colRef, equals('posts.title'));
     });

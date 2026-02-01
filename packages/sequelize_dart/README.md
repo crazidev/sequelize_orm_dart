@@ -18,16 +18,18 @@ dependencies:
 import 'package:sequelize_dart/sequelize_dart.dart';
 
 void main() async {
-  // Create connection
+  // Create connection using factory methods
   final sequelize = Sequelize().createInstance(
-    PostgressConnection(
+    connection: SequelizeConnection.postgres(
       url: 'postgresql://user:pass@localhost:5432/dbname',
     ),
+    // Optional: Custom logging for SQL queries and status messages
+    logging: (msg) => print('DB: $msg'),
   );
 
-  // Initialize models
+  // Initialize models (using generated registry)
   await sequelize.initialize(
-    models: [Users.model, Post.model],
+    models: Db.allModels(),
   );
 
   // Query data
@@ -35,6 +37,20 @@ void main() async {
 
   await sequelize.close();
 }
+```
+
+## Logging
+
+Sequelize Dart provides a powerful logging mechanism. You can pass a `logging` callback to `createInstance` to capture both SQL queries and internal state changes (like model definition progress).
+
+```dart
+final sequelize = Sequelize().createInstance(
+  connection: ...,
+  logging: (msg) {
+    // msg can be a SQL query or a status message like "✅ Defining model: User"
+    print(msg);
+  },
+);
 ```
 
 ## Documentation

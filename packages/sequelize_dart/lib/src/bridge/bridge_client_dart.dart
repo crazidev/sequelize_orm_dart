@@ -295,7 +295,7 @@ class BridgeClient implements BridgeClientInterface {
 
         if (response.containsKey('error')) {
           final error = response['error'];
-          String errorMessage = 'Unknown error';
+          const String errorMessage = 'Unknown error';
           int? errorCode;
           String? errorStack;
 

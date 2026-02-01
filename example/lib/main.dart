@@ -1,6 +1,5 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/models/db.dart';
-import 'package:sequelize_dart_example/db/seeders/seeders.dart';
+import 'package:sequelize_dart_example/db/db.dart';
 import 'package:sequelize_dart_example/queries.dart';
 
 const connectionString =
@@ -11,10 +10,7 @@ Future<void> main() async {
   // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
     connection: SequelizeConnection.postgres(url: connectionString),
-    // logging: (sql) => SqlFormatter.printFormatted(
-    //   sql,
-    //   colorScheme: SqlFormatterColors.redTheme,
-    // ),
+    logging: (msg) => print(msg),
   );
 
   // Initialize with models - this properly awaits:
@@ -27,7 +23,7 @@ Future<void> main() async {
 
   await sequelize.sync(alter: true, force: true);
   await sequelize.seed(
-    seeders: Seeders.all(),
+    seeders: Db.allSeeders(),
   );
 
   // Run queries - all query logic is in queries.dart

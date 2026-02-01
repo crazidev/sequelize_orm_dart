@@ -10,6 +10,7 @@ class Sequelize extends SequelizeInterface {
   final BridgeClient _bridge = BridgeClient.instance;
   final Map<String, Model> _models = {};
   Map<String, dynamic>? _connectionConfig;
+  Function(String message)? _logging;
 
   @override
   Future<void> authenticate() async {
@@ -34,6 +35,7 @@ class Sequelize extends SequelizeInterface {
 
     // Store the logging callback in the bridge client
     if (logging != null) {
+      _logging = logging;
       _bridge.setLoggingCallback(logging);
     }
 
@@ -48,11 +50,11 @@ class Sequelize extends SequelizeInterface {
     }
 
     // If URL is provided, remove individual connection parameters
-    if (connection.url != null) {
+    if (connection.url != null && connection.url!.isNotEmpty) {
       final keysToRemove = [
         'host',
         'password',
-        'user',
+        'username',
         'database',
         'port',
         'schema',
@@ -176,5 +178,10 @@ class Sequelize extends SequelizeInterface {
   static SqlAttribute attribute(String attr) => SqlAttribute(attr);
   static SqlIdentifier identifier(String id) => SqlIdentifier(id);
   static SqlCast cast(dynamic expr, String type) => SqlCast(expr, type);
-  static SqlRandom random() => SqlRandom();
+  @override
+  void log(String message) {
+    if (_logging != null) {
+      _logging!(message);
+    }
+  }
 }

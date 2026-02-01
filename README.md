@@ -170,10 +170,10 @@ sequelize_orm:
 ### Run seeders
 
 ```bash
-# Generates Db registry + Seeders registry and then runs:
+# Generates model code + Db registry and then runs:
 # - sequelize.initialize(models: Db.allModels())
 # - sequelize.sync(alter: true)
-# - runs Seeders.all() in order
+# - runs Db.allSeeders() in order
 dart run sequelize_dart_generator:generate --seed --url "postgresql://user:pass@localhost:5432/db"
 ```
 

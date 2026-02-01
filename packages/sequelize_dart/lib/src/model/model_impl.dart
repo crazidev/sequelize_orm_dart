@@ -16,7 +16,7 @@ abstract class Model<T> extends ModelInterface {
     sequelize = sq as Sequelize;
     sequelizeModel = <String, dynamic>{};
 
-    print('✅ Defining model: $modelName');
+    sequelize.log('✅ Defining model: $modelName');
     return this;
   }
 
@@ -36,7 +36,7 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    print('✅ $name hasOne ${model.name}');
+    sequelize.log('✅ $name hasOne ${model.name}');
 
     await sequelize.bridge.call('associateModel', {
       'sourceModel': name,
@@ -59,7 +59,7 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    print('✅ $name hasMany ${model.name}');
+    sequelize.log('✅ $name hasMany ${model.name}');
 
     await sequelize.bridge.call('associateModel', {
       'sourceModel': name,
@@ -82,7 +82,7 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? targetKey,
   }) async {
-    print('✅ $name belongsTo ${model.name}');
+    sequelize.log('✅ $name belongsTo ${model.name}');
 
     await sequelize.bridge.call('associateModel', {
       'sourceModel': name,

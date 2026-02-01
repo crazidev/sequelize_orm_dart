@@ -59,6 +59,7 @@ void main(List<String> args) async {
       dialect: parsed.dialect,
       alter: parsed.alter ?? true,
       force: parsed.force ?? false,
+      verbose: parsed.verbose,
     );
     exit(exitCode);
   }
@@ -95,7 +96,106 @@ void main(List<String> args) async {
     if (!ok) failures++;
   }
 
-  exit(failures == 0 ? 0 : 1);
+  if (failures != 0) {
+    exit(1);
+  }
+
+  // Auto-generate Db registry from configured paths (no marker file required).
+  final packageName = _readPackageName(packageRoot);
+  if (packageName == null) {
+    stderr.writeln('Failed to read package name from pubspec.yaml');
+    exit(2);
+  }
+
+  final modelsRelPath =
+      sequelizeOrmConfig.modelsPath ?? p.join('lib', 'models');
+  final seedersRelPath =
+      sequelizeOrmConfig.seedersPath ?? p.join('lib', 'seeders');
+
+  final okDb = await _generateDbRegistryFromModelsPath(
+    packageRoot: packageRoot,
+    packageName: packageName,
+    modelsRelPath: modelsRelPath,
+    seedersRelPath: seedersRelPath,
+    registryPathOverride: sequelizeOrmConfig.registryPath,
+  );
+  exit(okDb ? 0 : 1);
+}
+
+Map<String, String>? _env;
+
+void _loadEnv(String packageRoot, {bool quiet = false}) {
+  if (_env != null) return;
+  var envFile = File(p.join(packageRoot, '.env'));
+  if (!envFile.existsSync()) {
+    // Try current directory as fallback
+    envFile = File(p.join(Directory.current.path, '.env'));
+  }
+
+  if (!envFile.existsSync()) {
+    _env = {};
+    return;
+  }
+
+  try {
+    final lines = envFile.readAsLinesSync();
+    final map = <String, String>{};
+    for (var line in lines) {
+      line = line.trim();
+      if (line.isEmpty || line.startsWith('#')) continue;
+      final idx = line.indexOf('=');
+      if (idx == -1) continue;
+      final key = line.substring(0, idx).trim();
+      var val = line.substring(idx + 1).trim();
+      if (val.startsWith('"') && val.endsWith('"')) {
+        val = val.substring(1, val.length - 1);
+      } else if (val.startsWith("'") && val.endsWith("'")) {
+        val = val.substring(1, val.length - 1);
+      }
+      map[key] = val;
+    }
+    _env = map;
+    if (!quiet) {
+      stdout.writeln('Loaded ${map.length} variables from ${envFile.path}');
+    }
+  } catch (e) {
+    _env = {};
+    if (!quiet) {
+      stderr.writeln('Failed to read .env file: $e');
+    }
+  }
+}
+
+String? _resolveEnv(String? value) {
+  if (value == null) return null;
+  if (value.startsWith('env.')) {
+    final key = value.substring(4);
+    // Explicitly do not fallback to system env as requested
+    return _env?[key];
+  }
+  return value;
+}
+
+Future<String> _findRegistryPath({
+  required String packageRoot,
+  required String modelsRelPath,
+  required String? registryPathOverride,
+}) async {
+  if (registryPathOverride != null) {
+    return registryPathOverride;
+  }
+
+  // Look for .registry.dart files in the package (usually next to models)
+  final registries = _findRegistryFiles(packageRoot);
+  if (registries.isNotEmpty) {
+    // Return relative path to the first one found, with extension changed to .dart
+    final rel = p.relative(registries.first, from: packageRoot);
+    return rel.replaceFirst(RegExp(r'\.registry\.dart$'), '.dart');
+  }
+
+  // Fallback to default lib/models/db.dart (or equivalent)
+  final modelsBaseDirRel = p.dirname(modelsRelPath);
+  return p.join(modelsBaseDirRel, 'db.dart');
 }
 
 _DbProfile? _selectDbProfile({
@@ -292,48 +392,6 @@ Future<bool> _generateRegistries({
   return okAll;
 }
 
-Future<bool> _generateSeedersRegistryFileAtPath({
-  required String packageRoot,
-  required String packageName,
-  required String seedersRelPath,
-  required bool quiet,
-}) async {
-  final seedersDirAbs = _toAbsolutePath(packageRoot, seedersRelPath);
-  final seedersDir = Directory(seedersDirAbs);
-  if (!seedersDir.existsSync()) {
-    if (!quiet) {
-      stdout.writeln('No seeders directory found: $seedersRelPath');
-    }
-    return true;
-  }
-
-  final seeders = await _scanSeedersForRegistry(
-    packageRoot,
-    packageName,
-    seedersDirAbs,
-  );
-  seeders.sort((a, b) => a.className.compareTo(b.className));
-
-  final outAbs = p.join(seedersDirAbs, 'seeders.dart');
-  final content = _generateSeedersRegistryDart(
-    seeders: seeders,
-    registryClassName: 'Seeders',
-    packageName: packageName,
-  );
-
-  try {
-    await File(outAbs).writeAsString(content);
-    if (!quiet) {
-      stdout.writeln('Generated ${p.basename(outAbs)}');
-    }
-    return true;
-  } catch (e) {
-    stderr.writeln('Failed to write seeders registry: $outAbs');
-    stderr.writeln(e);
-    return false;
-  }
-}
-
 Future<List<_SeederInfo>> _scanSeedersForRegistry(
   String packageRoot,
   String packageName,
@@ -417,36 +475,6 @@ List<String> _findSeederFiles(String folderAbs) {
       .where((p) => p.endsWith('.seeder.dart'))
       .toList()
     ..sort();
-}
-
-String _generateSeedersRegistryDart({
-  required List<_SeederInfo> seeders,
-  required String registryClassName,
-  required String packageName,
-}) {
-  final buffer = StringBuffer();
-
-  for (final s in seeders) {
-    buffer.writeln("import 'package:$packageName/${s.importPath}.dart';");
-  }
-  buffer.writeln();
-  buffer.writeln("import 'package:sequelize_dart/sequelize_dart.dart';");
-  buffer.writeln();
-
-  buffer.writeln('/// Registry class for accessing all seeders');
-  buffer.writeln('class $registryClassName {');
-  buffer.writeln('  $registryClassName._();');
-  buffer.writeln();
-  buffer.writeln('  static List<SequelizeSeeding> all() {');
-  buffer.writeln('    return [');
-  for (final s in seeders) {
-    buffer.writeln('      ${s.className}(),');
-  }
-  buffer.writeln('    ];');
-  buffer.writeln('  }');
-  buffer.writeln('}');
-
-  return buffer.toString();
 }
 
 class _SeederInfo {
@@ -590,12 +618,14 @@ String? _readPackageName(String packageRoot) {
 class _SequelizeOrmConfig {
   final String? modelsPath;
   final String? seedersPath;
+  final String? registryPath;
   final _DbProfile? database;
   final Map<String, _DbProfile> databases;
 
   const _SequelizeOrmConfig({
     required this.modelsPath,
     required this.seedersPath,
+    required this.registryPath,
     required this.database,
     required this.databases,
   });
@@ -604,8 +634,23 @@ class _SequelizeOrmConfig {
 class _DbProfile {
   final String? dialect;
   final String? url;
+  final String? host;
+  final int? port;
+  final String? database;
+  final String? user;
+  final String? pass;
+  final bool? ssl;
 
-  const _DbProfile({required this.dialect, required this.url});
+  const _DbProfile({
+    this.dialect,
+    this.url,
+    this.host,
+    this.port,
+    this.database,
+    this.user,
+    this.pass,
+    this.ssl,
+  });
 }
 
 Future<int> _runSeedCommand({
@@ -616,6 +661,7 @@ Future<int> _runSeedCommand({
   required String? dialect,
   required bool alter,
   required bool force,
+  required bool verbose,
 }) async {
   final packageName = _readPackageName(packageRoot);
   if (packageName == null) {
@@ -628,11 +674,20 @@ Future<int> _runSeedCommand({
     databaseName: databaseName,
   );
 
+  final hasDiscreteParams =
+      selectedProfile != null &&
+      (selectedProfile.host != null ||
+          selectedProfile.database != null ||
+          selectedProfile.user != null);
+
   final resolvedUrl = (url != null && url.trim().isNotEmpty)
       ? url.trim()
       : (selectedProfile?.url ?? Platform.environment['DATABASE_URL']);
-  if (resolvedUrl == null || resolvedUrl.isEmpty) {
-    stderr.writeln('Missing database URL. Pass --url or set DATABASE_URL.');
+
+  if ((resolvedUrl == null || resolvedUrl.isEmpty) && !hasDiscreteParams) {
+    stderr.writeln(
+      'Missing database connection info. Pass --url, set DATABASE_URL, or configure a profile in sequelize.yaml.',
+    );
     return 2;
   }
 
@@ -666,40 +721,23 @@ Future<int> _runSeedCommand({
     packageRoot: packageRoot,
     packageName: packageName,
     modelsRelPath: modelsRelPath,
+    seedersRelPath: seedersRelPath,
+    registryPathOverride: sequelizeOrmConfig.registryPath,
   );
   if (!okDb) return 1;
 
-  // 2) Generate seeders registry directly (no build_runner marker required).
-  final okSeeders = await _generateSeedersRegistryFileAtPath(
-    packageRoot: packageRoot,
-    packageName: packageName,
-    seedersRelPath: seedersRelPath,
-    quiet: true,
-  );
-  if (!okSeeders) return 1;
-
   // 3) Create a temporary runner script and execute it.
-  final modelsBaseDirRel = p.dirname(modelsRelPath);
-  final dbFileAbs = _toAbsolutePath(
-    packageRoot,
-    p.join(modelsBaseDirRel, 'db.dart'),
-  );
-  final seedersFileAbs = _toAbsolutePath(
-    packageRoot,
-    p.join(seedersRelPath, 'seeders.dart'),
+  final registryPath = await _findRegistryPath(
+    packageRoot: packageRoot,
+    modelsRelPath: modelsRelPath,
+    registryPathOverride: sequelizeOrmConfig.registryPath,
   );
 
+  final dbFileAbs = _toAbsolutePath(packageRoot, registryPath);
   final dbImport = _importPathFromLib(packageRoot, dbFileAbs);
-  final seedersImport = _importPathFromLib(packageRoot, seedersFileAbs);
   if (dbImport == null) {
     stderr.writeln(
       'Failed to resolve Db registry import path from: $dbFileAbs',
-    );
-    return 1;
-  }
-  if (seedersImport == null) {
-    stderr.writeln(
-      'Failed to resolve Seeders registry import path from: $seedersFileAbs',
     );
     return 1;
   }
@@ -712,7 +750,6 @@ Future<int> _runSeedCommand({
     _seedRunnerSource(
       packageName: packageName,
       dbImportPath: dbImport,
-      seedersImportPath: seedersImport,
     ),
   );
 
@@ -721,8 +758,10 @@ Future<int> _runSeedCommand({
     [
       'run',
       runnerAbs,
-      '--url',
-      resolvedUrl,
+      if (resolvedUrl != null) ...[
+        '--url',
+        resolvedUrl,
+      ],
       if (dialect != null && dialect.trim().isNotEmpty) ...[
         '--dialect',
         dialect.trim(),
@@ -733,27 +772,45 @@ Future<int> _runSeedCommand({
       ],
       alter ? '--alter' : '--no-alter',
       force ? '--force' : '--no-force',
+      if (verbose) '--verbose',
     ],
     workingDirectory: packageRoot,
     runInShell: true,
+    environment: {
+      ...Platform.environment,
+      if (selectedProfile != null) ...{
+        if (selectedProfile.host != null)
+          'SEQUELIZE_HOST': selectedProfile.host!,
+        if (selectedProfile.port != null)
+          'SEQUELIZE_PORT': selectedProfile.port!.toString(),
+        if (selectedProfile.database != null)
+          'SEQUELIZE_DB': selectedProfile.database!,
+        if (selectedProfile.user != null)
+          'SEQUELIZE_USER': selectedProfile.user!,
+        if (selectedProfile.pass != null)
+          'SEQUELIZE_PASS': selectedProfile.pass!,
+        if (selectedProfile.ssl != null)
+          'SEQUELIZE_SSL': selectedProfile.ssl!.toString(),
+      },
+    },
   );
 
-  unawaited(stdout.addStream(proc.stdout));
-  unawaited(stderr.addStream(proc.stderr));
+  await Future.wait([
+    stdout.addStream(proc.stdout),
+    stderr.addStream(proc.stderr),
+  ]);
   return await proc.exitCode;
 }
 
 String _seedRunnerSource({
   required String packageName,
   required String dbImportPath,
-  required String seedersImportPath,
 }) {
   return '''
 import 'dart:io';
 
 import 'package:sequelize_dart/sequelize_dart.dart';
 import 'package:$packageName/$dbImportPath.dart';
-import 'package:$packageName/$seedersImportPath.dart';
 
 String? _valueAfter(List<String> args, String flag) {
   final idx = args.indexOf(flag);
@@ -763,10 +820,17 @@ String? _valueAfter(List<String> args, String flag) {
 }
 
 SequelizeCoreOptions _connectionFrom({
-  required String url,
+  required String? url,
+  String? host,
+  int? port,
+  String? database,
+  String? user,
+  String? pass,
+  bool? ssl,
   String? dialect,
 }) {
-  final uri = Uri.tryParse(url);
+  final hasUrl = url != null && url.trim().isNotEmpty;
+  final uri = hasUrl ? Uri.tryParse(url) : null;
   final scheme = (dialect ?? uri?.scheme ?? '').toLowerCase();
 
   // Normalize common scheme aliases.
@@ -780,20 +844,38 @@ SequelizeCoreOptions _connectionFrom({
 
   switch (normalized) {
     case 'postgres':
-      return SequelizeConnection.postgres(url: url);
+      if (hasUrl) return SequelizeConnection.postgres(url: url);
+      return SequelizeConnection.postgres(
+        host: host ?? 'localhost',
+        port: port ?? 5432,
+        database: database,
+        user: user,
+        password: pass,
+        ssl: ssl ?? false,
+      );
     case 'mysql':
-      return SequelizeConnection.mysql(url: url);
+      if (hasUrl) return SequelizeConnection.mysql(url: url);
+      return SequelizeConnection.mysql(
+        host: host ?? 'localhost',
+        port: port ?? 3306,
+        database: database,
+        user: user,
+        password: pass,
+        ssl: ssl ?? false,
+      );
     case 'mariadb':
-      return SequelizeConnection.mariadb(url: url);
+      if (hasUrl) return SequelizeConnection.mariadb(url: url);
+      return SequelizeConnection.mariadb(
+        host: host ?? 'localhost',
+        port: port ?? 3306,
+        database: database,
+        user: user,
+        password: pass,
+        ssl: ssl ?? false,
+      );
     case 'sqlite':
-      // Accept ':memory:' / 'sqlite::memory:' / 'sqlite:///path/to.db'
-      if (url == ':memory:' || url == 'sqlite::memory:') {
-        return SequelizeConnection.sqlite(storage: ':memory:');
-      }
-      if (uri != null && uri.path.isNotEmpty) {
-        return SequelizeConnection.sqlite(storage: uri.path);
-      }
-      return SequelizeConnection.sqlite(storage: url);
+      final storage = hasUrl ? url : (database ?? ':memory:');
+      return SequelizeConnection.sqlite(storage: storage);
     default:
       throw ArgumentError(
         'Unsupported dialect "\$normalized". Pass --dialect or use a URL scheme like postgresql://, mysql://, mariadb://, sqlite://',
@@ -802,29 +884,51 @@ SequelizeCoreOptions _connectionFrom({
 }
 
 void main(List<String> args) async {
-  final url = _valueAfter(args, '--url') ?? Platform.environment['DATABASE_URL'];
-  if (url == null || url.trim().isEmpty) {
-    stderr.writeln('Missing database URL. Pass --url or set DATABASE_URL.');
-    exit(2);
-  }
-
+  final urlStr = _valueAfter(args, '--url');
   final dialect = _valueAfter(args, '--dialect');
   final alter = args.contains('--no-alter') ? false : true;
   final force = args.contains('--force');
+  final verbose = args.contains('--verbose');
+
+  // These will be passed by the generator when it starts this script.
+  // We use environment variables for the complex parameters.
+  final host = Platform.environment['SEQUELIZE_HOST'];
+  final port = int.tryParse(Platform.environment['SEQUELIZE_PORT'] ?? '');
+  final database = Platform.environment['SEQUELIZE_DB'];
+  final user = Platform.environment['SEQUELIZE_USER'];
+  final pass = Platform.environment['SEQUELIZE_PASS'];
+  final ssl = Platform.environment['SEQUELIZE_SSL'] == 'true';
+
+  final envUrl = Platform.environment['DATABASE_URL'];
+  final resolvedUrl = (urlStr != null && urlStr.trim().isNotEmpty)
+      ? urlStr.trim()
+      : (envUrl != null && envUrl.trim().isNotEmpty ? envUrl.trim() : null);
 
   final sequelize = Sequelize().createInstance(
-    connection: _connectionFrom(url: url.trim(), dialect: dialect),
+    connection: _connectionFrom(
+      url: resolvedUrl,
+      host: host,
+      port: port,
+      database: database,
+      user: user,
+      pass: pass,
+      ssl: ssl,
+      dialect: dialect,
+    ),
+    logging: verbose ? (msg) => stdout.writeln(msg) : null,
   );
 
   await sequelize.initialize(models: Db.allModels());
-  await sequelize.sync(alter: alter, force: force);
+  
+  final syncMode = force 
+    ? SyncTableMode.force 
+    : (alter ? SyncTableMode.alter : SyncTableMode.none);
 
-  final seeders = Seeders.all()
-    ..sort((a, b) => a.order.compareTo(b.order));
-
-  for (final seeder in seeders) {
-    await seeder.run();
-  }
+  await sequelize.seed(
+    seeders: Db.allSeeders(),
+    syncTableMode: syncMode,
+    log: (msg) => stdout.writeln(msg),
+  );
 
   await sequelize.close();
 }
@@ -835,6 +939,8 @@ Future<bool> _generateDbRegistryFromModelsPath({
   required String packageRoot,
   required String packageName,
   required String modelsRelPath,
+  required String seedersRelPath,
+  required String? registryPathOverride,
 }) async {
   final modelsDirAbs = _toAbsolutePath(packageRoot, modelsRelPath);
   final modelFiles = _findModelFiles(modelsDirAbs);
@@ -884,12 +990,24 @@ Future<bool> _generateDbRegistryFromModelsPath({
 
   models.sort((a, b) => a.className.compareTo(b.className));
 
-  final baseDirRel = p.dirname(modelsRelPath);
-  final dbOutAbs = _toAbsolutePath(packageRoot, p.join(baseDirRel, 'db.dart'));
+  final dbOutRel = await _findRegistryPath(
+    packageRoot: packageRoot,
+    modelsRelPath: modelsRelPath,
+    registryPathOverride: registryPathOverride,
+  );
+  final dbOutAbs = _toAbsolutePath(packageRoot, dbOutRel);
 
-  final content = _generateRegistryDart(
+  final seedersDirAbs = _toAbsolutePath(packageRoot, seedersRelPath);
+  final seeders = Directory(seedersDirAbs).existsSync()
+      ? await _scanSeedersForRegistry(packageRoot, packageName, seedersDirAbs)
+      : <_SeederInfo>[];
+  seeders.sort((a, b) => a.className.compareTo(b.className));
+
+  final content = _generateDbRegistryDart(
     models: models,
+    seeders: seeders,
     registryClassName: 'Db',
+    packageName: packageName,
   );
 
   try {
@@ -902,7 +1020,72 @@ Future<bool> _generateDbRegistryFromModelsPath({
   }
 }
 
+String _generateDbRegistryDart({
+  required List<_RegistryModelInfo> models,
+  required List<_SeederInfo> seeders,
+  required String registryClassName,
+  required String packageName,
+}) {
+  final buffer = StringBuffer();
+
+  for (final model in models) {
+    buffer.writeln(
+      "import 'package:${model.packageName}/${model.importPath}.dart';",
+    );
+  }
+  for (final seeder in seeders) {
+    buffer.writeln("import 'package:$packageName/${seeder.importPath}.dart';");
+  }
+  buffer.writeln();
+  buffer.writeln("import 'package:sequelize_dart/sequelize_dart.dart';");
+  buffer.writeln();
+
+  buffer.writeln('/// Registry class for accessing all models and seeders');
+  buffer.writeln('class $registryClassName {');
+  buffer.writeln('  $registryClassName._();');
+  buffer.writeln();
+
+  for (final model in models) {
+    final getterName = _toCamelCase(model.className);
+    buffer.writeln('  /// Returns the ${model.className} model instance');
+    buffer.writeln(
+      '  static ${model.generatedClassName} get $getterName => ${model.generatedClassName}();',
+    );
+    buffer.writeln();
+  }
+
+  buffer.writeln('  /// Returns a list of all model instances');
+  buffer.writeln('  static List<Model> allModels() {');
+  buffer.writeln('    return [');
+  for (final model in models) {
+    final getterName = _toCamelCase(model.className);
+    buffer.writeln('      $registryClassName.$getterName,');
+  }
+  buffer.writeln('    ];');
+  buffer.writeln('  }');
+  buffer.writeln();
+
+  buffer.writeln('  /// Returns a list of all seeders');
+  buffer.writeln('  static List<SequelizeSeeding> allSeeders() {');
+  if (seeders.isEmpty) {
+    buffer.writeln('    return <SequelizeSeeding>[];');
+  } else {
+    buffer.writeln('    return [');
+    for (final seeder in seeders) {
+      buffer.writeln('      ${seeder.className}(),');
+    }
+    buffer.writeln('    ];');
+  }
+  buffer.writeln('  }');
+
+  buffer.writeln('}');
+
+  return buffer.toString();
+}
+
 _SequelizeOrmConfig _readSequelizeOrmConfig(String packageRoot) {
+  _loadEnv(packageRoot);
+
   // Prefer dedicated sequelize.yaml (adjacent to pubspec), then fall back to pubspec.yaml.
   final sequelizeYaml = File(p.join(packageRoot, 'sequelize.yaml'));
   if (sequelizeYaml.existsSync()) {
@@ -915,6 +1098,7 @@ _SequelizeOrmConfig _readSequelizeOrmConfig(String packageRoot) {
     return const _SequelizeOrmConfig(
       modelsPath: null,
       seedersPath: null,
+      registryPath: null,
       database: null,
       databases: {},
     );
@@ -926,6 +1110,7 @@ _SequelizeOrmConfig _readSequelizeOrmConfig(String packageRoot) {
       return const _SequelizeOrmConfig(
         modelsPath: null,
         seedersPath: null,
+        registryPath: null,
         database: null,
         databases: {},
       );
@@ -935,6 +1120,7 @@ _SequelizeOrmConfig _readSequelizeOrmConfig(String packageRoot) {
       return const _SequelizeOrmConfig(
         modelsPath: null,
         seedersPath: null,
+        registryPath: null,
         database: null,
         databases: {},
       );
@@ -942,13 +1128,14 @@ _SequelizeOrmConfig _readSequelizeOrmConfig(String packageRoot) {
 
     String? readString(String key) {
       final v = cfg[key];
-      if (v is String) return v.trim().isEmpty ? null : v.trim();
+      if (v is String) return v.trim().isEmpty ? null : _resolveEnv(v.trim());
       return null;
     }
 
     return _SequelizeOrmConfig(
       modelsPath: readString('models_path'),
       seedersPath: readString('seeders_path'),
+      registryPath: readString('registry_path'),
       database: null,
       databases: const {},
     );
@@ -957,6 +1144,7 @@ _SequelizeOrmConfig _readSequelizeOrmConfig(String packageRoot) {
     return const _SequelizeOrmConfig(
       modelsPath: null,
       seedersPath: null,
+      registryPath: null,
       database: null,
       databases: {},
     );
@@ -971,24 +1159,76 @@ _SequelizeOrmConfig? _tryReadConfigFromSequelizeYaml(File sequelizeYaml) {
     String? readString(dynamic map, String key) {
       if (map is! YamlMap) return null;
       final v = map[key];
-      if (v is String) return v.trim().isEmpty ? null : v.trim();
+      if (v is String) return v.trim().isEmpty ? null : _resolveEnv(v.trim());
       return null;
     }
 
     _DbProfile? readDbProfile(dynamic map) {
-      if (map is! YamlMap) return null;
+      if (map is! YamlMap) {
+        if (map is String) {
+          return _DbProfile(url: _resolveEnv(map));
+        }
+        return null;
+      }
+
+      int? readInt(dynamic map, String key) {
+        if (map is! YamlMap) return null;
+        final v = map[key];
+        if (v is int) return v;
+        if (v is String) return int.tryParse(_resolveEnv(v) ?? '');
+        return null;
+      }
+
+      bool? readBool(dynamic map, String key) {
+        if (map is! YamlMap) return null;
+        final v = map[key];
+        if (v is bool) return v;
+        if (v is String) return _resolveEnv(v) == 'true';
+        return null;
+      }
+
       return _DbProfile(
         dialect: readString(map, 'dialect'),
         url: readString(map, 'url'),
+        host: readString(map, 'host'),
+        port: readInt(map, 'port'),
+        database: readString(map, 'database'),
+        user: readString(map, 'user'),
+        pass: readString(map, 'pass'),
+        ssl: readBool(map, 'ssl'),
       );
     }
 
     final modelsPath = readString(doc, 'models_path');
     final seedersPath = readString(doc, 'seeders_path');
+    final registryPath = readString(doc, 'registry_path');
 
-    final database = readDbProfile(doc['database']);
-
+    final databaseNode = doc['database'] ?? doc['connection'];
+    _DbProfile? database;
     final dbs = <String, _DbProfile>{};
+
+    if (databaseNode is YamlMap) {
+      // Check if it's a single profile or multiple profiles
+      final isSingle =
+          databaseNode.containsKey('url') ||
+          databaseNode.containsKey('host') ||
+          databaseNode.containsKey('dialect');
+
+      if (isSingle) {
+        database = readDbProfile(databaseNode);
+      } else {
+        // It's a map of profiles (environments)
+        for (final entry in databaseNode.entries) {
+          final key = entry.key;
+          if (key is! String) continue;
+          final prof = readDbProfile(entry.value);
+          if (prof != null) dbs[key] = prof;
+        }
+      }
+    } else if (databaseNode is String) {
+      database = _DbProfile(url: _resolveEnv(databaseNode));
+    }
+
     final dbsNode = doc['databases'];
     if (dbsNode is YamlMap) {
       for (final entry in dbsNode.entries) {
@@ -1002,6 +1242,7 @@ _SequelizeOrmConfig? _tryReadConfigFromSequelizeYaml(File sequelizeYaml) {
     return _SequelizeOrmConfig(
       modelsPath: modelsPath,
       seedersPath: seedersPath,
+      registryPath: registryPath,
       database: database,
       databases: dbs,
     );
@@ -1234,6 +1475,7 @@ Options:
   --dialect <dialect>     Dialect override for the runner (postgres/mysql/mariadb/sqlite)
   --alter / --no-alter    Pass alter flag to sequelize.sync() (default: true)
   --force / --no-force    Pass force flag to sequelize.sync() (default: false)
+  --verbose / --v         Show verbose logs (SQL queries and seeder status)
   --output <path>         Output path (only applies to --input)
   --server               Run as a persistent stdio server (JSON lines)
   --help                 Show this help
@@ -1249,6 +1491,7 @@ Options:
   String? dialect,
   bool? alter,
   bool? force,
+  bool verbose,
   String? packageRoot,
   String? input,
   String? folder,
@@ -1277,6 +1520,7 @@ _parseArgs(List<String> args) {
     force: args.contains('--force')
         ? true
         : (args.contains('--no-force') ? false : null),
+    verbose: args.contains('--verbose') || args.contains('--v'),
     packageRoot: valueAfter('--package-root'),
     input: valueAfter('--input'),
     folder: valueAfter('--folder'),

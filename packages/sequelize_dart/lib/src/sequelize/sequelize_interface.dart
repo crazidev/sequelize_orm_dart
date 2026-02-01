@@ -44,4 +44,7 @@ abstract class SequelizeInterface {
   Future<void> sync({bool force = false, bool alter = false});
 
   Future<void> close();
+
+  /// Log a message using the configured logging function.
+  void log(String message);
 }
