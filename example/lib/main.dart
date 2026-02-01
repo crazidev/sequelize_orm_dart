@@ -10,7 +10,8 @@ Future<void> main() async {
   // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
     connection: SequelizeConnection.postgres(url: connectionString),
-    logging: (msg) => print(msg),
+    logging: SqlFormatter.printFormatted,
+    debug: true,
   );
 
   // Initialize with models - this properly awaits:
@@ -21,10 +22,10 @@ Future<void> main() async {
     models: Db.allModels(),
   );
 
-  await sequelize.seed(
-    seeders: Db.allSeeders(),
-    syncTableMode: SyncTableMode.force,
-  );
+  // await sequelize.seed(
+  //   seeders: Db.allSeeders(),
+  //   syncTableMode: SyncTableMode.force,
+  // );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

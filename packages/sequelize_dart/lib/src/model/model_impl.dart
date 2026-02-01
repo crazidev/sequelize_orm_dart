@@ -16,7 +16,6 @@ abstract class Model<T> extends ModelInterface {
     sequelize = sq as Sequelize;
     sequelizeModel = <String, dynamic>{};
 
-    sequelize.log('✅ Defining model: $modelName');
     return this;
   }
 
@@ -24,7 +23,7 @@ abstract class Model<T> extends ModelInterface {
   /// Called by Sequelize.initialize() after all models are defined
   @override
   @internal
-  Future<void> associateModel() async {
+  Future<void> associateModel({bool debug = false}) async {
     // Base implementation does nothing
     // Generated model classes override this to set up associations
   }
@@ -36,7 +35,7 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    sequelize.log('✅ $name hasOne ${model.name}');
+    if (sequelize.debug) sequelize.log('>> $name hasOne ${model.name}');
 
     await sequelize.bridge.call('associateModel', {
       'sourceModel': name,
@@ -59,7 +58,7 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    sequelize.log('✅ $name hasMany ${model.name}');
+    if (sequelize.debug) sequelize.log('>> $name hasMany ${model.name}');
 
     await sequelize.bridge.call('associateModel', {
       'sourceModel': name,
@@ -82,7 +81,7 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? targetKey,
   }) async {
-    sequelize.log('✅ $name belongsTo ${model.name}');
+    if (sequelize.debug) sequelize.log('>> $name belongsTo ${model.name}');
 
     await sequelize.bridge.call('associateModel', {
       'sourceModel': name,

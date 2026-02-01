@@ -11,6 +11,10 @@ class Sequelize extends SequelizeInterface {
   final Map<String, Model> _models = {};
   Map<String, dynamic>? _connectionConfig;
   Function(String message)? _logging;
+  bool _debug = false;
+
+  @override
+  bool get debug => _debug;
 
   @override
   Future<void> authenticate() async {
@@ -28,7 +32,10 @@ class Sequelize extends SequelizeInterface {
     required SequelizeCoreOptions connection,
     Function(String sql)? logging,
     SequelizePoolOptions? pool,
+    bool debug = false,
   }) {
+    _debug = debug;
+
     final Map<String, dynamic> config = Map<String, dynamic>.from(
       connection.toJson(),
     );
@@ -79,8 +86,9 @@ class Sequelize extends SequelizeInterface {
 
     await _bridge.start(connectionConfig: _connectionConfig!);
 
-    // print('[Sequelize] Defining ${models.length} models...');
+    if (_debug) log('[Sequelize] Defining ${models.length} models...');
     for (final model in models) {
+      if (_debug) log('>> Defining model: ${model.name}');
       model.define(model.name, this);
       _models[model.name] = model;
 
@@ -98,11 +106,11 @@ class Sequelize extends SequelizeInterface {
     }
     // print('[Sequelize] All models defined.');
 
-    // print('[Sequelize] Setting up associations...');
+    if (_debug) log('[Sequelize] Setting up associations...');
     for (final model in models) {
-      await model.associateModel();
+      // if (_debug) log('>> Setting up associations for model: ${model.name}');
+      await model.associateModel(debug: _debug);
     }
-    // print('[Sequelize] All associations configured.');
   }
 
   @override

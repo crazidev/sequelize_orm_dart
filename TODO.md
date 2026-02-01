@@ -21,3 +21,5 @@
 - Document that 'username' and 'password' in sequelize.yaml profiles are aliases for 'user' and 'pass'
 
 - Note: Internally the bridge uses 'user' at the root of the option bag for most dialects
+
+- Document the `debug` flag in `createInstance` and how it enables internal setup logging

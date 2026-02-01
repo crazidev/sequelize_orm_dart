@@ -27,7 +27,7 @@ abstract class ModelInterface<T> {
   /// Associate models - called after all models are defined
   /// Override in generated models to set up associations
   @protected
-  Future<void> associateModel();
+  Future<void> associateModel({bool debug = false});
 
   Future<Association> hasOne(
     ModelInterface model, {

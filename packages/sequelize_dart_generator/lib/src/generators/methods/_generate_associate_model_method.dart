@@ -8,7 +8,7 @@ void _generateAssociateModelMethod(
   // Always generate the method with @override annotation
   buffer.writeln('  @protected');
   buffer.writeln('  @override');
-  buffer.writeln('  Future<void> associateModel() async {');
+  buffer.writeln('  Future<void> associateModel({bool debug = false}) async {');
 
   if (associations.isEmpty) {
     buffer.writeln('    // No associations defined');

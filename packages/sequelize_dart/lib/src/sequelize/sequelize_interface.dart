@@ -17,6 +17,7 @@ abstract class SequelizeInterface {
     required SequelizeCoreOptions connection,
     Function(String sql)? logging,
     SequelizePoolOptions? pool,
+    bool debug = false,
   });
 
   Future<void> authenticate();
@@ -44,6 +45,9 @@ abstract class SequelizeInterface {
   Future<void> sync({bool force = false, bool alter = false});
 
   Future<void> close();
+
+  /// Whether debug logging is enabled.
+  bool get debug;
 
   /// Log a message using the configured logging function.
   void log(String message);
