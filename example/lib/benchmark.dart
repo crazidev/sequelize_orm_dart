@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/post.model.dart';
-import 'package:sequelize_dart_example/models/post_details.model.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/db/models/post.model.dart';
+import 'package:sequelize_dart_example/db/models/post_details.model.dart';
+import 'package:sequelize_dart_example/db/models/users.model.dart';
 
 const connectionString = 'mysql://root@localhost:3306/sequelize_dart';
 

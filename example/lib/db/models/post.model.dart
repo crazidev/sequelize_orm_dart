@@ -1,5 +1,6 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/post_details.model.dart';
+import 'package:sequelize_dart_example/db/models/post_details.model.dart';
+import 'package:sequelize_dart_example/db/models/users.model.dart';
 
 part 'post.model.g.dart';
 
@@ -25,6 +26,9 @@ abstract class Post {
 
   @HasOne(PostDetails, foreignKey: 'postId', as: 'postDetails')
   PostDetails? postDetails;
+
+  @BelongsTo(Users, foreignKey: 'userId', as: 'user')
+  Users? user;
 
   static PostModel get model => PostModel();
 }

@@ -142,7 +142,7 @@ Here's a complete example putting it all together:
 
 ```dart
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/user.model.dart';
+import 'package:sequelize_dart_example/db/models/user.model.dart';
 
 const connectionString = 'postgresql://postgres:postgres@localhost:5432/postgres';
 

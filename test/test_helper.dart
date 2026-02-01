@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/post.model.dart';
-import 'package:sequelize_dart_example/models/post_details.model.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/db/models/post.model.dart';
+import 'package:sequelize_dart_example/db/models/post_details.model.dart';
+import 'package:sequelize_dart_example/db/models/users.model.dart';
 import 'package:test/test.dart';
 
 /// Connection strings for test databases
@@ -15,7 +15,7 @@ const mariadbUrl = 'mariadb://root@localhost:3307/sequelize_dart';
 final List<String> capturedSql = [];
 
 /// Sequelize instance for tests
-late dynamic sequelize;
+late Sequelize sequelize;
 
 /// Initialize the test environment
 /// Call this in setUpAll() in your test files
@@ -90,9 +90,7 @@ Future<void> seedInitialData() async {
 /// Cleanup the test environment
 /// Call this in tearDownAll() in your test files
 Future<void> cleanupTestEnvironment() async {
-  if (sequelize != null) {
-    await sequelize.close();
-  }
+  await sequelize.close();
 }
 
 /// Clear captured SQL between tests

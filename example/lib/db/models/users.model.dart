@@ -1,5 +1,4 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/post.model.dart';
 
 part 'users.model.g.dart';
 
@@ -22,11 +21,11 @@ abstract class Users {
   @ColumnName('last_name')
   DataType lastName = DataType.STRING;
 
-  @HasOne(Post, foreignKey: 'user_id', as: 'post')
-  Post? post;
+  // @HasOne(Post, foreignKey: 'userId', as: 'post')
+  // Post? post;
 
-  @HasMany(Post, foreignKey: 'userId', as: 'posts')
-  List<Post>? posts;
+  // @HasMany(Post, foreignKey: 'userId', as: 'posts')
+  // List<Post>? posts;
 
   static UsersModel get model => UsersModel();
 }

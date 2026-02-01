@@ -35,6 +35,9 @@ export 'src/query/query/query.dart';
 export 'src/query/query_engine/query_engine.dart';
 export 'src/query/sql.dart';
 export 'src/query/typed_column.dart';
+export 'src/seeding/sequelize_seed.dart';
+// Seeding exports
+export 'src/seeding/sequelize_seeding.dart';
 // Sequelize exports
 export 'src/sequelize/sequelize.dart';
 // Utility exports

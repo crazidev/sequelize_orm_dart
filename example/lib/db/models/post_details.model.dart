@@ -1,4 +1,6 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_dart_example/db/models/post.model.dart';
+import 'package:sequelize_dart_example/db/models/users.model.dart';
 
 part 'post_details.model.g.dart';
 
@@ -6,7 +8,7 @@ part 'post_details.model.g.dart';
   tableName: 'post_details',
   underscored: true,
 )
- abstract class PostDetails {
+abstract class PostDetails {
   @ColumnDefinition(
     name: 'id',
     type: DataType.INTEGER,
@@ -26,6 +28,24 @@ part 'post_details.model.g.dart';
     type: DataType.JSON,
   )
   dynamic metadata;
+
+  @ColumnDefinition(
+    name: 'postId',
+    type: DataType.INTEGER,
+  )
+  dynamic postId;
+
+  @ColumnDefinition(
+    name: 'userId',
+    type: DataType.INTEGER,
+  )
+  dynamic userId;
+
+  @BelongsTo(Post, foreignKey: 'postId', as: 'post')
+  Post? post;
+
+  @BelongsTo(Users, foreignKey: 'userId', as: 'user')
+  Users? user;
 
   static PostDetailsModel get model => PostDetailsModel();
 }
