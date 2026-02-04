@@ -26,16 +26,16 @@ Then run:
 dart pub get
 ```
 
-### Setup Bridge Server (Dart VM only)
+### Setup for Dart VM (server-side)
 
-If you're running on Dart VM (server-side), you need to build the bridge server:
+If you're running on Dart VM (server-side), you need to build the server bundle:
 
 ```bash
 # From the project root
 ./tools/setup_bridge.sh [bun|pnpm|npm]
 ```
 
-This creates a bundled JavaScript file that allows Dart to communicate with Sequelize.js via a Node.js bridge process.
+This creates a bundled JavaScript file that allows Dart to communicate with Sequelize.js when running on the Dart VM.
 
 ## Database Connection
 

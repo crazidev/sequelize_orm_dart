@@ -1,0 +1,241 @@
+.demoSection {
+  padding: 2.5rem 0 1.5rem;
+}
+
+.inView .panels {
+  animation: fadeSlideIn 380ms ease-out both;
+}
+
+.headerRow {
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 52rem;
+  color: var(--ifm-color-content-secondary);
+}
+
+.demoLayout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media screen and (max-width: 996px) {
+  .demoLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stepsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stepsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: sticky;
+  top: calc(var(--ifm-navbar-height) + 1rem);
+}
+
+@media screen and (max-width: 996px) {
+  .stepsColumn {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: left;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  background: var(--ifm-background-surface-color);
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.step:hover {
+  transform: translateX(2px);
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.step.stepActive {
+  border-color: #fff;
+  background: #1e293b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='light'] .step.stepActive {
+  border-color: #0f172a;
+  background: #f1f5f9;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.stepBadge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  background: #334155;
+}
+
+[data-theme='light'] .stepBadge {
+  background: #cbd5e1;
+  color: #334155;
+}
+
+.step.stepActive .stepBadge {
+  background: #fff;
+  color: #000;
+}
+
+[data-theme='light'] .step.stepActive .stepBadge {
+  background: #0f172a;
+  color: #fff;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.stepKicker {
+  font-size: 0.72rem;
+  color: var(--ifm-color-content-secondary);
+}
+
+.stepTitle {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+@media screen and (max-width: 996px) {
+  .step {
+    flex: 1 1 auto;
+    min-width: 140px;
+  }
+
+  .stepCollapsible {
+    display: none;
+  }
+
+  .stepsExpanded .stepCollapsible {
+    display: flex;
+  }
+}
+
+.panelsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media screen and (max-width: 996px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--ifm-background-surface-color);
+}
+
+.outputPanel {
+  position: relative;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.panelTitle {
+  font-weight: 700;
+}
+
+.panelLink {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mobileExpandToggle {
+  display: none;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-color-primary);
+  cursor: pointer;
+}
+
+@media screen and (max-width: 996px) {
+  .mobileExpandToggle {
+    display: block;
+    order: 2;
+  }
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inView .panels {
+    animation: none;
+  }
+
+  .step,
+  .step:hover {
+    transform: none;
+    transition: none;
+  }
+}

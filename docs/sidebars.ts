@@ -47,7 +47,20 @@ const sidebars: SidebarsConfig = {
         'associations/complete-example',
       ],
     },
-    'querying',
+    {
+      type: 'category',
+      label: 'Querying',
+      items: [
+        'querying',
+        'querying/select',
+        'querying/insert',
+        'querying/update',
+        'querying/instance-methods',
+        'querying/filtering',
+        'querying/sorting-pagination',
+        'querying/aggregations',
+      ],
+    },
     'seeding-and-cli',
   ],
 };

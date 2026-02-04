@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
@@ -11,47 +11,43 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Dual Platform Support',
+    title: 'Dart-first (and strongly typed)',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Works seamlessly on both <strong>Dart server</strong> (via Node.js bridge) and{' '}
-        <strong>dart2js</strong> (via JS interop) with the same API.
+        Build queries with <strong>typed columns</strong> and IDE autocomplete. Your model
+        definitions power a safer query experience.
       </>
     ),
   },
   {
-    title: 'Type-Safe Queries',
+    title: 'Annotations + code generation',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Strongly-typed query builders with full autocomplete support. Write queries
-        with confidence using column extensions.
+        Define tables with simple annotations and let <strong>build_runner</strong> generate
+        model wrappers, helpers, and typed query extensions.
       </>
     ),
   },
   {
-    title: 'Code Generation',
+    title: 'Same API on server + web',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Automatic model implementation generation from simple annotations. Define your
-        models declaratively and let the generator do the work.
+        Run on <strong>Dart VM</strong> or <strong>dart2js</strong> without changing how you
+        write models and queries.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({ title, Svg, description }: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-      </div>
+    <div className={styles.feature}>
+      <Svg className={styles.featureSvg} role="img" />
+      <Heading as="h3" className={styles.featureTitle}>{title}</Heading>
+      <p className={styles.featureDescription}>{description}</p>
     </div>
   );
 }
@@ -60,7 +56,7 @@ export default function HomepageFeatures(): ReactNode {
   return (
     <section className={styles.features}>
       <div className="container">
-        <div className="row">
+        <div className={styles.featureList}>
           {FeatureList.map((props, idx) => (
             <Feature key={idx} {...props} />
           ))}
