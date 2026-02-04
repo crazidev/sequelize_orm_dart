@@ -288,6 +288,16 @@ class BridgeClient implements BridgeClientInterface {
         return;
       }
 
+      // Handle general log notifications
+      if (response['notification'] == 'log') {
+        final message = response['message'] as String?;
+        if (message != null) {
+          // ignore: avoid_print
+          print(message);
+        }
+        return;
+      }
+
       final id = response['id'];
 
       if (id != null && _pendingRequests.containsKey(id)) {

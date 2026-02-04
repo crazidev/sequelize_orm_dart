@@ -59,8 +59,6 @@ Future<void> initTestEnvironment() async {
   await sequelize.initialize(
     models: [Users.model, Post.model, PostDetails.model],
   );
-
-  await sequelize.sync(alter: true);
 }
 
 /// Seed initial data for tests

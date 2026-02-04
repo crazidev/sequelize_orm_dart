@@ -2,11 +2,12 @@ import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
 import { getModels, getSequelize } from '../utils/state';
 import { toModelResponseArray, ModelResponse } from '../utils/modelResponse';
-import { Model } from '@sequelize/core';
+import { Attributes, FindOptions, Model } from '@sequelize/core';
+
 
 type FindAllParams = {
   model: string;
-  options?: any;
+  options?: FindOptions<Attributes<any>>;
 };
 
 export async function handleFindAll(params: FindAllParams): Promise<ModelResponse[]> {
@@ -19,6 +20,6 @@ export async function handleFindAll(params: FindAllParams): Promise<ModelRespons
   const model = getModels().get(modelName);
   checkModelDefinition(model, modelName);
 
-  const results: Model[] = await model.findAll(options);
+  const results: Model[] = await model.findAll({ ...options, mapToModel: false });
   return toModelResponseArray(results);
 }

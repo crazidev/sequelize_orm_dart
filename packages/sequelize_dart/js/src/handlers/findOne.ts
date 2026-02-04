@@ -1,12 +1,13 @@
-import { Model } from '@sequelize/core';
+import { Attributes, FindOptions, Model } from '@sequelize/core';
 import { checkConnection, checkModelDefinition } from '../utils/checkUtils';
 import { convertQueryOptions } from '../utils/queryConverter';
-import { getModels, getSequelize } from '../utils/state';
+import { getModels, getSequelize, sendNotification } from '../utils/state';
 import { toModelResponse, ModelResponse } from '../utils/modelResponse';
+import { printLogs } from '../utils/printLogs';
 
 type FindOneParams = {
   model: string;
-  options?: any;
+  options?: FindOptions<Attributes<any>>;
 };
 
 export async function handleFindOne(params: FindOneParams): Promise<ModelResponse | null> {

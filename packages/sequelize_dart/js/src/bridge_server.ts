@@ -13,8 +13,29 @@ import {
 } from './request_handler';
 import { setNotificationCallback } from './utils/state';
 
-// Detect if we're running in a Worker Thread
 const isWorkerThread = parentPort !== null;
+
+// Override console methods to send logs as notifications
+import { format } from 'util';
+
+const originalLog = console.log;
+const originalInfo = console.info;
+const originalWarn = console.warn;
+
+function sendLog(level: string, args: any[]) {
+  const message = format(...args);
+  const notification = { notification: 'log', level, message };
+
+  if (isWorkerThread) {
+    parentPort!.postMessage(notification);
+  } else {
+    process.stdout.write(JSON.stringify(notification) + '\n');
+  }
+}
+
+console.log = (...args: any[]) => sendLog('log', args);
+console.info = (...args: any[]) => sendLog('info', args);
+console.warn = (...args: any[]) => sendLog('warn', args);
 
 type SendFunction = (response: JsonRpcResponse) => void;
 

@@ -14,6 +14,7 @@ const dataTypeMap: Record<string, any> = {
   UUID: DataTypes.UUID,
   JSON: DataTypes.JSON,
   JSONB: DataTypes.JSONB,
+  NOW: DataTypes.NOW,
 };
 
 export function convertAttribute(attrDef: any): any {
