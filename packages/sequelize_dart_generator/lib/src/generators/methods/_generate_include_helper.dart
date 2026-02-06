@@ -45,6 +45,7 @@ void _generateIncludeHelper(
     buffer.writeln(
       '    QueryOperator Function($colsClass c)? on, bool? or, bool? subQuery,',
     );
+    buffer.writeln('    bool? paranoid,');
     buffer.writeln('  }) {');
     buffer.writeln('    const cols = $colsClass();');
     buffer.writeln('    const incl = $inclClass();');
@@ -71,7 +72,7 @@ void _generateIncludeHelper(
     buffer.writeln(
       '      duplicating: duplicating, on: on != null ? on(cols) : null,',
     );
-    buffer.writeln('      or: or, subQuery: subQuery,');
+    buffer.writeln('      or: or, subQuery: subQuery, paranoid: paranoid,');
     buffer.writeln('    );');
     buffer.writeln('  }');
   }

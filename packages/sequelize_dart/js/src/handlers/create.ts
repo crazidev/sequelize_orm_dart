@@ -6,7 +6,7 @@ import {
   toModelResponseArray,
   ModelResponse,
 } from '../utils/modelResponse';
-import { Model } from '@sequelize/core';
+import { Model, sql } from '@sequelize/core';
 
 type CreateParams = {
   model: string;

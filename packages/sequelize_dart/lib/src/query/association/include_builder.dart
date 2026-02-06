@@ -68,6 +68,10 @@ class IncludeBuilder<T> {
   /// Use sub queries. This should only be used if you know for sure the query does not result in a cartesian product
   final bool? subQuery;
 
+  /// If false, includes soft-deleted records for paranoid models
+  /// @default true (excludes soft-deleted records)
+  final bool? paranoid;
+
   IncludeBuilder({
     this.association,
     this.model,
@@ -88,6 +92,7 @@ class IncludeBuilder<T> {
     this.on,
     this.or,
     this.subQuery,
+    this.paranoid,
   }) : assert(
          (all == true && association == null && model == null) ||
              ((all == null || all == false) &&
@@ -118,6 +123,7 @@ class IncludeBuilder<T> {
     dynamic on,
     bool? or,
     bool? subQuery,
+    bool? paranoid,
   }) {
     return IncludeBuilder<T>(
       association: association ?? this.association,
@@ -139,6 +145,7 @@ class IncludeBuilder<T> {
       on: on ?? this.on,
       or: or ?? this.or,
       subQuery: subQuery ?? this.subQuery,
+      paranoid: paranoid ?? this.paranoid,
     );
   }
 
@@ -313,6 +320,9 @@ class IncludeBuilder<T> {
     }
 
     if (through != null) result['through'] = through;
+
+    // Handle paranoid option for soft-deleted records
+    if (paranoid != null) result['paranoid'] = paranoid;
 
     // Handle 'on' clause (custom ON condition)
     if (on != null && all != true) {

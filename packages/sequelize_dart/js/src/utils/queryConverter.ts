@@ -371,6 +371,21 @@ export function convertQueryOptions(options: any): any {
     result.attributes = convertAttributes(options.attributes);
   }
 
+  // Pass through paranoid option (for soft-delete queries)
+  if (options.paranoid !== undefined && options.paranoid !== null) {
+    result.paranoid = options.paranoid;
+  }
+
+  // Pass through force option (for hard delete)
+  if (options.force !== undefined && options.force !== null) {
+    result.force = options.force;
+  }
+
+  // Pass through individualHooks option
+  if (options.individualHooks !== undefined && options.individualHooks !== null) {
+    result.individualHooks = options.individualHooks;
+  }
+
   if (getOptions().hoistIncludeOptions) {
     hoistIncludeOptions(result);
   }

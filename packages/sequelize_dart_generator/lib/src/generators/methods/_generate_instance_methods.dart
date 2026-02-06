@@ -277,5 +277,50 @@ void _generateInstanceMethods(
     buffer.writeln('    return affectedRows;');
     buffer.writeln('  }');
     buffer.writeln();
+
+    // Generate destroy() instance method
+    buffer.writeln('  /// Destroys this instance (deletes from database)');
+    buffer.writeln(
+      '  /// For paranoid models, sets deletedAt unless force is true',
+    );
+    buffer.writeln('  Future<void> destroy({bool? force}) async {');
+    buffer.writeln('    final pkValues = getPrimaryKeyMap();');
+    buffer.writeln('    if (pkValues == null || pkValues.isEmpty) {');
+    buffer.writeln(
+      '      throw StateError(\'Cannot destroy: instance has no primary key values\');',
+    );
+    buffer.writeln('    }');
+    buffer.writeln();
+    buffer.writeln('    await QueryEngine().instanceDestroy(');
+    buffer.writeln('      modelName: $generatedClassName().name,');
+    buffer.writeln('      primaryKeyValues: pkValues,');
+    buffer.writeln('      options: {if (force != null) \'force\': force},');
+    buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
+    buffer.writeln('      model: $generatedClassName().sequelizeModel,');
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln();
+
+    // Generate restore() instance method
+    buffer.writeln('  /// Restores this soft-deleted instance (for paranoid models)');
+    buffer.writeln('  Future<void> restore() async {');
+    buffer.writeln('    final pkValues = getPrimaryKeyMap();');
+    buffer.writeln('    if (pkValues == null || pkValues.isEmpty) {');
+    buffer.writeln(
+      '      throw StateError(\'Cannot restore: instance has no primary key values\');',
+    );
+    buffer.writeln('    }');
+    buffer.writeln();
+    buffer.writeln('    await QueryEngine().instanceRestore(');
+    buffer.writeln('      modelName: $generatedClassName().name,');
+    buffer.writeln('      primaryKeyValues: pkValues,');
+    buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
+    buffer.writeln('      model: $generatedClassName().sequelizeModel,');
+    buffer.writeln('    );');
+    buffer.writeln();
+    buffer.writeln('    // Reload to get updated values (deletedAt should be null)');
+    buffer.writeln('    await reload();');
+    buffer.writeln('  }');
+    buffer.writeln();
   }
 }

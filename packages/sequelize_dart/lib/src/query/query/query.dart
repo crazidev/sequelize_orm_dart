@@ -20,6 +20,10 @@ class Query extends QueryInterface {
   final int? offset;
   final QueryAttributes? attributes;
 
+  /// If false, includes soft-deleted records (for paranoid tables)
+  /// @default true (excludes soft-deleted records)
+  final bool? paranoid;
+
   Query({
     this.where,
     this.include,
@@ -28,6 +32,7 @@ class Query extends QueryInterface {
     this.limit,
     this.offset,
     this.attributes,
+    this.paranoid,
   });
 
   /// Create a Query from callbacks
@@ -42,6 +47,7 @@ class Query extends QueryInterface {
     int? limit,
     int? offset,
     QueryAttributes? attributes,
+    bool? paranoid,
   }) {
     return Query(
       where: where != null && columns != null
@@ -55,6 +61,7 @@ class Query extends QueryInterface {
       limit: limit,
       offset: offset,
       attributes: attributes,
+      paranoid: paranoid,
     );
   }
 
@@ -74,6 +81,7 @@ class Query extends QueryInterface {
       'limit': limit,
       'offset': offset,
       if (attributes != null) 'attributes': attributes!.toJson()['value'],
+      if (paranoid != null) 'paranoid': paranoid,
     };
   }
 

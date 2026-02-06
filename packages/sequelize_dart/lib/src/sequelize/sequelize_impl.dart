@@ -173,6 +173,39 @@ class Sequelize extends SequelizeInterface {
     await _bridge.close();
   }
 
+  /// Truncate all models registered in this instance.
+  /// This is done by calling Model.truncate on each model.
+  ///
+  /// __Danger__: This will completely empty all your tables!
+  Future<void> truncate({
+    bool? cascade,
+    bool? restartIdentity,
+    bool? withoutForeignKeyChecks,
+  }) async {
+    final options = <String, dynamic>{
+      if (cascade != null) 'cascade': cascade,
+      if (restartIdentity != null) 'restartIdentity': restartIdentity,
+      if (withoutForeignKeyChecks != null)
+        'withoutForeignKeyChecks': withoutForeignKeyChecks,
+    };
+    await _bridge.call('sequelizeTruncate', {'options': options});
+  }
+
+  /// A slower alternative to truncate that uses DELETE FROM instead of TRUNCATE,
+  /// but which works with foreign key constraints in dialects that don't support
+  /// TRUNCATE CASCADE (postgres), or temporarily disabling foreign key constraints
+  /// (mysql, mariadb, sqlite).
+  Future<void> destroyAll({
+    bool? force,
+    bool? individualHooks,
+  }) async {
+    final options = <String, dynamic>{
+      if (force != null) 'force': force,
+      if (individualHooks != null) 'individualHooks': individualHooks,
+    };
+    await _bridge.call('sequelizeDestroyAll', {'options': options});
+  }
+
   // --- SQL Expression Builders ---
 
   static SqlFn fn(String fn, [dynamic args]) {

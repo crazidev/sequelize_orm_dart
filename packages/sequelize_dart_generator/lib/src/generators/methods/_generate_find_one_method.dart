@@ -26,6 +26,7 @@ void _generateFindOneMethod(
   buffer.writeln('    int? limit,');
   buffer.writeln('    int? offset,');
   buffer.writeln('    QueryAttributes? attributes,');
+  buffer.writeln('    bool? paranoid,');
   buffer.writeln('  }) {');
   buffer.writeln('    const columns = $columnsClassName();');
   buffer.writeln('    const includeHelper = $includeHelperClassName();');
@@ -39,6 +40,7 @@ void _generateFindOneMethod(
   buffer.writeln('      limit: limit,');
   buffer.writeln('      offset: offset,');
   buffer.writeln('      attributes: attributes,');
+  buffer.writeln('      paranoid: paranoid,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().findOne(');
   buffer.writeln('      modelName: name,');

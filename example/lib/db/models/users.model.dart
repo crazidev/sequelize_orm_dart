@@ -3,7 +3,10 @@ import 'package:sequelize_dart_example/db/models/post.model.dart';
 
 part 'users.model.g.dart';
 
-@Table(tableName: 'users', timestamps: false)
+@Table(
+  underscored: true,
+  deletedAt: TimestampOption.custom('deleted_at'),
+)
 abstract class Users {
   @PrimaryKey()
   @AutoIncrement()
@@ -21,6 +24,9 @@ abstract class Users {
 
   @ColumnName('last_name')
   DataType lastName = DataType.STRING;
+
+  @ColumnName('deleted_at')
+  DataType deletedAt = DataType.DATE;
 
   @HasOne(Post, foreignKey: 'userId', as: 'post')
   Post? post;

@@ -518,4 +518,128 @@ class QueryEngine extends QueryEngineInterface {
       );
     }
   }
+
+  @override
+  Future<int> destroy({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      final result = await getBridge(sequelize).call('destroy', {
+        'model': modelName,
+        'options': options,
+      });
+
+      if (result is int) return result;
+      if (result is num) return result.toInt();
+
+      throw Exception(
+        'Invalid response format: expected int, got ${result.runtimeType}',
+      );
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute destroy()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute destroy()',
+      );
+    }
+  }
+
+  @override
+  Future<void> truncate({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      await getBridge(sequelize).call('truncate', {
+        'model': modelName,
+        'options': options,
+      });
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute truncate()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute truncate()',
+      );
+    }
+  }
+
+  @override
+  Future<void> restore({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      await getBridge(sequelize).call('restore', {
+        'model': modelName,
+        'options': options,
+      });
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute restore()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute restore()',
+      );
+    }
+  }
+
+  @override
+  Future<void> instanceDestroy({
+    required String modelName,
+    required Map<String, dynamic> primaryKeyValues,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      await getBridge(sequelize).call('instanceDestroy', {
+        'model': modelName,
+        'primaryKeyValues': primaryKeyValues,
+        'options': options,
+      });
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute instanceDestroy()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute instanceDestroy()',
+      );
+    }
+  }
+
+  @override
+  Future<void> instanceRestore({
+    required String modelName,
+    required Map<String, dynamic> primaryKeyValues,
+    dynamic sequelize,
+    dynamic model,
+  }) async {
+    try {
+      await getBridge(sequelize).call('instanceRestore', {
+        'model': modelName,
+        'primaryKeyValues': primaryKeyValues,
+      });
+    } catch (e) {
+      if (e is SequelizeException) {
+        throw e.copyWithContext('Exception: failed to execute instanceRestore()');
+      }
+      throw SequelizeException(
+        e.toString(),
+        context: 'Exception: failed to execute instanceRestore()',
+      );
+    }
+  }
 }

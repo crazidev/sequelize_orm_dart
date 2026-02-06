@@ -3,11 +3,10 @@ part of '../../sequelize_model_generator.dart';
 Map<String, dynamic> _extractTableAnnotation(ConstantReader annotation) {
   final result = <String, dynamic>{};
 
-  // Required field
-  result['tableName'] =
-      annotation.peek('tableName')?.stringValue ?? 'unknown_table';
-
   // Optional fields
+  if (annotation.peek('tableName')?.isNull == false) {
+    result['tableName'] = annotation.peek('tableName')?.stringValue;
+  }
   if (annotation.peek('omitNull')?.isNull == false) {
     result['omitNull'] = annotation.peek('omitNull')?.boolValue;
   }

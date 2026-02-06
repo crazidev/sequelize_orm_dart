@@ -31,9 +31,13 @@ export 'src/query/association/include_options.dart';
 export 'src/query/operators/operators.dart';
 export 'src/query/operators/operators_interface.dart';
 // Query exports
+export 'src/query/destroy_options.dart';
+export 'src/query/instance_destroy_options.dart';
 export 'src/query/query/query.dart';
 export 'src/query/query_engine/query_engine.dart';
+export 'src/query/restore_options.dart';
 export 'src/query/sql.dart';
+export 'src/query/truncate_options.dart';
 export 'src/query/typed_column.dart';
 export 'src/seeding/sequelize_seed.dart';
 // Seeding exports

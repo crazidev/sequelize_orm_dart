@@ -119,6 +119,7 @@ abstract class Model<T> extends ModelInterface {
     int? limit,
     int? offset,
     QueryAttributes? attributes,
+    bool? paranoid,
   }) {
     final query = Query.fromCallbacks(
       where: where,
@@ -128,6 +129,7 @@ abstract class Model<T> extends ModelInterface {
       limit: limit,
       offset: offset,
       attributes: attributes,
+      paranoid: paranoid,
     );
     return QueryEngine().findAll(
           modelName: name,
@@ -145,6 +147,7 @@ abstract class Model<T> extends ModelInterface {
     dynamic order,
     dynamic group,
     QueryAttributes? attributes,
+    bool? paranoid,
   }) {
     final query = Query.fromCallbacks(
       where: where,
@@ -152,6 +155,7 @@ abstract class Model<T> extends ModelInterface {
       order: order,
       group: group,
       attributes: attributes,
+      paranoid: paranoid,
     );
     return QueryEngine().findOne(
           modelName: name,
@@ -197,4 +201,70 @@ abstract class Model<T> extends ModelInterface {
 
   /// Sum values of a column
   Future<num?> sum(covariant dynamic columnFn, {covariant dynamic where});
+
+  /// Deletes multiple instances, or set their deletedAt timestamp to the current time if `paranoid` is enabled.
+  ///
+  /// Returns the number of destroyed rows.
+  Future<int> destroy({
+    covariant dynamic where,
+    bool? force,
+    int? limit,
+    bool? individualHooks,
+  }) {
+    final query = Query.fromCallbacks(where: where);
+    final options = <String, dynamic>{
+      ...query.toJson(),
+      if (force != null) 'force': force,
+      if (limit != null) 'limit': limit,
+      if (individualHooks != null) 'individualHooks': individualHooks,
+    };
+    return QueryEngine().destroy(
+      modelName: name,
+      options: options,
+      sequelize: sequelizeInstance,
+      model: sequelizeModel,
+    );
+  }
+
+  /// Truncates the table associated with the model.
+  ///
+  /// __Danger__: This will completely empty your table!
+  Future<void> truncate({
+    bool? cascade,
+    bool? restartIdentity,
+    bool? force,
+  }) {
+    final options = <String, dynamic>{
+      if (cascade != null) 'cascade': cascade,
+      if (restartIdentity != null) 'restartIdentity': restartIdentity,
+      if (force != null) 'force': force,
+    };
+    return QueryEngine().truncate(
+      modelName: name,
+      options: options,
+      sequelize: sequelizeInstance,
+      model: sequelizeModel,
+    );
+  }
+
+  /// Restores multiple paranoid instances.
+  /// Only usable if `paranoid` is enabled.
+  Future<void> restore({
+    covariant dynamic where,
+    int? limit,
+    bool? individualHooks,
+  }) {
+    final query = Query.fromCallbacks(where: where);
+    final options = <String, dynamic>{
+      ...query.toJson(),
+      if (limit != null) 'limit': limit,
+      if (individualHooks != null) 'individualHooks': individualHooks,
+    };
+    return QueryEngine().restore(
+      modelName: name,
+      options: options,
+      sequelize: sequelizeInstance,
+      model: sequelizeModel,
+    );
+  }
 }

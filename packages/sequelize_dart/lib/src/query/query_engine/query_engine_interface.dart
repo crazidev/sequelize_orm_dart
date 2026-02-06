@@ -143,4 +143,48 @@ abstract class QueryEngineInterface {
     dynamic sequelize,
     dynamic model,
   });
+
+  /// Destroy records matching the query
+  /// Returns the number of destroyed rows
+  Future<int> destroy({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Truncate the table associated with the model
+  Future<void> truncate({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Restore soft-deleted records matching the query
+  /// Only usable if paranoid is enabled
+  Future<void> restore({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Destroy a single instance
+  Future<void> instanceDestroy({
+    required String modelName,
+    required Map<String, dynamic> primaryKeyValues,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Restore a single soft-deleted instance
+  /// Only usable if paranoid is enabled
+  Future<void> instanceRestore({
+    required String modelName,
+    required Map<String, dynamic> primaryKeyValues,
+    dynamic sequelize,
+    dynamic model,
+  });
 }

@@ -24,6 +24,7 @@ part 'generators/methods/_generate_columns.dart';
 part 'generators/methods/_generate_count_method.dart';
 part 'generators/methods/_generate_create_method.dart';
 part 'generators/methods/_generate_define_method.dart';
+part 'generators/methods/_generate_destroy_method.dart';
 part 'generators/methods/_generate_find_all_method.dart';
 part 'generators/methods/_generate_find_one_method.dart';
 part 'generators/methods/_generate_get_attributes_json_method.dart';
@@ -38,7 +39,9 @@ part 'generators/methods/_generate_max_method.dart';
 part 'generators/methods/_generate_merge_where_helper.dart';
 part 'generators/methods/_generate_min_method.dart';
 part 'generators/methods/_generate_query_builder.dart';
+part 'generators/methods/_generate_restore_method.dart';
 part 'generators/methods/_generate_sum_method.dart';
+part 'generators/methods/_generate_truncate_method.dart';
 part 'generators/methods/_generate_update_method.dart';
 part 'generators/methods/_generate_where_method.dart';
 part 'generators/methods/_generator_naming_config.dart';
@@ -186,6 +189,22 @@ Future<String> _generateForClassElement(
     valuesClassName,
     baseCallbackName,
     fields,
+    namingConfig,
+  );
+  _generateDestroyMethod(
+    buffer,
+    className,
+    baseCallbackName,
+    namingConfig,
+  );
+  _generateTruncateMethod(
+    buffer,
+    className,
+  );
+  _generateRestoreMethod(
+    buffer,
+    className,
+    baseCallbackName,
     namingConfig,
   );
   _generateGetQueryBuilderMethod(

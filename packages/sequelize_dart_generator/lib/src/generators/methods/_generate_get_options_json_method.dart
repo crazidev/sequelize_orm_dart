@@ -9,12 +9,8 @@ void _generateGetOptionsJsonMethod(
   buffer.writeln('  Map<String, dynamic> getOptionsJson() {');
   buffer.writeln('    final table = Table(');
 
-  // Write tableName (required)
-  buffer.writeln("      tableName: '${tableAnnotation['tableName']}',");
-
   // Write all optional parameters
   final optionalParams = <String, dynamic>{...tableAnnotation};
-  optionalParams.remove('tableName');
 
   for (final entry in optionalParams.entries) {
     final key = entry.key;

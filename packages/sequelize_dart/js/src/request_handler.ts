@@ -21,6 +21,13 @@ import { handleSync } from './handlers/sync';
 import { handleBelongsToGet } from './handlers/belongsToGet';
 import { handleBelongsToSet } from './handlers/belongsToSet';
 import { handleBelongsToCreate } from './handlers/belongsToCreate';
+import { handleDestroy } from './handlers/destroy';
+import { handleTruncate } from './handlers/truncate';
+import { handleRestore } from './handlers/restore';
+import { handleInstanceDestroy } from './handlers/instanceDestroy';
+import { handleInstanceRestore } from './handlers/instanceRestore';
+import { handleSequelizeTruncate } from './handlers/sequelizeTruncate';
+import { handleSequelizeDestroyAll } from './handlers/sequelizeDestroyAll';
 
 export type JsonRpcRequest = {
   id: unknown;
@@ -126,6 +133,34 @@ export async function processRequest(
 
       case 'belongsToCreate':
         result = await handleBelongsToCreate(params);
+        break;
+
+      case 'destroy':
+        result = await handleDestroy(params);
+        break;
+
+      case 'truncate':
+        result = await handleTruncate(params);
+        break;
+
+      case 'restore':
+        result = await handleRestore(params);
+        break;
+
+      case 'instanceDestroy':
+        result = await handleInstanceDestroy(params);
+        break;
+
+      case 'instanceRestore':
+        result = await handleInstanceRestore(params);
+        break;
+
+      case 'sequelizeTruncate':
+        result = await handleSequelizeTruncate(params);
+        break;
+
+      case 'sequelizeDestroyAll':
+        result = await handleSequelizeDestroyAll(params);
         break;
 
       case 'close':

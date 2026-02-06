@@ -71,7 +71,7 @@ class Table {
   /// in which case it uses model name verbatim.
   ///
   /// Not inherited.
-  final String tableName;
+  final String? tableName;
 
   /// Don't persist null values. This means that all columns with null values will not be saved.
   ///
@@ -185,7 +185,7 @@ class Table {
   final VersionOption? version;
 
   const Table({
-    required this.tableName,
+    this.tableName,
     this.omitNull,
     this.noPrimaryKey,
     this.timestamps = true,
@@ -209,9 +209,11 @@ class Table {
   });
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{
-      'tableName': tableName,
-    };
+    final json = <String, dynamic>{};
+
+    if (tableName != null) {
+      json['tableName'] = tableName;
+    }
 
     if (omitNull != null) {
       json['omitNull'] = omitNull;
@@ -224,6 +226,9 @@ class Table {
     }
     if (paranoid != null) {
       json['paranoid'] = paranoid;
+    } else if (deletedAt != null && deletedAt!.enable) {
+      // Automatically enable paranoid mode when deletedAt is configured
+      json['paranoid'] = true;
     }
     if (underscored != null) {
       json['underscored'] = underscored;
