@@ -19,6 +19,9 @@ class _FieldInfo {
   final bool zerofill;
   final bool binary;
 
+  /// Whether this field has a default value (via @Default decorator or defaultValue in ColumnDefinition).
+  bool get hasDefaultValue => defaultValue != null;
+
   _FieldInfo({
     required this.fieldName,
     required this.name,

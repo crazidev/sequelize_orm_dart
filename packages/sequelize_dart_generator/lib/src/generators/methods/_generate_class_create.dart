@@ -8,9 +8,9 @@ void _generateClassCreate(
   GeneratorNamingConfig namingConfig,
 ) {
   buffer.writeln('class $createClassName {');
-  // Add regular fields
+  // Add regular fields (omit auto-increment and fields with default values)
   for (var field in fields) {
-    if (!field.autoIncrement && !field.primaryKey) {
+    if (!field.autoIncrement && !field.hasDefaultValue) {
       buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
     }
   }
@@ -33,7 +33,7 @@ void _generateClassCreate(
   buffer.writeln();
   buffer.writeln('  $createClassName({');
   for (var field in fields) {
-    if (!field.autoIncrement && !field.primaryKey) {
+    if (!field.autoIncrement && !field.hasDefaultValue) {
       buffer.writeln('    this.${field.fieldName},');
     }
   }
@@ -45,9 +45,9 @@ void _generateClassCreate(
   buffer.writeln('  Map<String, dynamic> toJson() {');
   buffer.writeln('    final result = <String, dynamic>{};');
 
-  // Add regular fields
+  // Add regular fields (omit auto-increment and fields with default values)
   for (var field in fields) {
-    if (!field.autoIncrement && !field.primaryKey) {
+    if (!field.autoIncrement && !field.hasDefaultValue) {
       buffer.writeln(
         "    if (${field.fieldName} != null) result['${field.name}'] = ${field.fieldName};",
       );

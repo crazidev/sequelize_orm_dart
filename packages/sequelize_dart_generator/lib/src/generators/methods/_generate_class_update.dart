@@ -6,7 +6,7 @@ void _generateClassUpdate(
   List<_FieldInfo> fields,
 ) {
   buffer.writeln('class $updateClassName {');
-  // Add regular fields (same as Create - non-primary-key, non-auto-increment)
+  // Add regular fields (omit primary keys and auto-increment — these identify the row and should not be updated)
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
       buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
