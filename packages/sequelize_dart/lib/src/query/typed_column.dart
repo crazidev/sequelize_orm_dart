@@ -3,6 +3,9 @@ import 'package:sequelize_dart/src/annotations.dart';
 // Export all operator extensions for convenience
 export 'package:sequelize_dart/src/query/operators/extentions/extensions.dart';
 
+// Export JSON column types for fluent JSON path queries
+export 'package:sequelize_dart/src/query/json_column.dart';
+
 /// Type-safe column reference for building queries
 ///
 /// The [Column] class provides a type-safe way to reference database columns

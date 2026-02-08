@@ -22,9 +22,22 @@ void _generateColumns(
 
     final typeExpression = _getDataTypeExpression(field);
 
-    buffer.writeln(
-      "  final ${field.fieldName} = const Column<$dartType>('${field.name}', $typeExpression);",
-    );
+    // Use JsonColumn for JSON/JSONB columns to enable fluent JSON path queries
+    final baseType =
+        field.dataType.contains('(')
+            ? field.dataType.split('(')[0]
+            : field.dataType;
+    final isJson = baseType == 'JSON' || baseType == 'JSONB';
+
+    if (isJson) {
+      buffer.writeln(
+        "  final ${field.fieldName} = const JsonColumn('${field.name}', $typeExpression);",
+      );
+    } else {
+      buffer.writeln(
+        "  final ${field.fieldName} = const Column<$dartType>('${field.name}', $typeExpression);",
+      );
+    }
   }
 
   buffer.writeln('}');
