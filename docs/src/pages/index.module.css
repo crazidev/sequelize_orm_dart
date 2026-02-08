@@ -1,0 +1,218 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+.heroBanner {
+  position: relative;
+  padding: 8rem 0 6rem;
+  overflow: hidden;
+  background: #0f172a;
+  /* Slate 900 */
+  color: #fff;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+}
+
+[data-theme='light'] .heroBanner {
+  background: #f8fafc;
+  /* Slate 50 */
+  color: #0f172a;
+}
+
+/* Grid Background Effect */
+.heroBanner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+  animation: gridMove 20s linear infinite;
+  z-index: -1;
+}
+
+[data-theme='light'] .heroBanner::before {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+/* Glowing orb effect */
+.heroBanner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(var(--ifm-color-primary-rgb), 0.2) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 5rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+[data-theme='light'] .heroTitle {
+  background: linear-gradient(180deg, #0f172a 0%, #475569 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  color: #94a3b8;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.2s forwards;
+}
+
+[data-theme='light'] .heroSubtitle {
+  color: #475569;
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
+}
+
+.primaryButton {
+  background: var(--ifm-color-primary);
+  color: white;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  box-shadow: 0 0 20px rgba(var(--ifm-color-primary-rgb), 0.3);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(var(--ifm-color-primary-rgb), 0.5);
+  color: white;
+  text-decoration: none;
+}
+
+.outlineButton {
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  transition: all 0.2s ease;
+}
+
+[data-theme='light'] .outlineButton {
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.outlineButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border-color: #94a3b8;
+  text-decoration: none;
+}
+
+[data-theme='light'] .outlineButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+  border-color: #64748b;
+}
+
+.trustStrip {
+  margin-top: 5rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.6s forwards;
+}
+
+.trustStrip li {
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trustStrip li::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--ifm-color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--ifm-color-primary);
+}
+
+@media screen and (max-width: 996px) {
+  .heroTitle {
+    font-size: 3.5rem;
+  }
+}

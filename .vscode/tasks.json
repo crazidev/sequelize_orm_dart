@@ -1,38 +1,22 @@
 {
   "version": "2.0.0",
   "tasks": [
+    // ==================== Watch Tasks ====================
     {
-      "label": "Generate Models",
+      "label": "1. Watch Models",
+      "detail": "Watch model files and regenerate code on changes",
       "type": "shell",
-      "command": "dart run build_runner build --delete-conflicting-outputs",
+      "command": "./tools/watch_models.sh",
       "options": {
-        "cwd": "${workspaceFolder}/example"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Watch Models",
-      "type": "shell",
-      "command": "dart run build_runner watch --delete-conflicting-outputs",
-      "options": {
-        "cwd": "${workspaceFolder}/example"
+        "cwd": "${workspaceFolder}"
       },
       "isBackground": true,
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
         "panel": "dedicated",
-        "clear": true
+        "clear": true,
+        "group": "watch"
       },
       "problemMatcher": {
         "pattern": {
@@ -51,78 +35,38 @@
       }
     },
     {
-      "label": "Build Bridge Server",
+      "label": "2. Watch Dart VM",
+      "detail": "Watch Dart files and restart Dart VM server on changes",
       "type": "shell",
-      "command": "./tools/setup_bridge.sh",
+      "command": "./tools/watch_dart.sh",
       "options": {
         "cwd": "${workspaceFolder}"
       },
+      "isBackground": true,
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": true
+        "panel": "dedicated",
+        "clear": true,
+        "group": "watch"
       },
-      "problemMatcher": []
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting Dart server",
+          "endsPattern": "^.*Dart server started"
+        }
+      }
     },
     {
-      "label": "Compile JS",
-      "type": "shell",
-      "command": "./tools/build.sh",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Compile JS with Generator",
-      "type": "shell",
-      "command": "./tools/build.sh --generate",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Build and Run",
-      "type": "shell",
-      "command": "./tools/build.sh --generate --run",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Watch JS",
+      "label": "3. Watch dart2js",
+      "detail": "Watch Dart files and recompile to JavaScript on changes",
       "type": "shell",
       "command": "./tools/watch_js.sh",
       "options": {
@@ -131,11 +75,10 @@
       "isBackground": true,
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
         "panel": "dedicated",
-        "clear": false
+        "clear": true,
+        "group": "watch"
       },
       "problemMatcher": {
         "pattern": {
@@ -152,31 +95,127 @@
       }
     },
     {
-      "label": "Watch All",
-      "dependsOn": ["Watch Models", "Watch JS"],
-      "dependsOrder": "parallel",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Dev Server",
+      "label": "4. Watch Bridge",
+      "detail": "Watch TypeScript files and rebuild bridge bundles on changes",
       "type": "shell",
-      "command": "node --watch example/build/index.js",
+      "command": "./tools/watch_bridge.sh",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "isBackground": true,
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": true,
+        "panel": "new",
+        "clear": true
+        // "group": "watch"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^\\[.*\\] Running initial build",
+          "endsPattern": "^\\[.*\\] Ready"
+        }
+      }
+    },
+    // ==================== Build Tasks ====================
+    {
+      "label": "Build: Models",
+      "detail": "Generate model code once",
+      "type": "shell",
+      "command": "dart run build_runner build --delete-conflicting-outputs",
+      "options": {
+        "cwd": "${workspaceFolder}/example"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: Bridge",
+      "detail": "Build both stdio and worker bridge bundles",
+      "type": "shell",
+      "command": "./tools/setup_bridge.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: dart2js",
+      "detail": "Compile main.dart to JavaScript",
+      "type": "shell",
+      "command": "./tools/build.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: Full",
+      "detail": "Build everything: bridge → models → dart2js",
+      "dependsOn": ["Build: Bridge", "Build: Models", "Build: dart2js"],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    // ==================== Run Tasks ====================
+    {
+      "label": "Run: Dart VM",
+      "detail": "Run example with Dart VM",
+      "type": "shell",
+      "command": "dart run example/lib/main.dart",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: dart2js",
+      "detail": "Run compiled JavaScript with Node.js (auto-reload on rebuild)",
+      "type": "shell",
+      "command": "node --watch example/build/index.js",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
         "panel": "dedicated",
         "clear": true
       },
@@ -193,6 +232,53 @@
           "endsPattern": "."
         }
       }
+    },
+    {
+      "label": "Run: Benchmark (Dart VM)",
+      "detail": "Run performance benchmark with Dart VM",
+      "type": "shell",
+      "command": "dart run example/lib/benchmark.dart",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: Benchmark (dart2js)",
+      "detail": "Build and run performance benchmark with Node.js",
+      "type": "shell",
+      "command": "./tools/build.sh --input=example/lib/benchmark.dart --output=benchmark && node example/build/benchmark.js",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ==================== Compound Watch Tasks ====================
+    {
+      "label": "Watch: All (Models + dart2js + Run)",
+      "detail": "Watch models, compile to JS, and run with auto-reload",
+      "dependsOn": ["1. Watch Models", "3. Watch dart2js", "Run: dart2js"],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "Watch: Full Dev (Models + Dart VM)",
+      "detail": "Watch models and run Dart VM server with auto-restart",
+      "dependsOn": ["1. Watch Models", "2. Watch Dart VM"],
+      "dependsOrder": "parallel",
+      "group": "build"
     }
   ]
 }

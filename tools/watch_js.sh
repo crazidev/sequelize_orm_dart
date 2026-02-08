@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Watch script for Dart files - no external dependencies required
+# Watch script for dart2js compilation
 # Uses a polling approach for cross-platform compatibility
 
 # Get the directory where the script is located
@@ -25,6 +25,8 @@ HASH_FILE="/tmp/sequelize_dart_watch_hash_$$"
 
 # Cleanup on exit
 cleanup() {
+    echo ""
+    echo -e "${RED}Stopping watcher...${NC}"
     rm -f "$HASH_FILE" "$HASH_FILE.new"
     exit 0
 }
@@ -36,7 +38,7 @@ get_files_hash() {
 }
 
 echo -e "${CYAN}╔════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║   Sequelize Dart File Watcher          ║${NC}"
+echo -e "${CYAN}║   dart2js Watch Mode                   ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BLUE}Watching directories: ${WATCH_DIRS}${NC}"
@@ -51,7 +53,7 @@ echo ""
 # Store initial hash
 get_files_hash > "$HASH_FILE"
 
-echo -e "${GREEN}[$(date +%H:%M:%S)] Watching for changes...${NC}"
+echo -e "${GREEN}[$(date +%H:%M:%S)] Ready - watching for changes...${NC}"
 echo ""
 
 # Polling loop

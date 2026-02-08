@@ -1,0 +1,91 @@
+.section {
+  padding: 2.25rem 0;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--ifm-color-content-secondary);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media screen and (max-width: 996px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 16px;
+  padding: 0.9rem 0.95rem;
+  background: var(--ifm-background-surface-color);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 320ms ease-out,
+    transform 320ms ease-out,
+    box-shadow 120ms ease,
+    border-color 120ms ease;
+}
+
+.step.inView {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.step:hover {
+  border-color: var(--ifm-color-emphasis-400);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+}
+
+.stepBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: #334155;
+  flex: 0 0 auto;
+}
+
+[data-theme='light'] .stepBadge {
+  color: #fff;
+  background: #0f172a;
+}
+
+.stepTitle {
+  font-weight: 800;
+  margin-bottom: 0.15rem;
+}
+
+.stepDescription {
+  color: var(--ifm-color-content-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .step,
+  .step.inView {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

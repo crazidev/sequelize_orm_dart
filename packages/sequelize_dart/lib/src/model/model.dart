@@ -1,3 +1,3 @@
-export 'model_stub.dart'
-    if (dart.library.js_interop) 'model_js.dart'
-    if (dart.library.io) 'model_dart.dart';
+// Unified Model implementation - no longer needs platform-specific code
+// Both Dart VM and dart2js use the same bridge pattern
+export 'model_impl.dart';

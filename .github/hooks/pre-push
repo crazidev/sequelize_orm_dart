@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Pre-push hook to check formatting before pushing
+# This ensures code is properly formatted before pushing to remote
+
+# Get the git root directory
+# Hooks run from .git/hooks/, so we need to go up two levels to get to the repo root
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ "$HOOK_DIR" == *"/.git/hooks" ]]; then
+  # Hook is in .git/hooks, go up two levels to repo root
+  ROOT_DIR="$(cd "$HOOK_DIR/../.." && pwd)"
+elif [ -d "$HOOK_DIR/../.." ] && [ -d "$(cd "$HOOK_DIR/../.." && pwd)/.git" ]; then
+  # Try going up two levels
+  ROOT_DIR="$(cd "$HOOK_DIR/../.." && pwd)"
+else
+  # Fallback: use git rev-parse if we're in a work tree
+  ROOT_DIR="$(cd "$HOOK_DIR/../.." && git rev-parse --show-toplevel 2>/dev/null || pwd)"
+fi
+
+# Change to root directory
+if [ -n "$ROOT_DIR" ] && [ -d "$ROOT_DIR" ]; then
+  cd "$ROOT_DIR" || exit 1
+else
+  echo "Error: Could not find git repository root from $HOOK_DIR"
+  exit 1
+fi
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🔍 Checking code formatting before push...${NC}\n"
+
+# Check if prettier is available
+PRETTIER_CMD=""
+if [ -f "node_modules/.bin/prettier" ]; then
+  PRETTIER_CMD="node_modules/.bin/prettier"
+elif command -v npx &> /dev/null; then
+  PRETTIER_CMD="npx prettier"
+elif command -v prettier &> /dev/null; then
+  PRETTIER_CMD="prettier"
+fi
+
+# Check JavaScript/JSON formatting
+if [ -n "$PRETTIER_CMD" ]; then
+  echo -e "${YELLOW}Checking JavaScript/JSON formatting...${NC}"
+  if ! $PRETTIER_CMD --check "**/*.{js,json,md}" --ignore-path .prettierignore 2>/dev/null; then
+    echo -e "${RED}❌ JavaScript/JSON files are not properly formatted!${NC}"
+    echo -e "${YELLOW}Run: ./tools/format.sh to fix formatting${NC}"
+    exit 1
+  fi
+fi
+
+# Check Dart formatting
+echo -e "${YELLOW}Checking Dart formatting...${NC}"
+if ! dart format --set-exit-if-changed . > /dev/null 2>&1; then
+  echo -e "${RED}❌ Dart files are not properly formatted!${NC}"
+  echo -e "${YELLOW}Run: dart format . to fix formatting${NC}"
+  exit 1
+fi
+
+echo -e "\n${GREEN}✅ All files are properly formatted!${NC}"

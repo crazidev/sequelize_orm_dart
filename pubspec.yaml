@@ -1,14 +1,14 @@
-name: sequelize_dart_monorepo
-description: Monorepo for sequelize_dart packages - A Dart ORM for Sequelize.js.
-version: 1.0.0
-
+name: _
+publish_to: none
 environment:
   sdk: ^3.9.2
 
-# This is a monorepo - packages are in the packages/ directory
-# - packages/sequelize_dart: Main package
-# - packages/sequelize_dart_generator: Code generator package
-# - example/: Example project
-
+workspace:
+  - packages/sequelize_dart
+  - packages/sequelize_dart_generator
+  - example
+  - packages/sequelize_dart_analyzer_plugin
 dev_dependencies:
-  lints: ^6.0.0
+  test: ^1.28.0
+dependencies:
+  sequelize_dart_example: ^1.0.0

@@ -1,0 +1,76 @@
+.section {
+  padding: 2.25rem 0;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--ifm-color-content-secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media screen and (max-width: 996px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  display: block;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 16px;
+  padding: 0.95rem 0.95rem 0.85rem;
+  text-decoration: none;
+  background: var(--ifm-background-surface-color);
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  color: inherit;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  border-color: var(--ifm-color-emphasis-400);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.cardTitle {
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+}
+
+.cardDescription {
+  color: var(--ifm-color-content-secondary);
+  margin-bottom: 0.55rem;
+}
+
+.cardCta {
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card:hover {
+    transform: none;
+    transition: none;
+  }
+}
+

@@ -25,8 +25,8 @@ If you prefer to set up hooks manually:
 
 ```bash
 # Copy hooks to .git/hooks
-cp hooks/pre-commit .git/hooks/pre-commit
-cp hooks/pre-push .git/hooks/pre-push
+cp .github/hooks/pre-commit .git/hooks/pre-commit
+cp .github/hooks/pre-push .git/hooks/pre-push
 chmod +x .git/hooks/pre-commit .git/hooks/pre-push
 ```
 
@@ -61,13 +61,6 @@ This project uses automated formatting to maintain consistent code style. Please
 ```bash
 # Using the format script
 ./tools/format.sh
-
-# Or using npm scripts
-npm run format
-
-# Or manually
-dart format .
-prettier --write "**/*.{js,json,md}"
 ```
 
 #### Check formatting (CI/CD):
@@ -89,7 +82,6 @@ dart fix --apply .
 The project includes configuration for:
 
 - **VS Code**: `.vscode/settings.json` - Auto-format on save enabled
-- **EditorConfig**: `.editorconfig` - Cross-editor formatting rules
 - **Prettier**: `.prettierrc.json` - JavaScript/JSON formatting
 - **Dart Analysis**: `analysis_options.yaml` - Dart linting and formatting
 

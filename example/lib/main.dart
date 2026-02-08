@@ -1,84 +1,36 @@
 import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/models/users.model.dart';
+import 'package:sequelize_dart_example/db/db.dart';
+import 'package:sequelize_dart_example/queries.dart';
 
 const connectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';
 
+/// Main entry point - handles database setup and initialization
 Future<void> main() async {
+  // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
-    PostgressConnection(
-      url: connectionString,
-      logging: (String sql) => print(sql),
-      pool: SequelizePoolOptions(
-        max: 10, // Maximum connections (increased to handle concurrent queries)
-        min: 5, // Minimum connections
-        idle: 10000, // Idle timeout (ms)
-        acquire: 60000, // Max time to get connection (ms)
-        evict: 1000, // Check for idle connections (ms)
-      ),
-    ),
+    connection: SequelizeConnection.postgres(url: connectionString),
+    logging: SqlFormatter.printFormatted,
+    debug: true,
   );
 
-  await sequelize.authenticate();
-  sequelize.addModels([Users.instance]);
-
-  final startTime = DateTime.now();
-
-  const totalQueries = 1;
-
-  // Test type-safe queries
-  print('\n=== Testing Type-Safe Queries ===\n');
-
-  // Example 1: Type-safe findAll with autocomplete
-  final users1 = await Users.instance.findAll(
-    (q) => Query(
-      where: or([
-        q.id.greaterThan(1),
-      ]),
-      order: [
-        ['id', 'DESC'],
-      ],
-    ),
+  // Initialize with models - this properly awaits:
+  // 1. Bridge connection
+  // 2. All model definitions
+  // 3. All model associations
+  await sequelize.initialize(
+    models: Db.allModels(),
   );
 
-  // Example 2: Type-safe findOne
-  final user = await Users.instance.findOne(
-    (q) => Query(
-      where: q.id.eq(1),
-    ),
-  );
+  // await sequelize.truncate(cascade: true, restartIdentity: true);
 
-  print('Found ${users1.length} users');
-  print('Found user: ${user?.email}');
+  // await sequelize.seed(
+  //   seeders: Db.allSeeders(),
+  //   syncTableMode: SyncTableMode.force,
+  // );
 
-  // Performance test
-  final futures = <Future>[];
-  for (var i = 0; i < totalQueries; i++) {
-    final queryStart = DateTime.now();
-    final future = Users.instance
-        .findAll(
-          (q) => Query(
-            where: q.id.in_([1, 2]),
-            order: [
-              ['id', 'DESC'],
-            ],
-          ),
-        )
-        .then((value) {
-          final queryDuration = DateTime.now().difference(queryStart);
-          print(
-            '\nQUERY $i: ${value.map((e) => e.toJson())} (took ${queryDuration.inMilliseconds}ms)',
-          );
-        });
-    futures.add(future);
-  }
-
-  // Wait for all queries to complete
-  await Future.wait(futures);
-  final totalDuration = DateTime.now().difference(startTime);
-  print(
-    '\n$totalQueries queries completed in ${totalDuration.inMilliseconds}ms',
-  );
+  // Run queries - all query logic is in queries.dart
+  await runQueries();
 
   // Close the connection to free up resources
   await sequelize.close();

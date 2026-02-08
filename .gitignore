@@ -12,9 +12,14 @@ example/build/
 *.lock
 
 # Bridge server bundle (generated file)
-packages/sequelize_dart/js/bridge_server.bundle.js
 packages/sequelize_dart/js/node_modules/
 packages/sequelize_dart/js/package-lock.json
 
+# Docusaurus
+docs/build/*
+docs/.docusaurus/*
+docs/node_modules/*
+
 # Prettier
 .prettiercache
+*.g.dart

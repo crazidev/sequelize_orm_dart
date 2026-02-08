@@ -1,30 +1,25 @@
 {
   // File nesting patterns - groups interface/js/dart/stub files together
   "explorer.fileNesting.enabled": true,
-  "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
     // Group implementation files under interface files in same folder
     "*.interface.dart": "${capture}.js.dart, ${capture}.dart.dart, ${capture}.stub.dart",
     "*.js.dart": "${capture}.dart.dart, ${capture}.stub.dart",
-
     // Group export files with their implementations
     "query.dart": "query_interface.dart, query_js.dart, query_dart.dart, query_stub.dart",
     "query_engine.dart": "query_engine_interface.dart, query_engine_js.dart, query_engine_dart.dart, query_engine_stub.dart",
     "operators.dart": "operators_interface.dart, operators_js.dart, operators_dart.dart, operators_stub.dart"
   },
-
   // Explorer settings
   "explorer.sortOrder": "type",
-  "explorer.compactFolders": false,
+  "explorer.compactFolders": true,
   "explorer.fileNesting.expand": false,
-
   // Hide backup folders from explorer
   "files.exclude": {
     "**/backup": true,
     "**/.DS_Store": true,
     "**/.git": true
   },
-
   // File watcher exclusions for better performance
   "files.watcherExclude": {
     "**/.git/objects/**": true,
@@ -34,7 +29,6 @@
     "**/build/**": true,
     "**/backup/**": true
   },
-
   // Dart editor settings
   "[dart]": {
     "editor.defaultFormatter": "Dart-Code.dart-code",
@@ -43,13 +37,14 @@
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
     },
-    "editor.rulers": [80],
+    "editor.rulers": [
+      80
+    ],
     "editor.wordWrap": "wordWrapColumn",
     "editor.wordWrapColumn": 80,
     "editor.tabSize": 2,
     "editor.insertSpaces": true
   },
-
   // JavaScript/TypeScript editor settings
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -60,19 +55,16 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true
   },
-
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "vscode.json-language-features",
     "editor.formatOnSave": true,
     "editor.tabSize": 2
   },
-
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "vscode.json-language-features",
     "editor.formatOnSave": true,
     "editor.tabSize": 2
   },
-
   // File associations
   "files.associations": {
     "*.dart": "dart"

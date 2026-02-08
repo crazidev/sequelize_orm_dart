@@ -1,302 +1,182 @@
 # Sequelize Dart
 
-A Dart ORM for Sequelize.js integration with code generation support. Works seamlessly on both **Dart server** (via Node.js bridge) and **dart2js** (via JS interop).
+A Dart ORM for Sequelize.js integration with code generation support. Works seamlessly on both **Dart server** (Dart VM) and **dart2js** (JavaScript compilation) via a unified Node.js bridge.
 
 ## Features
 
-- 🚀 **Dual Platform Support**: Works on Dart server and dart2js
-- 📦 **Code Generation**: Automatic model implementation generation
-- 🔌 **Multiple Databases**: PostgreSQL, MySQL, MariaDB support
-- 🎯 **Type-Safe Queries**: Strongly-typed query builders
-- 🔄 **Connection Pooling**: Built-in connection pool management
-- 📝 **Annotations**: Simple, declarative model definitions
+- **Dual Platform Support**: Works on Dart server and dart2js
+- **Code Generation**: Automatic model implementation generation
+- **Multiple Databases**: PostgreSQL, MySQL, MariaDB support
+- **Type-Safe Queries**: Strongly-typed query builders
+- **Connection Pooling**: Built-in connection pool management
+- **Annotations**: Simple, declarative model definitions
 
-## Packages
+## Package Structure
 
-- **[sequelize_dart](./packages/sequelize_dart/README.md)** - Main ORM package with Sequelize.js integration
-- **[sequelize_dart_annotations](./packages/sequelize_dart_annotations/README.md)** - Platform-independent annotations
-- **[sequelize_dart_generator](./packages/sequelize_dart_generator/README.md)** - Code generator for model implementations
+This is a monorepo containing the following packages:
 
-## How It Works
+- **[sequelize_dart](./packages/sequelize_dart/)** - Main ORM package with Sequelize.js integration
+- **[sequelize_dart_generator](./packages/sequelize_dart_generator/)** - Code generator for model implementations
+- **[example](./example/)** - Example application demonstrating usage
 
-### Dart Server (Dart VM)
+## Project Structure
 
-When running on Dart server, Sequelize Dart uses a **Node.js bridge process** to execute Sequelize.js operations:
-
-1. **Bridge Process**: A singleton Node.js process is spawned that runs Sequelize.js
-2. **JSON-RPC Communication**: Dart communicates with the bridge via JSON-RPC over stdin/stdout
-3. **Query Execution**: Queries are sent to the bridge, executed in Node.js, and results are streamed back
-4. **Connection Pooling**: Managed by Sequelize.js in the bridge process
-
-**Setup:**
-
-```bash
-# Build the bridge server bundle (one-time setup)
-./tools/setup_bridge.sh [bun|pnpm|npm]
+```
+my_dart_server/
+├── packages/
+│   ├── sequelize_dart/              # Main ORM package
+│   └── sequelize_dart_generator/    # Code generator
+├── example/                          # Example application
+├── docs/                            # Documentation (Docusaurus)
+├── tools/                           # Development scripts
+└── test/                            # Integration tests
 ```
 
-The bridge server is bundled into a single JavaScript file, so end-users don't need to run `npm install`.
+## Getting Started
 
-### dart2js (JavaScript Compilation)
+For quick start guide and usage examples, see:
 
-When compiling to JavaScript with `dart2js`, Sequelize Dart uses **JS interop** to directly call Sequelize.js:
+- **[Main Package README](./packages/sequelize_dart/README.md)** - Quick start
+- **[Documentation Site](./docs/)** - Full documentation (hosted on Vercel)
 
-1. **Direct Integration**: Uses `dart:js_interop` to call Sequelize.js APIs
-2. **Native Performance**: No bridge overhead, direct function calls
-3. **Same API**: Identical API surface for both platforms
+## Development Tools
 
-**No setup required** - works out of the box when compiled to JavaScript.
+### Available Scripts
 
-## Quick Start
+The `tools/` directory contains development scripts:
 
-### 1. Add Dependencies
+- **`watch.sh`** - Watch models, compile to JS, and run with auto-reload
+- **`watch_models.sh`** - Watch model files and regenerate code
+- **`watch_dart.sh`** - Watch Dart files and restart Dart VM server
+- **`watch_js.sh`** - Watch Dart files and recompile to JavaScript
+- **`watch_bridge.sh`** - Watch TypeScript files and rebuild bridge bundles
+- **`setup_bridge.sh`** - Build bridge server bundles
+- **`build.sh`** - Compile Dart to JavaScript
+- **`format.sh`** - Format all Dart files
+
+### VSCode Tasks
+
+Pre-configured tasks are available in `.vscode/tasks.json`:
+
+#### Watch Tasks
+
+- **1. Watch Models** - Regenerate code on model file changes
+- **2. Watch Dart VM** - Restart Dart VM server on file changes
+- **3. Watch dart2js** - Recompile to JavaScript on file changes
+- **4. Watch Bridge** - Rebuild bridge bundles on TypeScript changes
+
+#### Build Tasks
+
+- **Build: Models** - Generate model code once
+- **Build: Bridge** - Build bridge server bundles
+- **Build: dart2js** - Compile main.dart to JavaScript
+- **Build: Full** - Build everything (bridge → models → dart2js)
+
+#### Run Tasks
+
+- **Run: Dart VM** - Run example with Dart VM
+- **Run: dart2js** - Run compiled JavaScript with Node.js
+- **Run: Benchmark (Dart VM)** - Run performance benchmark
+- **Run: Benchmark (dart2js)** - Run benchmark with Node.js
+
+#### Compound Tasks
+
+- **Watch: All** - Watch models, compile to JS, and run with auto-reload
+- **Watch: Full Dev** - Watch models and run Dart VM server
+
+Access tasks via: `Cmd+Shift+P` → "Tasks: Run Task"
+
+## Development Guide
+
+### Prerequisites
+
+1. **Dart SDK**: Install [Dart SDK](https://dart.dev/get-dart) (^3.9.2 or higher)
+2. **Node.js**: Install [Node.js](https://nodejs.org/) (v18+ recommended)
+3. **Database**: PostgreSQL, MySQL, or MariaDB
+
+### Setup
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone <repository-url>
+   cd my_dart_server
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   dart pub get
+   ```
+
+3. **Build the bridge server**:
+
+   ```bash
+   ./tools/setup_bridge.sh
+   ```
+
+4. **Generate model code**:
+
+   ```bash
+   cd example
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+5. **Run the example**:
+   ```bash
+   dart run lib/main.dart
+   ```
+
+### Development Workflow
+
+1. **Use VSCode Tasks** for automated workflows (recommended)
+   - Run "Watch: Full Dev" for complete development environment
+   - Or use individual watch tasks as needed
+
+2. **Manual workflow**:
+
+   ```bash
+   # Watch mode (regenerates on file changes)
+   ./tools/watch_models.sh
+
+   # In another terminal, run your app
+   dart run example/lib/main.dart
+   ```
+
+### Running Tests
+
+```bash
+# Run all tests
+dart test
+```
+
+## Seeding (experimental)
+
+### Folder layout
+
+- Models: `lib/db/models`
+- Seeders: `lib/db/seeders` (files must end with `*.seeder.dart`)
+
+### `pubspec.yaml` config
+
+Add this to your package `pubspec.yaml`:
 
 ```yaml
-# pubspec.yaml
-dependencies:
-  sequelize_dart: letest
-  sequelize_dart_annotations: letest
-
-dev_dependencies:
-  sequelize_dart_generator:
-    path: sequelize_dart_generator
-  build_runner: ^2.10.4
+sequelize_orm:
+  models_path: lib/db/models
+  seeders_path: lib/db/seeders
 ```
 
-### 2. Create a Model
-
-```dart
-// lib/models/users.model.dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-
-part 'users.model.g.dart';
-
-@Table(tableName: 'users')
-class Users {
-  @ModelAttributes(
-    name: 'id',
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  )
-  dynamic id;
-
-  @ModelAttributes(
-    name: 'email',
-    type: DataType.STRING,
-    unique: true,
-  )
-  dynamic email;
-
-  @ModelAttributes(
-    name: 'firstName',
-    type: DataType.STRING,
-  )
-  dynamic firstName;
-
-  @ModelAttributes(
-    name: 'lastName',
-    type: DataType.STRING,
-  )
-  dynamic lastName;
-
-  static $Users get instance => $Users();
-}
-```
-
-### 3. Generate Model Code
+### Run seeders
 
 ```bash
-# Generate model implementations
-dart run build_runner build
-
-# Or watch for changes
-dart run build_runner watch
+# Generates model code + Db registry and then runs:
+# - sequelize.initialize(models: Db.allModels())
+# - sequelize.sync(alter: true)
+# - runs Db.allSeeders() in order
+dart run sequelize_dart_generator:generate --seed --url "postgresql://user:pass@localhost:5432/db"
 ```
 
-This creates `users.model.g.dart` with the generated `$Users` class.
+## Contributing
 
-**Note**: Not required for dart2js compilation.
-
-### 5. Create Database Connection
-
-```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-
-// PostgreSQL
-var sequelize = Sequelize().createInstance(
-  PostgressConnection(
-    url: 'postgresql://user:password@localhost:5432/dbname',
-    ssl: false,
-    logging: (String sql) => print(sql),
-    pool: SequelizePoolOptions(
-      max: 10,
-      min: 2,
-      idle: 10000,
-      acquire: 60000,
-      evict: 1000,
-    ),
-  ),
-);
-```
-
-### 6. Authenticate and Register Models
-
-```dart
-// Verify connection
-await sequelize.authenticate();
-print('✅ Connected to database');
-
-// Register models
-sequelize.addModels([Users.instance]);
-```
-
-### 7. Query the Database
-
-```dart
-// Type-safe queries with autocomplete
-var users = await Users.instance.findAll(
-  (q) => Query(
-    where: q.email.eq('user@example.com'),
-    order: [['id', 'DESC']],
-    limit: 10,
-  ),
-);
-
-// Find one record
-var user = await Users.instance.findOne(
-  (q) => Query(
-    where: q.id.eq(1),
-  ),
-);
-```
-
-### 8. Clean Up
-
-```dart
-// Close connection when done
-await sequelize.close();
-```
-
-## Query Operators
-
-### Logical Operators
-
-```dart
-// AND
-where: and([
-  equal('email', 'user@example.com'),
-])
-
-// OR
-where: or([
-  equal('id', 1),
-])
-
-// NOT
-where: not([
-  equal('email', 'admin@example.com'),
-])
-```
-
-### Comparison Operators
-
-```dart
-// Equal
-where: equal('id', 1)
-
-// Not Equal
-where: notEqual('id', 1)
-
-// Advanced operators can be used via ComparisonOperator
-// Bridge supports: $gt, $gte, $lt, $lte, $like, $ilike, $in, $notIn
-```
-
-### Type-Safe Queries
-
-```dart
-// Type-safe queries with full autocomplete support
-var users = await Users.instance.findAll(
-  (q) => Query(
-    where: and([
-      or([
-        q.email.eq('user1@example.com'),
-        q.email.eq('user2@example.com'),
-      ]),
-      q.id.ne(0),
-    ]),
-    order: [
-      ['lastName', 'ASC'],
-      ['firstName', 'ASC'],
-    ],
-    limit: 20,
-    offset: 0,
-  ),
-);
-```
-
-## Platform Differences
-
-| Feature          | Dart Server           | dart2js             |
-| ---------------- | --------------------- | ------------------- |
-| **Setup**        | Requires bridge setup | No setup needed     |
-| **Performance**  | Bridge overhead       | Native performance  |
-| **Dependencies** | Bundled bridge        | Direct Sequelize.js |
-| **API**          | Same API              | Same API            |
-
-## Connection Pooling
-
-Configure connection pooling for better performance and concurrency:
-
-```dart
-pool: SequelizePoolOptions(
-  max: 10,        // Maximum connections in pool
-  min: 2,         // Minimum connections in pool
-  idle: 10000,    // Idle timeout in milliseconds
-  acquire: 60000, // Maximum time to get connection (ms)
-  evict: 1000,    // Check for idle connections (ms)
-)
-```
-
-## Documentation
-
-- **[sequelize_dart](./packages/sequelize_dart/README.md)** - Main package documentation
-- **[sequelize_dart_annotations](./packages/sequelize_dart_annotations/README.md)** - Annotations reference
-- **[sequelize_dart_generator](./packages/sequelize_dart_generator/README.md)** - Code generator guide
-
-## Development
-
-### Setting Up Git Hooks
-
-Install git hooks to automatically format code before committing:
-
-```bash
-./tools/setup-git-hooks.sh
-```
-
-This installs:
-
-- **pre-commit**: Formats code automatically before each commit
-- **pre-push**: Checks formatting before pushing (prevents unformatted code)
-
-### Building the Bridge Server
-
-```bash
-# Setup bridge (installs dependencies and builds bundle)
-./tools/setup_bridge.sh [bun|pnpm|npm]
-
-# The bundle is created at:
-# packages/sequelize_dart/js/bridge_server.bundle.js
-```
-
-### Running Examples
-
-```bash
-# Run example on Dart server
-cd example
-dart run lib/main.dart
-
-# Compile to JavaScript and run
-dart compile js lib/main.dart -o main.js
-node main.js
-```
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
