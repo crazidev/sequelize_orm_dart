@@ -219,6 +219,8 @@ class Sequelize extends SequelizeInterface {
   static SqlAttribute attribute(String attr) => SqlAttribute(attr);
   static SqlIdentifier identifier(String id) => SqlIdentifier(id);
   static SqlCast cast(dynamic expr, String type) => SqlCast(expr, type);
+  static SqlRandom random() => SqlRandom();
+
   @override
   void log(String message) {
     if (_logging != null) {

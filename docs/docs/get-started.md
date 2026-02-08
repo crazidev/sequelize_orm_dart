@@ -25,21 +25,9 @@ Then run:
 ```bash
 dart pub get
 ```
-
-### Setup for Dart VM (server-side)
-
-If you're running on Dart VM (server-side), you need to build the server bundle:
-
-```bash
-# From the project root
-./tools/setup_bridge.sh [bun|pnpm|npm]
-```
-
-This creates a bundled JavaScript file that allows Dart to communicate with Sequelize.js when running on the Dart VM.
-
 ## Database Connection
 
-Sequelize Dart supports PostgreSQL, MySQL, MariaDB, SQLite, MS SQL Server, and DB2. Here's how to set up a connection:
+Sequelize Dart supports PostgreSQL, MySQL, MariaDB, SQLite. Here's how to set up a connection:
 
 ```dart
 import 'package:sequelize_dart/sequelize_dart.dart';
@@ -50,7 +38,6 @@ void main() async {
     connection: SequelizeConnection.postgres(
       url: 'postgresql://username:password@localhost:5432/database_name',
     ),
-    // Optional: Enable SQL logging
     logging: (sql) => SqlFormatter.printFormatted(sql),
   );
 
@@ -61,9 +48,6 @@ void main() async {
     ],
   );
 
-  // Your code here...
-
-  // Close connection when done
   await sequelize.close();
 }
 ```
@@ -77,7 +61,7 @@ import 'package:sequelize_dart/sequelize_dart.dart';
 
 part 'users.model.g.dart';
 
-@Table(tableName: 'users', underscored: true)
+@Table()
 class User {
   @PrimaryKey()
   @AutoIncrement()

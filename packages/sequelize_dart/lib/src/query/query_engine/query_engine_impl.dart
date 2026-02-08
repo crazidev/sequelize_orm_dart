@@ -611,7 +611,9 @@ class QueryEngine extends QueryEngineInterface {
       });
     } catch (e) {
       if (e is SequelizeException) {
-        throw e.copyWithContext('Exception: failed to execute instanceDestroy()');
+        throw e.copyWithContext(
+          'Exception: failed to execute instanceDestroy()',
+        );
       }
       throw SequelizeException(
         e.toString(),
@@ -634,7 +636,9 @@ class QueryEngine extends QueryEngineInterface {
       });
     } catch (e) {
       if (e is SequelizeException) {
-        throw e.copyWithContext('Exception: failed to execute instanceRestore()');
+        throw e.copyWithContext(
+          'Exception: failed to execute instanceRestore()',
+        );
       }
       throw SequelizeException(
         e.toString(),

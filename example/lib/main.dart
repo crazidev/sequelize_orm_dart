@@ -22,7 +22,7 @@ Future<void> main() async {
     models: Db.allModels(),
   );
 
-  await sequelize.sync(force: true);
+  // await sequelize.truncate(cascade: true, restartIdentity: true);
 
   // await sequelize.seed(
   //   seeders: Db.allSeeders(),

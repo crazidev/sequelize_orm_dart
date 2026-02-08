@@ -27,7 +27,12 @@ class SeedUserPost extends SequelizeSeeding<CreatePost> {
         ),
         postDetails: CreatePostDetails(
           likes: index,
-          metadata: {'source': 'seeder'},
+          metadata: {
+            'source': 'seeder',
+            'tags': ['dart', 'sequelize', 'database'],
+            'category': 'tutorial',
+            'author': 'SeedUserPost',
+          },
         ),
       ),
     ),
