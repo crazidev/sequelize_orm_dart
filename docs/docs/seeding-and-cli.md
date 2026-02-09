@@ -48,7 +48,7 @@ connection:
 The CLI can automatically synchronize your database schema and execute all registered seeders.
 
 ```bash
-dart run sequelize_dart_generator:generate --seed
+dart run sequelize_orm_generator:generate --seed
 ```
 
 ### Options
@@ -69,7 +69,7 @@ dart run sequelize_dart_generator:generate --seed
 You can run seeders directly from your code using the `sequelize.seed()` extension.
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 import 'lib/db/db.dart'; // Import your generated registry
 
 void main() async {
@@ -103,7 +103,7 @@ void main() async {
 Seeders are classes that extend `SequelizeSeeding<TCreate>`, where `TCreate` is the generated create-type for your model (e.g., `CreateUser`).
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 import '../db.dart';
 
 class UserSeeder extends SequelizeSeeding<CreateUser> {

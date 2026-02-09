@@ -31,7 +31,7 @@ const DEMO_STEPS: DemoStep[] = [
     kicker: 'Dart class + annotations',
     code: {
       language: 'dart',
-      content: `import 'package:sequelize_dart/sequelize_dart.dart';
+      content: `import 'package:sequelize_orm/sequelize_orm.dart';
 
 part 'users.model.g.dart';
 
@@ -155,7 +155,7 @@ WHERE users.id = 1;`,
     code: {
       language: 'dart',
       content: `// CLI: sync + run all seeders
-dart run sequelize_dart_generator:generate --seed
+dart run sequelize_orm_generator:generate --seed
 
 // Programmatic
 await sequelize.seed(

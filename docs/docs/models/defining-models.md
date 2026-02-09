@@ -10,8 +10,8 @@ import TabItem from '@theme/TabItem';
 Models in Sequelize Dart are regular Dart classes annotated with `@Table` and various column annotations. Here's the basic structure:
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart'; // Optional if exported by main package
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_annotations/sequelize_orm_annotations.dart'; // Optional if exported by main package
 
 part 'users.model.g.dart';
 

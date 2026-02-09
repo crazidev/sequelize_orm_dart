@@ -7,8 +7,8 @@ sidebar_position: 9
 Here is a comprehensive example of a model definition using various annotations and options.
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_annotations/sequelize_dart_annotations.dart'; // Optional if exported by main package
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_annotations/sequelize_orm_annotations.dart'; // Optional if exported by main package
 
 part 'product.model.g.dart';
 

@@ -1,9 +1,9 @@
-import 'package:sequelize_dart_example/db/models/post.model.dart';
-import 'package:sequelize_dart_example/db/models/post_details.model.dart';
-import 'package:sequelize_dart_example/db/models/users.model.dart';
-import 'package:sequelize_dart_example/db/seeders/seed_user_post.seeder.dart';
+import 'package:sequelize_orm_example/db/models/post.model.dart';
+import 'package:sequelize_orm_example/db/models/post_details.model.dart';
+import 'package:sequelize_orm_example/db/models/users.model.dart';
+import 'package:sequelize_orm_example/db/seeders/seed_user_post.seeder.dart';
 
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 
 /// Registry class for accessing all models and seeders
 class Db {

@@ -13,7 +13,7 @@ Note: The `ModelAttributes` class name remains unchanged in generated code - onl
 
 ### 1. Rename ModelAttributes Annotation to Column
 
-**File**: `packages/sequelize_dart_annotations/lib/src/model_attribute.dart`
+**File**: `packages/sequelize_orm_annotations/lib/src/model_attribute.dart`
 
 - Create a new annotation class `Column` that accepts the same parameters as `ModelAttributes`
 - This will be used as `@Column(...)` annotation
@@ -24,7 +24,7 @@ Note: The `ModelAttributes` class name remains unchanged in generated code - onl
 
 ### 2. Add Missing Decorators to Annotations Package
 
-**File**: `packages/sequelize_dart_annotations/lib/src/table.dart`
+**File**: `packages/sequelize_orm_annotations/lib/src/table.dart`
 
 Add decorator classes matching Sequelize 7 API:
 
@@ -43,7 +43,7 @@ These should be added after the existing `PrimaryKey`, `NotNull`, and `AutoIncre
 
 ### 3. Update Field Info Model
 
-**File**: `packages/sequelize_dart_generator/lib/src/generators/methods/_models.dart`
+**File**: `packages/sequelize_orm_generator/lib/src/generators/methods/_models.dart`
 
 Extend `_FieldInfo` class to include new properties:
 
@@ -57,7 +57,7 @@ Update constructor to accept these parameters with defaults.
 
 ### 4. Refactor Field Extraction Logic
 
-**File**: `packages/sequelize_dart_generator/lib/src/generators/methods/_get_fields.dart`
+**File**: `packages/sequelize_orm_generator/lib/src/generators/methods/_get_fields.dart`
 
 Major refactor to support both patterns:
 
@@ -115,7 +115,7 @@ dynamic id;
 
 ### 5. Update Attribute Generation
 
-**File**: `packages/sequelize_dart_generator/lib/src/generators/methods/_generate_get_attributes_method.dart`
+**File**: `packages/sequelize_orm_generator/lib/src/generators/methods/_generate_get_attributes_method.dart`
 
 Update to generate `ModelAttributes` with all new properties:
 
@@ -128,7 +128,7 @@ Update to generate `ModelAttributes` with all new properties:
 
 ### 6. Export New Decorators and Column
 
-**File**: `packages/sequelize_dart_annotations/lib/sequelize_dart_annotations.dart`
+**File**: `packages/sequelize_orm_annotations/lib/sequelize_orm_annotations.dart`
 
 Ensure all new decorators and `Column` annotation are exported.
 

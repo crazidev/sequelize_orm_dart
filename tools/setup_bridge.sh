@@ -20,7 +20,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-BRIDGE_DIR="$ROOT_DIR/packages/sequelize_dart/js"
+BRIDGE_DIR="$ROOT_DIR/packages/sequelize_orm/js"
 
 # Default values
 PACKAGE_MANAGER="bun"

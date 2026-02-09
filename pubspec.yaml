@@ -4,11 +4,94 @@ environment:
   sdk: ^3.9.2
 
 workspace:
-  - packages/sequelize_dart
-  - packages/sequelize_dart_generator
+  - packages/sequelize_orm
+  - packages/sequelize_orm_generator
   - example
-  - packages/sequelize_dart_analyzer_plugin
+  - packages/sequelize_orm_analyzer
+
 dev_dependencies:
+  melos: ^7.4.0
   test: ^1.28.0
+
 dependencies:
-  sequelize_dart_example: ^1.0.0
+  sequelize_orm_example: ^1.0.0
+
+melos:
+  sdkPath: auto
+  repository: https://github.com/crazidev/sequelize_orm_dart
+
+  categories:
+    packages:
+      - packages/**
+    examples:
+      - example
+
+  command:
+    version:
+      branch: dev
+      message: "chore(release): publish packages\n\n{new_package_versions}"
+      linkToCommits: true
+      workspaceChangelog: true
+
+    publish:
+        # hooks:
+        # pre: dart pub run build_runner build
+        # post: dart pub run build_runner clean
+
+  scripts:
+    # ─── Analysis & Linting ─────────────────────────────
+    analyze:
+      description: Run dart analyze across all packages.
+      run: dart analyze --fatal-infos
+      exec:
+        concurrency: 1
+
+    fix:
+      description: Apply dart fix across all packages.
+      run: dart fix --apply
+      exec:
+        concurrency: 1
+
+    # ─── Testing ────────────────────────────────────────
+    test:
+      description: Run tests across all packages.
+      run: dart test
+      exec:
+        concurrency: 1
+        failFast: true
+      packageFilters:
+        dirExists: test
+
+    # ─── Code Generation ───────────────────────────────
+    generate:
+      description: Run build_runner for code generation.
+      run: dart run build_runner build --delete-conflicting-outputs
+      exec:
+        concurrency: 1
+        orderDependents: true
+      packageFilters:
+        dependsOn: build_runner
+
+    generate:watch:
+      description: Watch and regenerate code on changes.
+      run: dart run build_runner watch --delete-conflicting-outputs
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: build_runner
+
+    generate:models:
+      description: Generate models from database.
+      run: dart run sequelize_orm_generator:generate --generate
+      exec:
+        concurrency: 1
+      packageFilters:
+        category: examples
+
+    generate:seed:
+      description: Generate seeders from database.
+      run: dart run sequelize_orm_generator:generate --seed
+      exec:
+        concurrency: 1
+      packageFilters:
+        category: examples

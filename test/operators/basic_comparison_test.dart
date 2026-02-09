@@ -1,5 +1,5 @@
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/models/users.model.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_example/db/models/users.model.dart';
 import 'package:test/test.dart';
 
 import '../test_helper.dart';

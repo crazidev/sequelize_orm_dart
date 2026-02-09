@@ -14,14 +14,14 @@ const DEFAULT_CONFIG: ResolvedConfig = {
   },
   analyzerServer: {
     command: 'dart',
-    args: ['run', 'sequelize_dart_generator:generate', '--server'],
+    args: ['run', 'sequelize_orm_generator:generate', '--server'],
     extraArgs: [],
   },
   model: {
     includeGlobs: ['**/*.model.dart'],
     generatedExtension: '.model.g.dart',
     partDirectiveRequired: true,
-    configFileNames: ['sequelize_dart.yaml', 'sequelize_dart_tools.yaml'],
+    configFileNames: ['sequelize_orm.yaml', 'sequelize_orm_tools.yaml'],
   },
 };
 

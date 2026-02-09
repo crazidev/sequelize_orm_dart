@@ -1,0 +1,190 @@
+import 'package:sequelize_orm/src/model/model_instance_data.dart';
+import 'package:sequelize_orm/src/query/query/query.dart';
+
+/// Abstract interface for query engines
+/// This interface defines the contract that all query engines must implement
+/// regardless of whether they're running in JS or Dart VM environment
+abstract class QueryEngineInterface {
+  /// Find all records matching the query
+  Future<List<ModelInstanceData>> findAll({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Find one record matching the query
+  Future<ModelInstanceData?> findOne({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Create a new record
+  Future<ModelInstanceData> create({
+    required String modelName,
+    required Map<String, dynamic> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Create multiple records (bulk create)
+  Future<List<ModelInstanceData>> bulkCreate({
+    required String modelName,
+    required List<Map<String, dynamic>> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Update records
+  Future<int> update({
+    required String modelName,
+    required Map<String, dynamic> data,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Count records matching the query
+  Future<int> count({
+    required String modelName,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Find the maximum value of a column
+  Future<num?> max({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Find the minimum value of a column
+  Future<num?> min({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Sum values of a column
+  Future<num?> sum({
+    required String modelName,
+    required String column,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Increment numeric column values
+  Future<List<ModelInstanceData>> increment({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Decrement numeric column values
+  Future<List<ModelInstanceData>> decrement({
+    required String modelName,
+    required Map<String, dynamic> fields,
+    Query? query,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Save an instance (INSERT for new records, UPDATE for existing)
+  Future<ModelInstanceData> save({
+    required String modelName,
+    required Map<String, dynamic> currentData,
+    Map<String, dynamic>? previousData,
+    required Map<String, dynamic> primaryKeyValues,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// BelongsTo association getter (instance.getX)
+  Future<ModelInstanceData?> belongsToGet({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// BelongsTo association setter (instance.setX)
+  Future<void> belongsToSet({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    required dynamic targetOrKey,
+    bool? save,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// BelongsTo association creator (instance.createX)
+  Future<ModelInstanceData> belongsToCreate({
+    required String sourceModel,
+    required Map<String, dynamic> primaryKeyValues,
+    required String associationName,
+    required Map<String, dynamic> data,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Destroy records matching the query
+  /// Returns the number of destroyed rows
+  Future<int> destroy({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Truncate the table associated with the model
+  Future<void> truncate({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Restore soft-deleted records matching the query
+  /// Only usable if paranoid is enabled
+  Future<void> restore({
+    required String modelName,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Destroy a single instance
+  Future<void> instanceDestroy({
+    required String modelName,
+    required Map<String, dynamic> primaryKeyValues,
+    Map<String, dynamic>? options,
+    dynamic sequelize,
+    dynamic model,
+  });
+
+  /// Restore a single soft-deleted instance
+  /// Only usable if paranoid is enabled
+  Future<void> instanceRestore({
+    required String modelName,
+    required Map<String, dynamic> primaryKeyValues,
+    dynamic sequelize,
+    dynamic model,
+  });
+}

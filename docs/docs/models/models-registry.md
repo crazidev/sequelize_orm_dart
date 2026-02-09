@@ -149,7 +149,7 @@ import 'package:myapp/models/post.model.dart';
 import 'package:myapp/models/users.model.dart';
 // ... other model imports
 
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 
 /// Registry class for accessing all models
 class Db {
@@ -185,7 +185,7 @@ The generated file is always created in the same directory as the registry file:
 ### Basic Initialization
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:myapp/models/db.dart';
 
 Future<void> main() async {
@@ -255,7 +255,7 @@ await sequelize.initialize(
 ### Real-World Example
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:myapp/models/db.dart';
 
 Future<void> seedDatabase() async {
@@ -427,7 +427,7 @@ When you rename a model class or add/remove models:
 **Before (Without Registry):**
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:myapp/models/users.model.dart';
 import 'package:myapp/models/post.model.dart';
 import 'package:myapp/models/post_details.model.dart';
@@ -460,7 +460,7 @@ Future<void> main() async {
 **After (With Registry):**
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:myapp/models/db.dart';
 
 const connectionString = 'postgresql://user:pass@localhost/db';

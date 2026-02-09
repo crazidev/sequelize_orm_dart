@@ -1,0 +1,27 @@
+targets:
+  $default:
+    builders:
+      sequelize_orm_generator|sequelize_model_builder:
+        enabled: true
+      sequelize_orm_generator|models_registry_builder:
+        enabled: true
+        options:
+          className: Models
+          outputFileName: models
+          entryFileName: models
+
+builders:
+  sequelize_model_builder:
+    import: "package:sequelize_orm_generator/src/builder.dart"
+    builder_factories: ["sequelizeModelBuilder"]
+    build_extensions: {".model.dart": [".model.g.dart"]}
+    auto_apply: dependents
+    build_to: source
+  
+  models_registry_builder:
+    import: "package:sequelize_orm_generator/src/builder.dart"
+    builder_factories: ["modelsRegistryBuilder"]
+    build_extensions:
+      ".registry.dart": [".dart"]
+    auto_apply: dependents
+    build_to: source

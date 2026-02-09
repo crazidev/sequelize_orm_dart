@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-BRIDGE_DIR="$ROOT_DIR/packages/sequelize_dart/js"
+BRIDGE_DIR="$ROOT_DIR/packages/sequelize_orm/js"
 HASH_FILE="/tmp/sequelize_bridge_watch_hash_$$"
 
 cleanup() {
@@ -33,7 +33,7 @@ echo -e "${CYAN}╔════════════════════�
 echo -e "${CYAN}║   Bridge Server Watch                  ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "${BLUE}Watching: packages/sequelize_dart/js/src/${NC}"
+echo -e "${BLUE}Watching: packages/sequelize_orm/js/src/${NC}"
 echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
 echo ""
 

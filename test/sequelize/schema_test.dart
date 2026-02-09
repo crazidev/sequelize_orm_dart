@@ -1,4 +1,4 @@
-// import 'package:sequelize_dart_example/db/models/post.model.dart';
+// import 'package:sequelize_orm_example/db/models/post.model.dart';
 // import 'package:test/test.dart';
 
 // import '../test_helper.dart';

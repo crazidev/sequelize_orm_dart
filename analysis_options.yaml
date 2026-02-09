@@ -85,8 +85,8 @@ analyzer:
 # https://dart.dev/guides/language/analysis-options
 
 plugins:
-  sequelize_dart_analyzer_plugin:
-    path: packages/sequelize_dart_analyzer_plugin
+  sequelize_orm_analyzer:
+    path: packages/sequelize_orm_analyzer
     diagnostics:
       table_must_be_abstract: true
       suggest_association_foreign_key: true

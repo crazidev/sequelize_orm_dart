@@ -12,11 +12,11 @@ Add Sequelize Dart to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  sequelize_dart: ^1.0.0
-  sequelize_dart_annotations: ^1.0.0
+  sequelize_orm: ^1.0.0
+  sequelize_orm_annotations: ^1.0.0
 
 dev_dependencies:
-  sequelize_dart_generator: ^1.0.0
+  sequelize_orm_generator: ^1.0.0
   build_runner: ^2.4.0
 ```
 
@@ -30,7 +30,7 @@ dart pub get
 Sequelize Dart supports PostgreSQL, MySQL, MariaDB, SQLite. Here's how to set up a connection:
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 
 void main() async {
   // Create Sequelize instance with PostgreSQL connection
@@ -57,7 +57,7 @@ void main() async {
 Models in Sequelize Dart are defined using annotations. Here's a basic example:
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
 
 part 'users.model.g.dart';
 
@@ -125,8 +125,8 @@ await User.model.update(
 Here's a complete example putting it all together:
 
 ```dart
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/models/user.model.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_example/db/models/user.model.dart';
 
 const connectionString = 'postgresql://postgres:postgres@localhost:5432/postgres';
 
