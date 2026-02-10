@@ -305,10 +305,6 @@ class BridgeClient implements BridgeClientInterface {
 
         if (response.containsKey('error')) {
           final error = response['error'];
-          const String errorMessage = 'Unknown error';
-          int? errorCode;
-          String? errorStack;
-
           if (error is Map) {
             completer.completeError(
               SequelizeException.fromBridge(Map<String, dynamic>.from(error)),
