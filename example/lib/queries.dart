@@ -11,5 +11,5 @@ Future<void> runQueries() async {
     ]),
   );
 
-  print(post);
+  print(post?.toJson() ?? 'No post found');
 }

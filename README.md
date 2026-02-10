@@ -1,5 +1,7 @@
 # Sequelize Dart
 
+**[Documentation](https://sequelize-orm-dart.vercel.app)** | **[Get Started](https://sequelize-orm-dart.vercel.app/docs/get-started)** | **[pub.dev](https://pub.dev/packages/sequelize_orm_dart)**
+
 A Dart ORM for Sequelize.js integration with code generation support. Works seamlessly on both **Dart server** (Dart VM) and **dart2js** (JavaScript compilation) via a unified Node.js bridge.
 
 ## Features
@@ -37,7 +39,7 @@ my_dart_server/
 For quick start guide and usage examples, see:
 
 - **[Main Package README](./packages/sequelize_orm/README.md)** - Quick start
-- **[Documentation Site](./docs/)** - Full documentation (hosted on Vercel)
+- **[Documentation Site](https://sequelize-orm-dart.vercel.app)** - Full documentation
 
 ## Development Tools
 

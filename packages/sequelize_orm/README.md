@@ -2,6 +2,8 @@
 
 A type-safe ORM for Dart powered by Sequelize. Define models with annotations, generate query builders with code generation, and interact with PostgreSQL, MySQL, MariaDB, SQLite, and MSSQL databases from Dart.
 
+**[Visit Documentation](https://sequelize-orm-dart.vercel.app/docs/get-started)**
+
 ## Features
 
 - **Multi-database support** -- PostgreSQL, MySQL, MariaDB, SQLite, MSSQL
@@ -204,15 +206,15 @@ SequelizeConnection.mysql(
 
 For complete documentation including associations, advanced querying, filtering, seeding, and more:
 
-**[Full Documentation](https://sequelize-dart.dev)**
+**[Full Documentation](https://sequelize-orm-dart.vercel.app)**
 
 The documentation covers:
 
-- [Defining models](https://sequelize-dart.dev/docs/models/defining-models) -- Table options, column annotations, data types
-- [Model registry](https://sequelize-dart.dev/docs/models/models-registry) -- Centralized model access
-- [Associations](https://sequelize-dart.dev/docs/associations) -- HasOne, HasMany, BelongsTo
-- [Querying](https://sequelize-dart.dev/docs/querying) -- Select, insert, update, delete, aggregations
-- [Database connections](https://sequelize-dart.dev/docs/databases) -- All supported dialects and options
+- [Defining models](https://sequelize-orm-dart.vercel.app/docs/models/defining-models) -- Table options, column annotations, data types
+- [Model registry](https://sequelize-orm-dart.vercel.app/docs/models/models-registry) -- Centralized model access
+- [Associations](https://sequelize-orm-dart.vercel.app/docs/associations) -- HasOne, HasMany, BelongsTo
+- [Querying](https://sequelize-orm-dart.vercel.app/docs/querying) -- Select, insert, update, delete, aggregations
+- [Database connections](https://sequelize-orm-dart.vercel.app/docs/databases) -- All supported dialects and options
 
 ## See also
 

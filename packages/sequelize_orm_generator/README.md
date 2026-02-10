@@ -1,5 +1,7 @@
 # sequelize_orm_generator
 
+**[Documentation](https://sequelize-orm-dart.vercel.app/docs/get-started)** | **[sequelize_orm](https://pub.dev/packages/sequelize_orm)** | **[GitHub](https://github.com/crazidev/sequelize_orm)**
+
 Code generator for [sequelize_orm](https://pub.dev/packages/sequelize_orm). Generates type-safe model classes, query builders, create/update helpers, and a centralized model registry from annotated Dart classes using `build_runner`.
 
 ## Installation
@@ -217,4 +219,4 @@ part 'users.model.g.dart';
 ## See also
 
 - [sequelize_orm](https://pub.dev/packages/sequelize_orm) -- Main ORM package
-- [Full documentation](https://sequelize-dart.dev) -- Guides and API reference
+- [Full documentation](https://sequelize-orm-dart.vercel.app) -- Guides and API reference

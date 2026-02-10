@@ -15,7 +15,7 @@ topics:
   - sql
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.6.0
 
 dependencies:
   analyzer: ^9.0.0
