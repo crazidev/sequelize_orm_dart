@@ -11,7 +11,7 @@ VS Code extension for generating Sequelize Dart model outputs via `build_runner`
 
 ## Configuration
 
-Place a `sequelize_dart.yaml` or `sequelize_dart_tools.yaml` next to the nearest `pubspec.yaml` (or in the workspace root) to customize:
+Place a `sequelize_orm.yaml` or `sequelize_orm_tools.yaml` next to the nearest `pubspec.yaml` (or in the workspace root) to customize:
 
 ```yaml
 generator:
@@ -26,7 +26,7 @@ buildRunner:
 
 analyzerServer:
   command: dart
-  args: [run, sequelize_dart_generator:generate, --server]
+  args: [run, sequelize_orm_generator:generate, --server]
   extraArgs: []
 
 model:

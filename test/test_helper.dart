@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/models/post.model.dart';
-import 'package:sequelize_dart_example/db/models/post_details.model.dart';
-import 'package:sequelize_dart_example/db/models/users.model.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_example/db/models/post.model.dart';
+import 'package:sequelize_orm_example/db/models/post_details.model.dart';
+import 'package:sequelize_orm_example/db/models/users.model.dart';
 import 'package:test/test.dart';
 
 /// Connection strings for test databases
 const postgresUrl = 'postgresql://postgres:postgres@localhost:5432/postgres';
-const mysqlUrl = 'mysql://root@localhost:3306/sequelize_dart';
-const mariadbUrl = 'mariadb://root@localhost:3307/sequelize_dart';
+const mysqlUrl = 'mysql://root@localhost:3306/sequelize_orm';
+const mariadbUrl = 'mariadb://root@localhost:3307/sequelize_orm';
 
 /// List to capture SQL queries for assertions
 final List<String> capturedSql = [];

@@ -1,5 +1,7 @@
 # Sequelize Dart
 
+**[Documentation](https://sequelize-orm-dart.vercel.app)** | **[Get Started](https://sequelize-orm-dart.vercel.app/docs/get-started)** | **[pub.dev](https://pub.dev/packages/sequelize_orm_dart)**
+
 A Dart ORM for Sequelize.js integration with code generation support. Works seamlessly on both **Dart server** (Dart VM) and **dart2js** (JavaScript compilation) via a unified Node.js bridge.
 
 ## Features
@@ -15,8 +17,8 @@ A Dart ORM for Sequelize.js integration with code generation support. Works seam
 
 This is a monorepo containing the following packages:
 
-- **[sequelize_dart](./packages/sequelize_dart/)** - Main ORM package with Sequelize.js integration
-- **[sequelize_dart_generator](./packages/sequelize_dart_generator/)** - Code generator for model implementations
+- **[sequelize_orm](./packages/sequelize_orm/)** - Main ORM package with Sequelize.js integration
+- **[sequelize_orm_generator](./packages/sequelize_orm_generator/)** - Code generator for model implementations
 - **[example](./example/)** - Example application demonstrating usage
 
 ## Project Structure
@@ -24,8 +26,8 @@ This is a monorepo containing the following packages:
 ```
 my_dart_server/
 ├── packages/
-│   ├── sequelize_dart/              # Main ORM package
-│   └── sequelize_dart_generator/    # Code generator
+│   ├── sequelize_orm/              # Main ORM package
+│   └── sequelize_orm_generator/    # Code generator
 ├── example/                          # Example application
 ├── docs/                            # Documentation (Docusaurus)
 ├── tools/                           # Development scripts
@@ -36,8 +38,8 @@ my_dart_server/
 
 For quick start guide and usage examples, see:
 
-- **[Main Package README](./packages/sequelize_dart/README.md)** - Quick start
-- **[Documentation Site](./docs/)** - Full documentation (hosted on Vercel)
+- **[Main Package README](./packages/sequelize_orm/README.md)** - Quick start
+- **[Documentation Site](https://sequelize-orm-dart.vercel.app)** - Full documentation
 
 ## Development Tools
 
@@ -174,7 +176,7 @@ sequelize_orm:
 # - sequelize.initialize(models: Db.allModels())
 # - sequelize.sync(alter: true)
 # - runs Db.allSeeders() in order
-dart run sequelize_dart_generator:generate --seed --url "postgresql://user:pass@localhost:5432/db"
+dart run sequelize_orm_generator:generate --seed --url "postgresql://user:pass@localhost:5432/db"
 ```
 
 ## Contributing

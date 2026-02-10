@@ -1,0 +1,16 @@
+name: sequelize_orm_analyzer
+description: Analyzer plugin for Sequelize Dart.
+version: 1.0.0
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  analyzer: ^9.0.0
+  analyzer_plugin: ^0.13.11
+  sequelize_orm_generator:
+    path: ../sequelize_orm_generator
+  source_gen: ^4.1.1
+  build: ^4.0.3
+  analysis_server_plugin: ^0.3.4

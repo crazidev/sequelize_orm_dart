@@ -21,7 +21,7 @@ NC='\033[0m' # No Color
 WATCH_DIRS="example/lib packages"
 
 # File hash storage
-HASH_FILE="/tmp/sequelize_dart_server_watch_hash_$$"
+HASH_FILE="/tmp/sequelize_orm_server_watch_hash_$$"
 DART_PID=""
 
 # Cleanup on exit

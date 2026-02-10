@@ -1,6 +1,6 @@
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/db.dart';
-import 'package:sequelize_dart_example/queries.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_example/db/db.dart';
+import 'package:sequelize_orm_example/queries.dart';
 
 const connectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';

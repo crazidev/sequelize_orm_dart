@@ -1,5 +1,5 @@
-import 'package:sequelize_dart/sequelize_dart.dart';
-import 'package:sequelize_dart_example/db/db.dart';
+import 'package:sequelize_orm/sequelize_orm.dart';
+import 'package:sequelize_orm_example/db/db.dart';
 
 /// Run all query examples
 /// This function is called from main.dart after the database connection is established
@@ -11,5 +11,5 @@ Future<void> runQueries() async {
     ]),
   );
 
-  print(post);
+  print(post?.toJson() ?? 'No post found');
 }

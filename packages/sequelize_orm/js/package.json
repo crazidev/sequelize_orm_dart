@@ -1,0 +1,23 @@
+{
+  "name": "sequelize_orm_bridge",
+  "version": "1.0.0",
+  "description": "Bridge server for Sequelize Dart",
+  "main": "bridge_server.bundle.js",
+  "scripts": {
+    "build": "esbuild src/bridge_server.ts --bundle --platform=node --target=node18 --outfile=bridge_server.bundle.js --minify --external:fsevents --external:@sequelize/mssql --external:@sequelize/sqlite3 --external:@sequelize/db2-ibmi --external:@sequelize/db2 --external:@sequelize/snowflake --format=cjs --banner:js=\"#!/usr/bin/env node\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.47",
+    "@sequelize/mariadb": "^7.0.0-alpha.47",
+    "@sequelize/mysql": "^7.0.0-alpha.47",
+    "@sequelize/postgres": "^7.0.0-alpha.47",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.3.3"
+  }
+}
