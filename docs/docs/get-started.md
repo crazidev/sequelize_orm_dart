@@ -6,6 +6,41 @@ sidebar_position: 1
 
 Welcome to Sequelize Dart! This guide will help you get started with using Sequelize Dart in your Dart projects.
 
+## Prerequisites
+
+Sequelize Dart uses a Node.js bridge to communicate with the [Sequelize.js](https://sequelize.org/) runtime. You must have Node.js installed before using this package.
+
+### Install Node.js
+
+Download and install **Node.js v18 or later** from [nodejs.org](https://nodejs.org/).
+
+Alternatively, use a version manager:
+
+- **nvm** (macOS/Linux): [github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm)
+- **nvm-windows** (Windows): [github.com/coreybutler/nvm-windows](https://github.com/coreybutler/nvm-windows)
+- **fnm**: [github.com/Schniz/fnm](https://github.com/Schniz/fnm)
+
+```bash
+# Install with nvm
+nvm install 18
+nvm use 18
+
+# Or install with fnm
+fnm install 18
+fnm use 18
+```
+
+Verify your installation:
+
+```bash
+node --version
+# Should print v18.x.x or later
+```
+
+:::warning
+Sequelize Dart will not work without Node.js. The ORM uses a background Node.js process to run Sequelize.js queries against your database.
+:::
+
 ## Installation
 
 Add Sequelize Dart to your `pubspec.yaml`:
