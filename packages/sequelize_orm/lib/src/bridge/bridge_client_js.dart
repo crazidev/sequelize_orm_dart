@@ -89,9 +89,8 @@ class BridgeClient implements BridgeClientInterface {
 
       // Create worker thread
       final workerConstructor = workerThreads.workerClass;
-      _worker =
-          workerConstructor.callAsConstructorVarArgs([workerPath.toJS, options])
-              as _Worker;
+      _worker = workerConstructor
+          .callAsConstructorVarArgs([workerPath.toJS, options]) as _Worker;
 
       _isClosed = false;
 
@@ -99,33 +98,30 @@ class BridgeClient implements BridgeClientInterface {
       _worker!.on(
         'message',
         js.allowInterop((data) {
-              _handleResponse(data as JSAny?);
-            })
-            as JSFunction,
+          _handleResponse(data as JSAny?);
+        }) as JSFunction,
       );
 
       // Listen for errors
       _worker!.on(
         'error',
         js.allowInterop((error) {
-              print('[BridgeClient] Worker error: $error');
-              _cleanup();
-            })
-            as JSFunction,
+          print('[BridgeClient] Worker error: $error');
+          _cleanup();
+        }) as JSFunction,
       );
 
       // Listen for exit
       _worker!.on(
         'exit',
         js.allowInterop((code) {
-              if (!_isClosed) {
-                print(
-                  '[BridgeClient] Worker exited unexpectedly with code: $code',
-                );
-                _cleanup();
-              }
-            })
-            as JSFunction,
+          if (!_isClosed) {
+            print(
+              '[BridgeClient] Worker exited unexpectedly with code: $code',
+            );
+            _cleanup();
+          }
+        }) as JSFunction,
       );
 
       // Wait for ready signal
@@ -213,8 +209,7 @@ class BridgeClient implements BridgeClientInterface {
           String? errorStack;
 
           if (error is Map) {
-            errorMessage =
-                error['message'] as String? ??
+            errorMessage = error['message'] as String? ??
                 error['name'] as String? ??
                 'Unknown error';
             errorCode = error['code'] as int?;
