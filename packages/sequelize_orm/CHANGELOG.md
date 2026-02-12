@@ -1,8 +1,9 @@
 ## 0.1.0+1
 
- - **REFACTOR**: rename packages for pub.dev discoverability and add melos workspace management. ([c3c3cb69](https://github.com/crazidev/sequelize_orm_dart/commit/c3c3cb695b555bfe8d3cbfa98c10bbc4e00c8259))
- - **FIX**: harden model generation and runtime serialization. ([c734bb10](https://github.com/crazidev/sequelize_orm_dart/commit/c734bb10d722b41e72453df46c20a98c8ac16e99))
- - **DOCS**: prepare packages for pub.dev publishing and split CLI commands. ([98083c73](https://github.com/crazidev/sequelize_orm_dart/commit/98083c73f80f3156d3ec98de1c093b658180a61a))
+- **FIX**: migrate model identity usage from `name` to `modelName` across runtime model APIs to avoid clashes with columns named `name`.
+- **FIX**: keep backward compatibility by deprecating `Model.name` and forwarding it to `modelName`.
+- **FIX**: update Sequelize registration/association flows to use `modelName` consistently.
+- **FIX**: move bridge server bundle to package source path for runtime packaging consistency.
 
 ## 0.1.0
 

@@ -1,8 +1,11 @@
 ## 0.1.0+1
 
- - **REFACTOR**: rename packages for pub.dev discoverability and add melos workspace management. ([c3c3cb69](https://github.com/crazidev/sequelize_orm_dart/commit/c3c3cb695b555bfe8d3cbfa98c10bbc4e00c8259))
- - **FIX**: harden model generation and runtime serialization. ([c734bb10](https://github.com/crazidev/sequelize_orm_dart/commit/c734bb10d722b41e72453df46c20a98c8ac16e99))
- - **DOCS**: prepare packages for pub.dev publishing and split CLI commands. ([98083c73](https://github.com/crazidev/sequelize_orm_dart/commit/98083c73f80f3156d3ec98de1c093b658180a61a))
+- **FIX**: generate `modelName` instead of `name` in generated models to prevent collisions with fields named `name`.
+- **FIX**: correct `@Default(...)` emission for string and JSON defaults by preserving annotation source for complex literals.
+- **FIX**: always generate `originalQuery` on values classes so generated query assignments are valid.
+- **FIX**: serialize `DateTime` fields as ISO-8601 strings in generated `toJson()` output to avoid `jsonEncode` failures.
+- **IMPROVEMENT**: make generated DateTime parsing tolerant of `DateTime`, epoch integers, and string payloads.
+- **CHORE**: add file-level `ignore_for_file` directives in generated model files to suppress known generated-code warnings.
 
 ## 0.1.0
 
