@@ -196,6 +196,7 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     primaryKey: primaryKey,
     allowNull: allowNull,
     defaultValue: defaultValue,
+    defaultValueSource: _extractDefaultAnnotationSource(field),
     validateCode: validateCode,
     columnName: columnName,
     comment: comment,

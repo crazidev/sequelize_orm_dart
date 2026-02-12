@@ -12,7 +12,7 @@ void _generateClassDefinition(
   );
   buffer.writeln();
   buffer.writeln('  @override');
-  buffer.writeln("  String get name => '$className';");
+  buffer.writeln("  String get modelName => '$className';");
   buffer.writeln();
   buffer.writeln('  $generatedClassName._internal();');
   buffer.writeln();

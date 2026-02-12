@@ -56,7 +56,7 @@ void _generateCreateMethod(
   buffer.writeln();
 
   buffer.writeln('    return QueryEngine().create(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      data: data,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');

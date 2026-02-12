@@ -142,14 +142,14 @@ case "$PACKAGE_MANAGER" in
 esac
 
 # Check bundle
-BUNDLE="bridge_server.bundle.js"
+BUNDLE="../lib/src/bridge/bridge_server.bundle.js"
 
 if [ -f "$BUNDLE" ]; then
     BUNDLE_SIZE=$(du -h "$BUNDLE" | cut -f1)
     
     echo -e "${GREEN}✓ Bridge server bundle built successfully!${NC}"
     echo ""
-    echo -e "${GREEN}  unified bundle: $BUNDLE_SIZE - $BRIDGE_DIR/$BUNDLE${NC}"
+    echo -e "${GREEN}  unified bundle: $BUNDLE_SIZE - $BUNDLE${NC}"
     
     # Remove node_modules after successful build
     # Rule: 

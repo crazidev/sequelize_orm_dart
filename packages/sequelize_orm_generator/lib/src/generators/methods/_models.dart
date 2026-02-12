@@ -9,6 +9,7 @@ class _FieldInfo {
   final bool primaryKey;
   final bool? allowNull;
   final Object? defaultValue;
+  final String? defaultValueSource;
   final String? validateCode; // Generated code for ValidateOption
   final String? columnName;
   final String? comment;
@@ -31,6 +32,7 @@ class _FieldInfo {
     this.primaryKey = false,
     this.allowNull,
     this.defaultValue,
+    this.defaultValueSource,
     this.validateCode,
     this.columnName,
     this.comment,

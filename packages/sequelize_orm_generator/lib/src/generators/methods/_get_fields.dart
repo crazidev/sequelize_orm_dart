@@ -96,9 +96,8 @@ Future<List<_FieldInfo>> _getFields(
         final defaultValue = reader.peek('defaultValue')?.literalValue;
         final columnName = reader.peek('columnName')?.stringValue;
         final comment = reader.peek('comment')?.stringValue;
-        final autoIncrementIdentity = reader
-            .peek('autoIncrementIdentity')
-            ?.boolValue;
+        final autoIncrementIdentity =
+            reader.peek('autoIncrementIdentity')?.boolValue;
 
         // Extract unique
         Object? unique;
@@ -137,6 +136,7 @@ Future<List<_FieldInfo>> _getFields(
             primaryKey: primaryKey,
             allowNull: allowNull,
             defaultValue: defaultValue,
+            defaultValueSource: null,
             validateCode: validateCode,
             columnName: columnName,
             comment: comment,
@@ -201,6 +201,24 @@ Future<List<_FieldInfo>> _getFields(
     }
   }
   return fields;
+}
+
+String? _extractDefaultAnnotationSource(FieldElement field) {
+  for (final meta in field.metadata.annotations) {
+    final annotationElement = meta.element;
+    final enclosing = annotationElement?.enclosingElement;
+    if (enclosing?.name != 'Default') continue;
+
+    final source = meta.toSource().trim();
+    final start = source.indexOf('(');
+    final end = source.lastIndexOf(')');
+    if (start == -1 || end <= start) return null;
+
+    final valueSource = source.substring(start + 1, end).trim();
+    if (valueSource.isEmpty) return null;
+    return valueSource;
+  }
+  return null;
 }
 
 Future<_FieldInfo?> _extractFromAttributeField(
@@ -407,6 +425,7 @@ Future<_FieldInfo?> _extractFromAttributeField(
     primaryKey: primaryKey,
     allowNull: allowNull,
     defaultValue: defaultValue,
+    defaultValueSource: _extractDefaultAnnotationSource(field),
     validateCode: validateCode,
     columnName: columnName,
     comment: comment,

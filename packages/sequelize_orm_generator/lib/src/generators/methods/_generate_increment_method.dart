@@ -116,7 +116,7 @@ void _generateNumericOperationMethod(
   buffer.writeln('    );');
   buffer.writeln();
   buffer.writeln('    return QueryEngine().$operation(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      fields: fields,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');

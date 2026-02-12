@@ -9,8 +9,7 @@ void _generateGetAttributesMethod(
   buffer.writeln('  List<ColumnDefinition> \$getAttributes() {');
   buffer.writeln('    return [');
   for (var field in fields) {
-    final hasExtraProperties =
-        field.autoIncrement ||
+    final hasExtraProperties = field.autoIncrement ||
         field.primaryKey ||
         field.allowNull != null ||
         field.defaultValue != null ||
@@ -37,7 +36,11 @@ void _generateGetAttributesMethod(
         buffer.writeln("        columnName: '${field.columnName}',");
       }
       if (field.defaultValue != null) {
-        buffer.writeln('        defaultValue: ${field.defaultValue},');
+        final defaultValueCode =
+            field.defaultValueSource ?? _toDartLiteral(field.defaultValue);
+        buffer.writeln(
+          '        defaultValue: $defaultValueCode,',
+        );
       }
       if (field.comment != null) {
         buffer.writeln("        comment: '${field.comment}',");
@@ -80,4 +83,19 @@ void _generateGetAttributesMethod(
   buffer.writeln('    ];');
   buffer.writeln('  }');
   buffer.writeln();
+}
+
+String _toDartLiteral(Object? value) {
+  if (value == null) return 'null';
+  if (value is String) {
+    final escaped = value
+        .replaceAll(r'\', r'\\')
+        .replaceAll("'", r"\'")
+        .replaceAll('\n', r'\n')
+        .replaceAll('\r', r'\r')
+        .replaceAll('\t', r'\t');
+    return "'$escaped'";
+  }
+
+  return value.toString();
 }

@@ -88,12 +88,12 @@ class Sequelize extends SequelizeInterface {
 
     if (_debug) log('[Sequelize] Defining ${models.length} models...');
     for (final model in models) {
-      if (_debug) log('>> Defining model: ${model.name}');
-      model.define(model.name, this);
-      _models[model.name] = model;
+      if (_debug) log('>> Defining model: ${model.modelName}');
+      model.define(model.modelName, this);
+      _models[model.modelName] = model;
 
       final response = await _bridge.call('defineModel', {
-        'name': model.name,
+        'name': model.modelName,
         'attributes': model.$getAttributesJson(),
         'options': model.getOptionsJson(),
       });
@@ -116,17 +116,19 @@ class Sequelize extends SequelizeInterface {
   @override
   void addModels(List<Model> models) {
     for (final model in models) {
-      model.define(model.name, this);
-      _models[model.name] = model;
+      model.define(model.modelName, this);
+      _models[model.modelName] = model;
 
       _bridge
           .call('defineModel', {
-            'name': model.name,
+            'name': model.modelName,
             'attributes': model.$getAttributesJson(),
             'options': model.getOptionsJson(),
           })
           .catchError((error) {
-            print('[Sequelize] Failed to define model "${model.name}": $error');
+            print(
+              '[Sequelize] Failed to define model "${model.modelName}": $error',
+            );
           });
     }
   }

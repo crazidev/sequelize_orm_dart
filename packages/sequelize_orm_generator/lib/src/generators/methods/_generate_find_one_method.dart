@@ -43,7 +43,7 @@ void _generateFindOneMethod(
   buffer.writeln('      paranoid: paranoid,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().findOne(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');

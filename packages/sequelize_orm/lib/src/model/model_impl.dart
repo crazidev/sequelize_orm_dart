@@ -12,7 +12,7 @@ abstract class Model<T> extends ModelInterface {
   @internal
   ModelInterface define(String modelName, Object sq) {
     sequelizeInstance = sq;
-    name = modelName;
+    this.modelName = modelName;
     sequelize = sq as Sequelize;
     sequelizeModel = <String, dynamic>{};
 
@@ -35,11 +35,13 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    if (sequelize.debug) sequelize.log('>> $name hasOne ${model.name}');
+    if (sequelize.debug) {
+      sequelize.log('>> $modelName hasOne ${model.modelName}');
+    }
 
     await sequelize.bridge.call('associateModel', {
-      'sourceModel': name,
-      'targetModel': model.name,
+      'sourceModel': modelName,
+      'targetModel': model.modelName,
       'associationType': 'hasOne',
       'options': {
         'foreignKey': foreignKey,
@@ -58,11 +60,13 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    if (sequelize.debug) sequelize.log('>> $name hasMany ${model.name}');
+    if (sequelize.debug) {
+      sequelize.log('>> $modelName hasMany ${model.modelName}');
+    }
 
     await sequelize.bridge.call('associateModel', {
-      'sourceModel': name,
-      'targetModel': model.name,
+      'sourceModel': modelName,
+      'targetModel': model.modelName,
       'associationType': 'hasMany',
       'options': {
         'foreignKey': foreignKey,
@@ -81,11 +85,13 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? targetKey,
   }) async {
-    if (sequelize.debug) sequelize.log('>> $name belongsTo ${model.name}');
+    if (sequelize.debug) {
+      sequelize.log('>> $modelName belongsTo ${model.modelName}');
+    }
 
     await sequelize.bridge.call('associateModel', {
-      'sourceModel': name,
-      'targetModel': model.name,
+      'sourceModel': modelName,
+      'targetModel': model.modelName,
       'associationType': 'belongsTo',
       'options': {
         'foreignKey': foreignKey,
@@ -132,7 +138,7 @@ abstract class Model<T> extends ModelInterface {
       paranoid: paranoid,
     );
     return QueryEngine().findAll(
-          modelName: name,
+          modelName: modelName,
           query: query,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
@@ -158,7 +164,7 @@ abstract class Model<T> extends ModelInterface {
       paranoid: paranoid,
     );
     return QueryEngine().findOne(
-          modelName: name,
+          modelName: modelName,
           query: query,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
@@ -174,7 +180,7 @@ abstract class Model<T> extends ModelInterface {
         : (data as dynamic).toJson();
 
     return QueryEngine().create(
-          modelName: name,
+          modelName: modelName,
           data: dataMap,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
@@ -186,7 +192,7 @@ abstract class Model<T> extends ModelInterface {
   Future<int> count({covariant dynamic where}) {
     final query = Query.fromCallbacks(where: where);
     return QueryEngine().count(
-      modelName: name,
+      modelName: modelName,
       query: query,
       sequelize: sequelizeInstance,
       model: sequelizeModel,
@@ -219,7 +225,7 @@ abstract class Model<T> extends ModelInterface {
       if (individualHooks != null) 'individualHooks': individualHooks,
     };
     return QueryEngine().destroy(
-      modelName: name,
+      modelName: modelName,
       options: options,
       sequelize: sequelizeInstance,
       model: sequelizeModel,
@@ -240,7 +246,7 @@ abstract class Model<T> extends ModelInterface {
       if (force != null) 'force': force,
     };
     return QueryEngine().truncate(
-      modelName: name,
+      modelName: modelName,
       options: options,
       sequelize: sequelizeInstance,
       model: sequelizeModel,
@@ -261,7 +267,7 @@ abstract class Model<T> extends ModelInterface {
       if (individualHooks != null) 'individualHooks': individualHooks,
     };
     return QueryEngine().restore(
-      modelName: name,
+      modelName: modelName,
       options: options,
       sequelize: sequelizeInstance,
       model: sequelizeModel,

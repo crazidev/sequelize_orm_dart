@@ -6,7 +6,7 @@ js/package-lock.json
 js/node_modules/
 
 # Keep the production built bridge:
-# js/bridge_server.bundle.js
+# lib/src/bridge/bridge_server.bundle.js
 # js/preamble.js
 
 # Other

@@ -26,7 +26,7 @@ void _generateMinMethod(
   buffer.writeln('      columns: columns,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().min(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      column: column.name,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');

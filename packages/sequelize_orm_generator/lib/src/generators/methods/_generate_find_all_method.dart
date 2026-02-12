@@ -43,7 +43,7 @@ void _generateFindAllMethod(
   buffer.writeln('      paranoid: paranoid,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().findAll(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');
