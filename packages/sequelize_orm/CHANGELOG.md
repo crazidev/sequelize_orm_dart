@@ -1,4 +1,4 @@
-## 0.1.0+1
+## 0.1.1
 
 - **FIX**: migrate model identity usage from `name` to `modelName` across runtime model APIs to avoid clashes with columns named `name`.
 - **FIX**: keep backward compatibility by deprecating `Model.name` and forwarding it to `modelName`.

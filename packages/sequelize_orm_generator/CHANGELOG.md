@@ -1,4 +1,4 @@
-## 0.1.0+1
+## 0.1.1
 
 - **FIX**: generate `modelName` instead of `name` in generated models to prevent collisions with fields named `name`.
 - **FIX**: correct `@Default(...)` emission for string and JSON defaults by preserving annotation source for complex literals.
