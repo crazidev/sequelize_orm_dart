@@ -22,12 +22,7 @@ Future<void> main() async {
     models: Db.allModels(),
   );
 
-  // await sequelize.truncate(cascade: true, restartIdentity: true);ant
-
-  // await sequelize.seed(
-  //   seeders: Db.allSeeders(),
-  //   syncTableMode: SyncTableMode.force,
-  // );
+  // await sequelize.sync(force: true);
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

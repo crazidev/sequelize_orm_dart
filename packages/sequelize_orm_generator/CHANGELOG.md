@@ -1,3 +1,10 @@
+## 0.1.2
+
+- **FEAT**: Generated `fromJson` now uses shared parse helpers with structured error reporting (model, field, operation, row index).
+- **FEAT**: BIGINT columns generate `SequelizeBigInt` fields instead of plain `String`.
+- **IMPROVEMENT**: `TINYINT`, `SMALLINT`, `MEDIUMINT` mapped to `int`; `BIGINT` to `SequelizeBigInt`.
+- **IMPROVEMENT**: `findAll` passes row index to `fromJson` for per-row error context.
+
 ## 0.1.1
 
 - **FIX**: generate `modelName` instead of `name` in generated models to prevent collisions with fields named `name`.

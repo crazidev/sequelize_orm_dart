@@ -80,11 +80,19 @@ void _generateClassValues(
   buffer.writeln('  });');
   buffer.writeln();
   buffer.writeln(
-    '  factory $valuesClassName.fromJson(Map<String, dynamic> json) {',
+    '  factory $valuesClassName.fromJson(Map<String, dynamic> json, {String operation = \'unknown\', int? rowIndex}) {',
+  );
+  // Local helper that captures model name, operation, and rowIndex once.
+  // Each field becomes a clean one-liner: _p('key', parser, 'Type')
+  buffer.writeln(
+    '    T? _p<T>(String key, T? Function(dynamic) parse, String type) => parseField(json[key], parse, model: \'$valuesClassName\', key: key, expectedType: type, operation: operation, rowIndex: rowIndex);',
   );
   buffer.writeln('    return $valuesClassName(');
   for (var field in fields) {
-    final jsonValue = _generateJsonValueParser(field);
+    final jsonValue = _generateJsonValueParser(
+      field,
+      modelName: valuesClassName,
+    );
     buffer.writeln('      ${field.fieldName}: $jsonValue,');
   }
   // Add association parsing
@@ -96,11 +104,11 @@ void _generateClassValues(
     if (assoc.associationType == 'hasOne' ||
         assoc.associationType == 'belongsTo') {
       buffer.writeln(
-        "      ${assoc.fieldName}: json['$jsonKey'] != null ? $modelValuesClassName.fromJson(json['$jsonKey'] as Map<String, dynamic>) : null,",
+        "      ${assoc.fieldName}: json['$jsonKey'] != null ? $modelValuesClassName.fromJson(json['$jsonKey'] as Map<String, dynamic>, operation: operation, rowIndex: rowIndex) : null,",
       );
     } else {
       buffer.writeln(
-        "      ${assoc.fieldName}: (json['$jsonKey'] as List?)?.map((e) => $modelValuesClassName.fromJson(e as Map<String, dynamic>)).toList(),",
+        "      ${assoc.fieldName}: (json['$jsonKey'] as List?)?.map((e) => $modelValuesClassName.fromJson(e as Map<String, dynamic>, operation: operation, rowIndex: rowIndex)).toList(),",
       );
     }
   }
@@ -193,6 +201,9 @@ String _toJsonFieldValueExpression(
   required String valueExpression,
   required bool alreadyNonNull,
 }) {
+  if (field.dartType == 'SequelizeBigInt') {
+    return '$valueExpression?.toJson()';
+  }
   if (field.dartType == 'DateTime') {
     return '$valueExpression?.toIso8601String()';
   }
@@ -255,7 +266,7 @@ void _generateBelongsToInstanceMethods(
     buffer.writeln('    );');
     buffer.writeln('    if (result == null) return null;');
     buffer.writeln(
-      '    return $targetValuesClassName.fromJson(result.data);',
+      '    return $targetValuesClassName.fromJson(result.data, operation: \'belongsToGet\');',
     );
     buffer.writeln('  }');
     buffer.writeln();
@@ -320,7 +331,9 @@ void _generateBelongsToInstanceMethods(
     buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
     buffer.writeln('      model: $generatedClassName().sequelizeModel,');
     buffer.writeln('    );');
-    buffer.writeln('    return $targetValuesClassName.fromJson(result.data);');
+    buffer.writeln(
+      '    return $targetValuesClassName.fromJson(result.data, operation: \'belongsToCreate\');',
+    );
     buffer.writeln('  }');
   }
 }

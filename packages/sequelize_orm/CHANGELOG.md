@@ -1,3 +1,11 @@
+## 0.1.2
+
+- **FEAT**: `SequelizeBigInt` type for BIGINT columns — wraps the string value with `.toBigInt()`, `.toInt()`, and `.toJson()` helpers.
+- **FEAT**: Colored `ModelParseException` for `fromJson` failures — shows field, model, operation, types, and row index in a single line.
+- **FEAT**: Strict type-safe parse helpers for all supported data types.
+- **FEAT**: JS bridge support for `TINYINT`, `SMALLINT`, `MEDIUMINT`, `CHAR`, and `BLOB`.
+- **IMPROVEMENT**: Datatype options (length, scale, UNSIGNED, ZEROFILL, BINARY, variant) now forwarded to the JS bridge.
+
 ## 0.1.1
 
 - **FIX**: migrate model identity usage from `name` to `modelName` across runtime model APIs to avoid clashes with columns named `name`.

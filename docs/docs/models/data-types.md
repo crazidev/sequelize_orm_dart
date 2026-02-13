@@ -6,6 +6,10 @@ sidebar_position: 2
 
 Sequelize Dart supports a wide range of data types that map to their SQL equivalents. You can access these types via the `DataType` class.
 
+:::info Bridge support
+All data types on this page are fully supported in the JS bridge, including their modifiers (length, scale, UNSIGNED, ZEROFILL, BINARY, and TEXT/BLOB variants).
+:::
+
 ## String Types
 
 ### `STRING`
@@ -94,6 +98,81 @@ DataType.INTEGER.UNSIGNED
 DataType.INTEGER.UNSIGNED.ZEROFILL
 ```
 
+### BIGINT and `SequelizeBigInt`
+
+SQL `BIGINT` can hold values up to 2^63 - 1, but JavaScript numbers lose precision beyond 2^53. Because of this, Sequelize (Node.js) always returns BIGINT values as **strings**. Sequelize Dart follows this standard with a dedicated `SequelizeBigInt` type that wraps the string value while providing typed access.
+
+#### Dart type mapping
+
+| SQL Type | Dart Type |
+|---|---|
+| `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INTEGER` | `int` |
+| `BIGINT` | `SequelizeBigInt` |
+
+#### Defining a BIGINT column
+
+```dart
+@Table()
+abstract class Users {
+  @ColumnName('phone_number')
+  DataType phoneNumber = DataType.BIGINT;
+}
+```
+
+This generates a `SequelizeBigInt?` field in the model:
+
+```dart
+// Generated code
+final SequelizeBigInt? phoneNumber;
+```
+
+#### Creating records
+
+```dart
+// From a string (most common)
+await Db.users.create(CreateUsers(
+  phoneNumber: SequelizeBigInt('9223372036854775807'),
+));
+
+// From an int
+await Db.users.create(CreateUsers(
+  phoneNumber: SequelizeBigInt.fromInt(42),
+));
+
+// From a BigInt
+await Db.users.create(CreateUsers(
+  phoneNumber: SequelizeBigInt.fromBigInt(BigInt.parse('9223372036854775807')),
+));
+```
+
+#### Reading values
+
+```dart
+final user = await Db.users.findOne();
+
+// The raw string value
+user?.phoneNumber?.value;          // "9223372036854775807"
+
+// Convert to Dart BigInt for arithmetic
+user?.phoneNumber?.toBigInt();     // 9223372036854775807
+
+// Convert to int (only safe for small values)
+user?.phoneNumber?.toInt();        // throws FormatException if too large
+```
+
+#### JSON serialization
+
+`toJson()` always returns the string representation, ensuring no precision loss:
+
+```dart
+user?.toJson();
+// { "phone_number": "9223372036854775807", ... }
+```
+
+:::tip Why not plain String?
+Using `SequelizeBigInt` instead of `String` makes it immediately clear which fields are bigint values in your model. The compiler prevents accidentally mixing bigint fields with regular strings, and conversion helpers (`.toBigInt()`, `.toInt()`) are always at hand.
+:::
+
 ### Decimals & Floats
 
 For floating-point and fixed-point numbers.
@@ -178,6 +257,21 @@ DataType.JSON
 // JSONB column (PostgreSQL only)
 DataType.JSONB
 ```
+
+## SQL to Dart Type Mapping
+
+The following table shows how each SQL data type maps to a Dart type in generated models:
+
+| SQL Type | Dart Type | Notes |
+|---|---|---|
+| `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INTEGER` | `int` | |
+| `BIGINT` | `SequelizeBigInt` | String-backed to prevent precision loss |
+| `FLOAT`, `DOUBLE`, `DECIMAL` | `double` | |
+| `BOOLEAN` | `bool` | Also parses `1`/`0` from `int` |
+| `DATE`, `DATEONLY` | `DateTime` | |
+| `STRING`, `CHAR`, `TEXT`, `UUID` | `String` | |
+| `JSON`, `JSONB` | `Map<String, dynamic>` | |
+| `BLOB` | `List<int>` | Raw bytes |
 
 ## Chaining Example
 

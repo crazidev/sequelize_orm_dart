@@ -24,6 +24,7 @@ class SeedUserPost extends SequelizeSeeding<CreatePost> {
           email: 'seed$index@example.com',
           firstName: 'Seed $index',
           lastName: 'User',
+          phoneNumber: SequelizeBigInt('${9000000000000 + index}'),
         ),
         postDetails: CreatePostDetails(
           likes: index,

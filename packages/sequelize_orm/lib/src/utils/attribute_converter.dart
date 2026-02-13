@@ -9,7 +9,7 @@ class AttributeConverter {
     final map = <String, Map<String, dynamic>>{};
 
     for (var item in attributes) {
-      final attr = <String, dynamic>{'type': item.type.typeName};
+      final attr = <String, dynamic>{...item.type.toJson()};
 
       // Column name
       if (item.columnName != null) attr['columnName'] = item.columnName;

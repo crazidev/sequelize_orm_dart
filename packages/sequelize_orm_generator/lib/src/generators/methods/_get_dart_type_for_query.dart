@@ -6,11 +6,12 @@ String _getDartTypeForQuery(String dataType) {
 
   switch (baseType) {
     case 'INTEGER':
-    case 'BIGINT':
     case 'TINYINT':
     case 'SMALLINT':
     case 'MEDIUMINT':
       return 'int';
+    case 'BIGINT':
+      return 'SequelizeBigInt';
     case 'FLOAT':
     case 'DOUBLE':
     case 'DECIMAL':

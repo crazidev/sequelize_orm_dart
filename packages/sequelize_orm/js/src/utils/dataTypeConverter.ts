@@ -2,7 +2,11 @@ import { DataTypes } from '@sequelize/core';
 
 const dataTypeMap: Record<string, any> = {
   STRING: DataTypes.STRING,
+  CHAR: DataTypes.CHAR,
   TEXT: DataTypes.TEXT,
+  TINYINT: DataTypes.TINYINT,
+  SMALLINT: DataTypes.SMALLINT,
+  MEDIUMINT: DataTypes.MEDIUMINT,
   INTEGER: DataTypes.INTEGER,
   BIGINT: DataTypes.BIGINT,
   FLOAT: DataTypes.FLOAT,
@@ -14,17 +18,47 @@ const dataTypeMap: Record<string, any> = {
   UUID: DataTypes.UUID,
   JSON: DataTypes.JSON,
   JSONB: DataTypes.JSONB,
+  BLOB: DataTypes.BLOB,
   NOW: DataTypes.NOW,
 };
 
-export function convertAttribute(attrDef: any): any {
-  const sequelizeType = dataTypeMap[attrDef.type];
-  if (!sequelizeType) {
+function buildSequelizeType(attrDef: any): any {
+  const baseType = dataTypeMap[attrDef.type];
+  if (!baseType) {
     throw new Error(`Unknown data type: ${attrDef.type}`);
   }
 
+  let type = baseType;
+
+  const hasLength = typeof attrDef.length === 'number';
+  const hasScale = typeof attrDef.scale === 'number';
+  const hasVariant =
+    typeof attrDef.variant === 'string' && attrDef.variant.length > 0;
+
+  if (hasVariant && (attrDef.type === 'TEXT' || attrDef.type === 'BLOB')) {
+    type = baseType(attrDef.variant);
+  } else if (hasLength && hasScale) {
+    type = baseType(attrDef.length, attrDef.scale);
+  } else if (hasLength) {
+    type = baseType(attrDef.length);
+  }
+
+  if (attrDef.unsigned && type?.UNSIGNED) {
+    type = type.UNSIGNED;
+  }
+  if (attrDef.zerofill && type?.ZEROFILL) {
+    type = type.ZEROFILL;
+  }
+  if (attrDef.binary && type?.BINARY) {
+    type = type.BINARY;
+  }
+
+  return type;
+}
+
+export function convertAttribute(attrDef: any): any {
   const result: any = {
-    type: sequelizeType,
+    type: buildSequelizeType(attrDef),
   };
 
   if (attrDef.primaryKey !== undefined && attrDef.primaryKey !== null) {

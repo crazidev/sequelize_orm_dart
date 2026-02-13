@@ -63,7 +63,7 @@ void _generateCreateMethod(
   buffer.writeln('      model: sequelizeModel,');
   buffer.writeln('    ).then((result) {');
   buffer.writeln(
-    '      final instance = $valuesClassName.fromJson(result.data);',
+    '      final instance = $valuesClassName.fromJson(result.data, operation: \'create\');',
   );
   buffer.writeln('      instance.originalQuery = query;');
   buffer.writeln('      instance.setPreviousDataValues(instance.toJson());');

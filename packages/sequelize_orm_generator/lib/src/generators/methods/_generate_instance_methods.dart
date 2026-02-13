@@ -205,7 +205,7 @@ void _generateInstanceMethods(
     buffer.writeln();
     buffer.writeln('    // Update instance fields from result');
     buffer.writeln(
-      '    final updatedInstance = $valuesClassName.fromJson(result.data);',
+      '    final updatedInstance = $valuesClassName.fromJson(result.data, operation: \'save\');',
     );
     buffer.writeln('    _updateFields(updatedInstance);');
     buffer.writeln();

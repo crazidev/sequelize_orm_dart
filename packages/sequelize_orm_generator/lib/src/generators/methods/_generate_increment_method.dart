@@ -124,7 +124,7 @@ void _generateNumericOperationMethod(
   buffer.writeln('    ).then((results) =>');
   buffer.writeln('      results.map((result) {');
   buffer.writeln(
-    '        final instance = $valuesClassName.fromJson(result.data);',
+    '        final instance = $valuesClassName.fromJson(result.data, operation: \'$operation\');',
   );
   // TODO: Enable isNewRecord, changed & previous
   buffer.writeln('        return instance;');

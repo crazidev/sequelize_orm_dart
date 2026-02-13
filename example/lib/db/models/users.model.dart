@@ -25,6 +25,9 @@ abstract class Users {
   @ColumnName('last_name')
   DataType lastName = DataType.STRING;
 
+  @ColumnName('phone_number')
+  DataType phoneNumber = DataType.BIGINT;
+
   @ColumnName('deleted_at')
   DataType deletedAt = DataType.DATE;
 
