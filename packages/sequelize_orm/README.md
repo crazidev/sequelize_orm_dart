@@ -31,17 +31,17 @@ Add `sequelize_orm` to your dependencies and the generator to your dev dependenc
 
 ```yaml
 dependencies:
-  sequelize_orm: ^1.0.0
+  sequelize_orm: ^0.1.0
 
 dev_dependencies:
-  sequelize_orm_generator: ^1.0.0
-  build_runner: ^2.4.0
+  sequelize_orm_generator: ^0.1.0
+  build_runner: latest
 ```
 
-Then fetch packages:
+Or you can run the following command:
 
 ```bash
-dart pub get
+dart pub add sequelize_orm dev:sequelize_orm_generator dev:build_runner
 ```
 
 ### build.yaml
