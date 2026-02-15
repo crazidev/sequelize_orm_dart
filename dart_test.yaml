@@ -1,0 +1,4 @@
+# Run tests sequentially to avoid cross-file database interference.
+# Tests share a single database, so operations like TRUNCATE CASCADE
+# in one file can wipe data needed by concurrently running files.
+concurrency: 1

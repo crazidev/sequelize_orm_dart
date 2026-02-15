@@ -1,7 +1,9 @@
+/// {@category Querying}
 abstract class QueryOperator {
   Map<dynamic, dynamic> toJson();
 }
 
+/// {@category Querying}
 class ComparisonOperator extends QueryOperator {
   final dynamic column;
   final dynamic value;
@@ -15,6 +17,8 @@ class ComparisonOperator extends QueryOperator {
 }
 
 /// Logical operator (e.g., and, or, not)
+///
+/// {@category Querying}
 class LogicalOperator extends QueryOperator {
   final dynamic operator;
   final List<QueryOperator> values;

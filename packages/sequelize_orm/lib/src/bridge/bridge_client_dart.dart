@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:path/path.dart' as p;
 import 'package:sequelize_orm/src/bridge/bridge_client_interface.dart';
@@ -70,7 +71,7 @@ class BridgeClient implements BridgeClientInterface {
     _initializationCompleter = Completer<void>();
 
     // Find the bridge server path
-    final serverPath = bridgePath ?? _findBridgeServerPath();
+    final serverPath = bridgePath ?? await _findBridgeServerPath();
 
     if (!File(serverPath).existsSync()) {
       _isInitializing = false;
@@ -105,30 +106,28 @@ class BridgeClient implements BridgeClientInterface {
         .transform(utf8.decoder)
         .transform(const LineSplitter())
         .listen(
-          (line) {
-            _responseController.add(line);
-            _handleResponse(line);
-          },
-          onError: (error) {
-            // ignore: avoid_print
-            print('[BridgeClient] stdout error: $error');
-          },
-        );
+      (line) {
+        _responseController.add(line);
+        _handleResponse(line);
+      },
+      onError: (error) {
+        // ignore: avoid_print
+        print('[BridgeClient] stdout error: $error');
+      },
+    );
 
     // Listen to stderr for errors
-    _process!.stderr
-        .transform(utf8.decoder)
-        .listen(
-          (data) {
-            stderrBuffer.writeln(data);
-          },
-          onDone: () {
-            stderrCompleter.complete();
-          },
-          onError: (error) {
-            stderrCompleter.completeError(error);
-          },
-        );
+    _process!.stderr.transform(utf8.decoder).listen(
+      (data) {
+        stderrBuffer.writeln(data);
+      },
+      onDone: () {
+        stderrCompleter.complete();
+      },
+      onError: (error) {
+        stderrCompleter.completeError(error);
+      },
+    );
 
     // Handle process exit
     final bridgeProcess = _process;
@@ -207,34 +206,25 @@ class BridgeClient implements BridgeClientInterface {
   }
 
   /// Find the bridge server path relative to the package
-  String _findBridgeServerPath() {
-    // Try multiple possible locations (bundled version first)
-    final possiblePaths = [
-      // Bundled version (preferred - no npm install needed)
-      'packages/sequelize_orm/js/bridge_server.bundle.js',
-      '../packages/sequelize_orm/js/bridge_server.bundle.js',
-      'js/bridge_server.bundle.js',
-      // Absolute path fallback for bundled version
-      p.join(
-        Platform.script.toFilePath(),
-        '..',
-        '..',
-        'packages',
-        'sequelize_orm',
-        'js',
-        'bridge_server.bundle.js',
-      ),
-    ];
-
-    for (final path in possiblePaths) {
-      final normalized = p.normalize(path);
-      if (File(normalized).existsSync()) {
-        return p.absolute(normalized);
+  Future<String> _findBridgeServerPath() async {
+    try {
+      final packageUri =
+          Uri.parse('package:sequelize_orm/src/bridge/bridge_server.bundle.js');
+      final resolvedUri = await Isolate.resolvePackageUri(packageUri);
+      if (resolvedUri != null && resolvedUri.scheme == 'file') {
+        final filePath = resolvedUri.toFilePath();
+        if (File(filePath).existsSync()) {
+          return p.absolute(filePath);
+        }
       }
+    } catch (e) {
+      // ignore: avoid_print
+      print('[BridgeClient] Failed to resolve package URI for bundle: $e');
     }
 
-    // Default fallback to bundled version
-    return 'packages/sequelize_orm/js/bridge_server.bundle.js';
+    // Fallback to the logical package path which will trigger the "not found"
+    // error in start() if the resolution failed.
+    return 'packages/sequelize_orm/lib/src/bridge/bridge_server.bundle.js';
   }
 
   /// Wait for the ready signal from the bridge server

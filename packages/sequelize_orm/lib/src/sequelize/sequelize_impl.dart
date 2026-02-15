@@ -6,6 +6,8 @@ import 'package:sequelize_orm/src/sequelize/sequelize_interface.dart';
 
 /// Unified Sequelize implementation for both Dart VM and dart2js.
 /// Both platforms now use the bridge pattern (stdio for VM, Worker Thread for JS).
+///
+/// {@category Get Started}
 class Sequelize extends SequelizeInterface {
   final BridgeClient _bridge = BridgeClient.instance;
   final Map<String, Model> _models = {};
@@ -33,12 +35,18 @@ class Sequelize extends SequelizeInterface {
     Function(String sql)? logging,
     SequelizePoolOptions? pool,
     bool debug = false,
+    bool normalizeJsonTypes = true,
   }) {
     _debug = debug;
 
     final Map<String, dynamic> config = Map<String, dynamic>.from(
       connection.toJson(),
     );
+
+    // Pass normalizeJsonTypes to the bridge so JSON/JSONB types are
+    // automatically converted based on the dialect (e.g. JSON -> JSONB on
+    // PostgreSQL, JSONB -> JSON on MySQL).
+    config['normalizeJsonTypes'] = normalizeJsonTypes;
 
     // Store the logging callback in the bridge client
     if (logging != null) {
@@ -88,12 +96,12 @@ class Sequelize extends SequelizeInterface {
 
     if (_debug) log('[Sequelize] Defining ${models.length} models...');
     for (final model in models) {
-      if (_debug) log('>> Defining model: ${model.name}');
-      model.define(model.name, this);
-      _models[model.name] = model;
+      if (_debug) log('>> Defining model: ${model.modelName}');
+      model.define(model.modelName, this);
+      _models[model.modelName] = model;
 
       final response = await _bridge.call('defineModel', {
-        'name': model.name,
+        'name': model.modelName,
         'attributes': model.$getAttributesJson(),
         'options': model.getOptionsJson(),
       });
@@ -116,17 +124,19 @@ class Sequelize extends SequelizeInterface {
   @override
   void addModels(List<Model> models) {
     for (final model in models) {
-      model.define(model.name, this);
-      _models[model.name] = model;
+      model.define(model.modelName, this);
+      _models[model.modelName] = model;
 
       _bridge
           .call('defineModel', {
-            'name': model.name,
+            'name': model.modelName,
             'attributes': model.$getAttributesJson(),
             'options': model.getOptionsJson(),
           })
           .catchError((error) {
-            print('[Sequelize] Failed to define model "${model.name}": $error');
+            print(
+              '[Sequelize] Failed to define model "${model.modelName}": $error',
+            );
           });
     }
   }

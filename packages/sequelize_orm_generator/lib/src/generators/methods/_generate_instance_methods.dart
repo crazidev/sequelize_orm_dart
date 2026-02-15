@@ -21,8 +21,7 @@ void _generateInstanceMethods(
         dartType == 'int' || dartType == 'double' || dartType == 'num';
     final isNotPrimaryKey = !field.primaryKey;
     final isNotAutoIncrement = !field.autoIncrement;
-    final isNotForeignKey =
-        !field.name.toLowerCase().contains('_id') &&
+    final isNotForeignKey = !field.name.toLowerCase().contains('_id') &&
         !field.name.toLowerCase().endsWith('_id');
     return isNumeric &&
         isNotPrimaryKey &&
@@ -113,9 +112,8 @@ void _generateInstanceMethods(
 
   // Generate save() and update() methods if there are primary keys
   if (primaryKeys.isNotEmpty) {
-    final updateableFields = fields
-        .where((f) => !f.autoIncrement && !f.primaryKey)
-        .toList();
+    final updateableFields =
+        fields.where((f) => !f.autoIncrement && !f.primaryKey).toList();
     buffer.writeln('  /// Saves all changes made to this instance');
     buffer.writeln(
       '  /// Returns the number of affected rows (0 if no changes, 1 if updated/created)',
@@ -197,7 +195,7 @@ void _generateInstanceMethods(
     buffer.writeln();
     buffer.writeln('    // Call bridge save handler');
     buffer.writeln('    final result = await QueryEngine().save(');
-    buffer.writeln('      modelName: $generatedClassName().name,');
+    buffer.writeln('      modelName: $generatedClassName().modelName,');
     buffer.writeln('      currentData: dataToSave,');
     buffer.writeln('      previousData: previousData,');
     buffer.writeln('      primaryKeyValues: pkValues,');
@@ -207,7 +205,7 @@ void _generateInstanceMethods(
     buffer.writeln();
     buffer.writeln('    // Update instance fields from result');
     buffer.writeln(
-      '    final updatedInstance = $valuesClassName.fromJson(result.data);',
+      '    final updatedInstance = $valuesClassName.fromJson(result.data, operation: \'save\');',
     );
     buffer.writeln('    _updateFields(updatedInstance);');
     buffer.writeln();
@@ -291,10 +289,13 @@ void _generateInstanceMethods(
     );
     buffer.writeln('    }');
     buffer.writeln();
+    buffer.writeln('    final options = <String, dynamic>{};');
+    buffer.writeln('    if (force != null) options[\'force\'] = force;');
+    buffer.writeln();
     buffer.writeln('    await QueryEngine().instanceDestroy(');
-    buffer.writeln('      modelName: $generatedClassName().name,');
+    buffer.writeln('      modelName: $generatedClassName().modelName,');
     buffer.writeln('      primaryKeyValues: pkValues,');
-    buffer.writeln('      options: {if (force != null) \'force\': force},');
+    buffer.writeln('      options: options,');
     buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
     buffer.writeln('      model: $generatedClassName().sequelizeModel,');
     buffer.writeln('    );');
@@ -302,7 +303,8 @@ void _generateInstanceMethods(
     buffer.writeln();
 
     // Generate restore() instance method
-    buffer.writeln('  /// Restores this soft-deleted instance (for paranoid models)');
+    buffer.writeln(
+        '  /// Restores this soft-deleted instance (for paranoid models)');
     buffer.writeln('  Future<void> restore() async {');
     buffer.writeln('    final pkValues = getPrimaryKeyMap();');
     buffer.writeln('    if (pkValues == null || pkValues.isEmpty) {');
@@ -312,13 +314,14 @@ void _generateInstanceMethods(
     buffer.writeln('    }');
     buffer.writeln();
     buffer.writeln('    await QueryEngine().instanceRestore(');
-    buffer.writeln('      modelName: $generatedClassName().name,');
+    buffer.writeln('      modelName: $generatedClassName().modelName,');
     buffer.writeln('      primaryKeyValues: pkValues,');
     buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
     buffer.writeln('      model: $generatedClassName().sequelizeModel,');
     buffer.writeln('    );');
     buffer.writeln();
-    buffer.writeln('    // Reload to get updated values (deletedAt should be null)');
+    buffer.writeln(
+        '    // Reload to get updated values (deletedAt should be null)');
     buffer.writeln('    await reload();');
     buffer.writeln('  }');
     buffer.writeln();

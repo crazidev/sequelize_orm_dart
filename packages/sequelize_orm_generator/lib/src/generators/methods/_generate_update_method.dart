@@ -28,8 +28,13 @@ void _generateUpdateMethod(
   buffer.writeln('    final data = <String, dynamic>{};');
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
+      final serializedFieldValue = _toJsonFieldValueExpression(
+        field,
+        valueExpression: field.fieldName,
+        alreadyNonNull: true,
+      );
       buffer.writeln(
-        "    if (${field.fieldName} != null) data['${field.name}'] = ${field.fieldName};",
+        "    if (${field.fieldName} != null) data['${field.name}'] = $serializedFieldValue;",
       );
     }
   }
@@ -50,7 +55,7 @@ void _generateUpdateMethod(
 
   buffer.writeln();
   buffer.writeln('    return QueryEngine().update(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      data: data,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');

@@ -6,7 +6,13 @@ abstract class ModelInterface<T> {
   @protected
   late Sequelize sequelize;
 
-  late String name;
+  late String modelName;
+
+  @Deprecated('Use modelName instead.')
+  String get name => modelName;
+
+  @Deprecated('Use modelName instead.')
+  set name(String value) => modelName = value;
 
   @protected
   late dynamic sequelizeInstance;

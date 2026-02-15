@@ -7,12 +7,13 @@ import 'package:sequelize_orm/src/query/query/query.dart';
 import 'package:sequelize_orm/src/query/query_engine/query_engine.dart';
 import 'package:sequelize_orm/src/sequelize/sequelize.dart';
 
+/// {@category Models}
 abstract class Model<T> extends ModelInterface {
   @override
   @internal
   ModelInterface define(String modelName, Object sq) {
     sequelizeInstance = sq;
-    name = modelName;
+    this.modelName = modelName;
     sequelize = sq as Sequelize;
     sequelizeModel = <String, dynamic>{};
 
@@ -35,11 +36,13 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    if (sequelize.debug) sequelize.log('>> $name hasOne ${model.name}');
+    if (sequelize.debug) {
+      sequelize.log('>> $modelName hasOne ${model.modelName}');
+    }
 
     await sequelize.bridge.call('associateModel', {
-      'sourceModel': name,
-      'targetModel': model.name,
+      'sourceModel': modelName,
+      'targetModel': model.modelName,
       'associationType': 'hasOne',
       'options': {
         'foreignKey': foreignKey,
@@ -58,11 +61,13 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? sourceKey,
   }) async {
-    if (sequelize.debug) sequelize.log('>> $name hasMany ${model.name}');
+    if (sequelize.debug) {
+      sequelize.log('>> $modelName hasMany ${model.modelName}');
+    }
 
     await sequelize.bridge.call('associateModel', {
-      'sourceModel': name,
-      'targetModel': model.name,
+      'sourceModel': modelName,
+      'targetModel': model.modelName,
       'associationType': 'hasMany',
       'options': {
         'foreignKey': foreignKey,
@@ -81,11 +86,13 @@ abstract class Model<T> extends ModelInterface {
     String? as,
     String? targetKey,
   }) async {
-    if (sequelize.debug) sequelize.log('>> $name belongsTo ${model.name}');
+    if (sequelize.debug) {
+      sequelize.log('>> $modelName belongsTo ${model.modelName}');
+    }
 
     await sequelize.bridge.call('associateModel', {
-      'sourceModel': name,
-      'targetModel': model.name,
+      'sourceModel': modelName,
+      'targetModel': model.modelName,
       'associationType': 'belongsTo',
       'options': {
         'foreignKey': foreignKey,
@@ -110,7 +117,10 @@ abstract class Model<T> extends ModelInterface {
   /// Get model options for Sequelize
   Map<String, dynamic> getOptionsJson();
 
-  /// {@macro findAll}
+  /// Searches for multiple instances that match the query options.
+  ///
+  /// Returns a [List] of model instances. Returns an empty list if no
+  /// matches are found.
   Future<List<T>> findAll({
     covariant dynamic where,
     covariant dynamic include,
@@ -132,7 +142,7 @@ abstract class Model<T> extends ModelInterface {
       paranoid: paranoid,
     );
     return QueryEngine().findAll(
-          modelName: name,
+          modelName: modelName,
           query: query,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
@@ -140,7 +150,10 @@ abstract class Model<T> extends ModelInterface {
         as Future<List<T>>;
   }
 
-  /// {@macro findOne}
+  /// Searches for a single instance that matches the query options.
+  ///
+  /// Returns the first matching model instance, or `null` if no match
+  /// is found.
   Future<T?> findOne({
     covariant dynamic where,
     covariant dynamic include,
@@ -158,7 +171,7 @@ abstract class Model<T> extends ModelInterface {
       paranoid: paranoid,
     );
     return QueryEngine().findOne(
-          modelName: name,
+          modelName: modelName,
           query: query,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
@@ -166,7 +179,8 @@ abstract class Model<T> extends ModelInterface {
         as Future<T?>;
   }
 
-  /// {@macro create}
+  /// Creates a new instance in the database and returns the created model
+  /// instance with all auto-generated fields populated.
   Future<T> create(covariant dynamic data) {
     // Convert data to Map if it's not already (for Create classes)
     final Map<String, dynamic> dataMap = data is Map<String, dynamic>
@@ -174,7 +188,7 @@ abstract class Model<T> extends ModelInterface {
         : (data as dynamic).toJson();
 
     return QueryEngine().create(
-          modelName: name,
+          modelName: modelName,
           data: dataMap,
           sequelize: sequelizeInstance,
           model: sequelizeModel,
@@ -182,11 +196,13 @@ abstract class Model<T> extends ModelInterface {
         as Future<T>;
   }
 
-  /// {@macro count}
+  /// Counts the number of instances matching the optional [where] clause.
+  ///
+  /// Returns the total count as an [int].
   Future<int> count({covariant dynamic where}) {
     final query = Query.fromCallbacks(where: where);
     return QueryEngine().count(
-      modelName: name,
+      modelName: modelName,
       query: query,
       sequelize: sequelizeInstance,
       model: sequelizeModel,
@@ -219,7 +235,7 @@ abstract class Model<T> extends ModelInterface {
       if (individualHooks != null) 'individualHooks': individualHooks,
     };
     return QueryEngine().destroy(
-      modelName: name,
+      modelName: modelName,
       options: options,
       sequelize: sequelizeInstance,
       model: sequelizeModel,
@@ -240,7 +256,7 @@ abstract class Model<T> extends ModelInterface {
       if (force != null) 'force': force,
     };
     return QueryEngine().truncate(
-      modelName: name,
+      modelName: modelName,
       options: options,
       sequelize: sequelizeInstance,
       model: sequelizeModel,
@@ -261,7 +277,7 @@ abstract class Model<T> extends ModelInterface {
       if (individualHooks != null) 'individualHooks': individualHooks,
     };
     return QueryEngine().restore(
-      modelName: name,
+      modelName: modelName,
       options: options,
       sequelize: sequelizeInstance,
       model: sequelizeModel,

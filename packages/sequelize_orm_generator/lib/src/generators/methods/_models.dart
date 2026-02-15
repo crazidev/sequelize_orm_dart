@@ -9,6 +9,7 @@ class _FieldInfo {
   final bool primaryKey;
   final bool? allowNull;
   final Object? defaultValue;
+  final String? defaultValueSource;
   final String? validateCode; // Generated code for ValidateOption
   final String? columnName;
   final String? comment;
@@ -18,6 +19,10 @@ class _FieldInfo {
   final bool unsigned;
   final bool zerofill;
   final bool binary;
+
+  /// Optional Dart type hint for JSON/JSONB columns (e.g. `"List<String>"`).
+  /// When set, overrides the default `Map<String, dynamic>` mapping.
+  final String? jsonDartTypeHint;
 
   /// Whether this field has a default value (via @Default decorator or defaultValue in ColumnDefinition).
   bool get hasDefaultValue => defaultValue != null;
@@ -31,6 +36,7 @@ class _FieldInfo {
     this.primaryKey = false,
     this.allowNull,
     this.defaultValue,
+    this.defaultValueSource,
     this.validateCode,
     this.columnName,
     this.comment,
@@ -40,6 +46,7 @@ class _FieldInfo {
     this.unsigned = false,
     this.zerofill = false,
     this.binary = false,
+    this.jsonDartTypeHint,
   });
 }
 

@@ -18,7 +18,7 @@ void _generateTruncateMethod(
   buffer.writeln('      if (force != null) \'force\': force,');
   buffer.writeln('    };');
   buffer.writeln('    return QueryEngine().truncate(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      options: options,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');

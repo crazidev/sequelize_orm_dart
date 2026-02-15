@@ -31,7 +31,7 @@ void _generateDestroyMethod(
   );
   buffer.writeln('    };');
   buffer.writeln('    return QueryEngine().destroy(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      options: options,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');

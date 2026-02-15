@@ -1,4 +1,4 @@
-/// Base class for include helpers
+/// Base class for include helpers.
 ///
 /// Include helpers are generated per model and provide type-safe methods
 /// for including associations. Each method returns an [IncludeBuilder] instance.
@@ -13,6 +13,8 @@
 ///   ],
 /// );
 /// ```
+///
+/// {@category Associations}
 abstract class IncludeHelper {
   const IncludeHelper();
 }

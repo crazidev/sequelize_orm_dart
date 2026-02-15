@@ -43,14 +43,14 @@ void _generateFindOneMethod(
   buffer.writeln('      paranoid: paranoid,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().findOne(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');
   buffer.writeln('    ).then((result) =>');
   buffer.writeln('      result != null ? (() {');
   buffer.writeln(
-    '        final instance = $valuesClassName.fromJson(result.data);',
+    '        final instance = $valuesClassName.fromJson(result.data, operation: \'findOne\');',
   );
   buffer.writeln('        instance.originalQuery = query;');
   buffer.writeln('        instance.setPreviousDataValues(instance.toJson());');

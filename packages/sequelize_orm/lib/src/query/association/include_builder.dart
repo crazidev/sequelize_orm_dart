@@ -3,9 +3,11 @@ import 'package:sequelize_orm/src/query/operators/operators_interface.dart';
 import 'package:sequelize_orm/src/query/query/query.dart';
 import 'package:sequelize_orm/src/query/sql.dart';
 
-/// Builder for creating type-safe include configurations
+/// Builder for creating type-safe include configurations.
 ///
 /// This class provides a type-safe way to configure includes with all Sequelize options.
+///
+/// {@category Associations}
 class IncludeBuilder<T> {
   /// The association name (null when all: true)
   final String? association;

@@ -1,11 +1,10 @@
 import 'package:sequelize_orm_example/db/models/post.model.dart';
 import 'package:sequelize_orm_example/db/models/post_details.model.dart';
 import 'package:sequelize_orm_example/db/models/users.model.dart';
-import 'package:sequelize_orm_example/db/seeders/seed_user_post.seeder.dart';
 
 import 'package:sequelize_orm/sequelize_orm.dart';
 
-/// Registry class for accessing all models and seeders
+/// Registry class for accessing all models
 class Db {
   Db._();
 
@@ -24,13 +23,6 @@ class Db {
       Db.post,
       Db.postDetails,
       Db.users,
-    ];
-  }
-
-  /// Returns a list of all seeders
-  static List<SequelizeSeeding> allSeeders() {
-    return [
-      SeedUserPost(),
     ];
   }
 }

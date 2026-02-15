@@ -8,13 +8,14 @@ type ConnectParams = {
 
 export async function handleConnect(params: ConnectParams): Promise<{ connected: true }> {
   const config = params.config;
-  const { logging, dialect, pool, hoistIncludeOptions, ...sequelizeConfig } = config;
+  const { logging, dialect, pool, hoistIncludeOptions, normalizeJsonTypes, ...sequelizeConfig } = config;
 
   const normalizedDialect = typeof dialect === 'string' ? dialect.toLowerCase() : 'postgres';
 
   setOptions({
     hoistIncludeOptions: !!hoistIncludeOptions,
     dialect: normalizedDialect,
+    normalizeJsonTypes: normalizeJsonTypes !== false,
   });
 
   const poolConfig: any = {};
@@ -42,6 +43,17 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
     dialect: selectDialect(dialect),
     logging: loggingFn,
   };
+
+  // Sequelize v7 defaults to schema: 'public' for all dialects, but only
+  // PostgreSQL actually uses schemas.  For MySQL/MariaDB/SQLite/MSSQL/DB2 the
+  // "public" prefix is interpreted as a database name and causes
+  // "Unknown database 'public'" errors.  Clear it for non-PG dialects.
+  if (normalizedDialect !== 'postgres') {
+    sequelizeOptions.define = {
+      ...(sequelizeOptions.define || {}),
+      schema: undefined,
+    };
+  }
 
   if (Object.keys(poolConfig).length > 0) {
     sequelizeOptions.pool = poolConfig;

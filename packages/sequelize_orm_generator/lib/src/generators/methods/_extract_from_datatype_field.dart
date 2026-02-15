@@ -32,6 +32,7 @@ Future<_FieldInfo?> _extractFromDataTypeField(
   bool unsigned = false;
   bool zerofill = false;
   bool binary = false;
+  String? jsonDartTypeHint;
 
   // Try to get constant value from field first (works if field is const/final)
   final constantValue = field.computeConstantValue();
@@ -55,7 +56,19 @@ Future<_FieldInfo?> _extractFromDataTypeField(
           if (params != null) {
             final paramValues = params.substring(1, params.length - 1);
             final baseType = typeName.split('_')[0];
-            dataType = '$baseType($paramValues)';
+
+            // JSON/JSONB with type: parameter — extract Dart type hint
+            if ((baseType == 'JSON' || baseType == 'JSONB') &&
+                paramValues.contains('type:')) {
+              dataType = baseType;
+              final typeMatch =
+                  RegExp(r'type:\s*(.+)').firstMatch(paramValues);
+              if (typeMatch != null) {
+                jsonDartTypeHint = typeMatch.group(1)!.trim();
+              }
+            } else {
+              dataType = '$baseType($paramValues)';
+            }
           } else {
             dataType = typeName;
           }
@@ -84,6 +97,12 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     final nameValue = typeReader.peek('name')?.stringValue;
     if (nameValue != null) {
       dataType = nameValue;
+
+      // Check for JSON dart type hint
+      final jsonDartTypeValue = typeReader.peek('dartType')?.stringValue;
+      if (jsonDartTypeValue != null) {
+        jsonDartTypeHint = jsonDartTypeValue;
+      }
 
       // Check for additional parameters (length, scale, variant)
       final lengthValue = typeReader.peek('length')?.intValue;
@@ -179,7 +198,7 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     }
   }
 
-  final dartType = _getDartTypeForQuery(dataType);
+  final dartType = _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
 
   // Use columnName if provided, otherwise use fieldName (will be converted to snake_case)
   final name = columnName ?? fieldName;
@@ -196,6 +215,7 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     primaryKey: primaryKey,
     allowNull: allowNull,
     defaultValue: defaultValue,
+    defaultValueSource: _extractDefaultAnnotationSource(field),
     validateCode: validateCode,
     columnName: columnName,
     comment: comment,
@@ -205,5 +225,6 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     unsigned: unsigned,
     zerofill: zerofill,
     binary: binary,
+    jsonDartTypeHint: jsonDartTypeHint,
   );
 }

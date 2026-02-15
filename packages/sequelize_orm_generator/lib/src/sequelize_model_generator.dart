@@ -58,8 +58,8 @@ part 'generators/methods/_to_camel_case.dart';
 ///
 /// This is used to support non-const initializers without depending on
 /// `BuildStep.resolver.astNodeFor(...)` (e.g. in a standalone analyzer CLI).
-typedef InitializerSourceProvider =
-    Future<String?> Function(FieldElement field);
+typedef InitializerSourceProvider = Future<String?> Function(
+    FieldElement field);
 
 /// Shared implementation used by both build_runner and the standalone CLI.
 Future<String> _generateForClassElement(
@@ -80,6 +80,10 @@ Future<String> _generateForClassElement(
   final updateClassName = namingConfig.getModelUpdateClassName(className);
 
   final buffer = StringBuffer();
+  buffer.writeln(
+    '// ignore_for_file: override_on_non_overriding_member, invalid_use_of_protected_member, avoid_renaming_method_parameters, annotate_overrides, curly_braces_in_flow_control_structures, non_constant_identifier_names, use_null_aware_elements, prefer_function_declarations_over_variables, invalid_use_of_internal_member, unused_element, unnecessary_cast',
+  );
+  buffer.writeln();
 
   _generateClassDefinition(
     buffer,
@@ -102,11 +106,9 @@ Future<String> _generateForClassElement(
     tableAnnotation,
   );
 
-  final singularName =
-      (tableAnnotation['name']?['singular'] as String?) ??
+  final singularName = (tableAnnotation['name']?['singular'] as String?) ??
       _toCamelCase(className);
-  final pluralName =
-      (tableAnnotation['name']?['plural'] as String?) ??
+  final pluralName = (tableAnnotation['name']?['plural'] as String?) ??
       _toCamelCase(className);
 
   final baseCallbackName = namingConfig.getWhereCallbackName(

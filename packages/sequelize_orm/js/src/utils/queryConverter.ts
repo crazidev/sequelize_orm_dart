@@ -261,6 +261,15 @@ export function convertWhereClause(where: any): any {
             case '$match':
               converted[Op.match] = convertedValue;
               break;
+            case '$contains':
+              converted[Op.contains] = convertedValue;
+              break;
+            case '$contained':
+              converted[Op.contained] = convertedValue;
+              break;
+            case '$overlap':
+              converted[Op.overlap] = convertedValue;
+              break;
             default:
               converted[opKey] = convertedValue;
           }

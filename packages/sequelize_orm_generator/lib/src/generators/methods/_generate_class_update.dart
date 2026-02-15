@@ -33,8 +33,13 @@ void _generateClassUpdate(
   // Add regular fields
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
+      final serializedFieldValue = _toJsonFieldValueExpression(
+        field,
+        valueExpression: field.fieldName,
+        alreadyNonNull: true,
+      );
       buffer.writeln(
-        "    if (${field.fieldName} != null) result['${field.name}'] = ${field.fieldName};",
+        "    if (${field.fieldName} != null) result['${field.name}'] = $serializedFieldValue;",
       );
     }
   }

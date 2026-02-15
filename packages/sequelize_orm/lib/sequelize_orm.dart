@@ -44,6 +44,10 @@ export 'src/seeding/sequelize_seed.dart';
 export 'src/seeding/sequelize_seeding.dart';
 // Sequelize exports
 export 'src/sequelize/sequelize.dart';
+// Type exports
+export 'src/types/sequelize_big_int.dart';
 // Utility exports
 export 'src/utils/attribute_converter.dart';
+export 'src/utils/model_parse_exception.dart';
+export 'src/utils/parse_helpers.dart';
 export 'src/utils/sql_formatter.dart';

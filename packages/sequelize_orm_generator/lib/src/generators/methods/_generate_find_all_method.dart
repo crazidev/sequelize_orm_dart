@@ -43,14 +43,16 @@ void _generateFindAllMethod(
   buffer.writeln('      paranoid: paranoid,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().findAll(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');
   buffer.writeln('    ).then((results) =>');
-  buffer.writeln('      results.map((result) {');
+  buffer.writeln('      results.asMap().entries.map((entry) {');
+  buffer.writeln('        final rowIndex = entry.key;');
+  buffer.writeln('        final result = entry.value;');
   buffer.writeln(
-    '        final instance = $valuesClassName.fromJson(result.data);',
+    '        final instance = $valuesClassName.fromJson(result.data, operation: \'findAll\', rowIndex: rowIndex);',
   );
   buffer.writeln('        instance.originalQuery = query;');
   buffer.writeln('        instance.setPreviousDataValues(instance.toJson());');

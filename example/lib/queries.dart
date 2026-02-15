@@ -2,14 +2,17 @@ import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:sequelize_orm_example/db/db.dart';
 
 /// Run all query examples
-/// This function is called from main.dart after the database connection is established
+/// This function is called from
+/// main.dart after the database connection is established
 Future<void> runQueries() async {
-  final post = await Db.postDetails.findOne(
-    where: (postDetails) => and([
-      postDetails.id.eq(1),
-      postDetails.metadata.key('tags').unquote().like('%dart%'),
+  final user = await Db.users.findOne(
+    where: (users) => or([
+      // users.metadata.key('isAdmin').eq(true),
+      users.metadata.key('role').unquote().substring('user'),
+      // users.scores.at(0).unquote().gt(1),
+      // users.tags.contains(['dart', 'flutter']),
     ]),
   );
 
-  print(post?.toJson() ?? 'No post found');
+  print(user?.toJson());
 }

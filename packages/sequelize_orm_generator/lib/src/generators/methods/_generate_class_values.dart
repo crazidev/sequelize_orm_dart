@@ -46,7 +46,7 @@ void _generateClassValues(
     buffer.writeln('  @override');
     buffer.writeln('  Query? originalQuery;');
   } else {
-    buffer.writeln('  Query? _originalQuery;');
+    buffer.writeln('  Query? originalQuery;');
   }
   buffer.writeln();
 
@@ -80,11 +80,19 @@ void _generateClassValues(
   buffer.writeln('  });');
   buffer.writeln();
   buffer.writeln(
-    '  factory $valuesClassName.fromJson(Map<String, dynamic> json) {',
+    '  factory $valuesClassName.fromJson(Map<String, dynamic> json, {String operation = \'unknown\', int? rowIndex}) {',
+  );
+  // Local helper that captures model name, operation, and rowIndex once.
+  // Each field becomes a clean one-liner: _p('key', parser, 'Type')
+  buffer.writeln(
+    '    T? _p<T>(String key, T? Function(dynamic) parse, String type) => parseField(json[key], parse, model: \'$valuesClassName\', key: key, expectedType: type, operation: operation, rowIndex: rowIndex);',
   );
   buffer.writeln('    return $valuesClassName(');
   for (var field in fields) {
-    final jsonValue = _generateJsonValueParser(field);
+    final jsonValue = _generateJsonValueParser(
+      field,
+      modelName: valuesClassName,
+    );
     buffer.writeln('      ${field.fieldName}: $jsonValue,');
   }
   // Add association parsing
@@ -96,11 +104,11 @@ void _generateClassValues(
     if (assoc.associationType == 'hasOne' ||
         assoc.associationType == 'belongsTo') {
       buffer.writeln(
-        "      ${assoc.fieldName}: json['$jsonKey'] != null ? $modelValuesClassName.fromJson(json['$jsonKey'] as Map<String, dynamic>) : null,",
+        "      ${assoc.fieldName}: json['$jsonKey'] != null ? $modelValuesClassName.fromJson(json['$jsonKey'] as Map<String, dynamic>, operation: operation, rowIndex: rowIndex) : null,",
       );
     } else {
       buffer.writeln(
-        "      ${assoc.fieldName}: (json['$jsonKey'] as List?)?.map((e) => $modelValuesClassName.fromJson(e as Map<String, dynamic>)).toList(),",
+        "      ${assoc.fieldName}: (json['$jsonKey'] as List?)?.map((e) => $modelValuesClassName.fromJson(e as Map<String, dynamic>, operation: operation, rowIndex: rowIndex)).toList(),",
       );
     }
   }
@@ -110,7 +118,12 @@ void _generateClassValues(
   buffer.writeln('  Map<String, dynamic> toJson() {');
   buffer.writeln('    return {');
   for (var field in fields) {
-    buffer.writeln("      '${field.name}': ${field.fieldName},");
+    final serializedFieldValue = _toJsonFieldValueExpression(
+      field,
+      valueExpression: field.fieldName,
+      alreadyNonNull: false,
+    );
+    buffer.writeln("      '${field.name}': $serializedFieldValue,");
   }
   for (var assoc in associations) {
     final jsonKey = _getAssociationJsonKey(assoc.as, assoc.modelClassName);
@@ -183,6 +196,20 @@ void _generateClassValues(
   buffer.writeln();
 }
 
+String _toJsonFieldValueExpression(
+  _FieldInfo field, {
+  required String valueExpression,
+  required bool alreadyNonNull,
+}) {
+  if (field.dartType == 'SequelizeBigInt') {
+    return '$valueExpression?.toJson()';
+  }
+  if (field.dartType == 'DateTime') {
+    return '$valueExpression?.toIso8601String()';
+  }
+  return valueExpression;
+}
+
 // ignore: unused_element
 void _generateBelongsToInstanceMethods(
   StringBuffer buffer, {
@@ -192,9 +219,8 @@ void _generateBelongsToInstanceMethods(
   required GeneratorNamingConfig namingConfig,
   required bool hasPrimaryKey,
 }) {
-  final belongsToAssocs = associations
-      .where((a) => a.associationType == 'belongsTo')
-      .toList();
+  final belongsToAssocs =
+      associations.where((a) => a.associationType == 'belongsTo').toList();
   if (belongsToAssocs.isEmpty) return;
 
   // These methods require a primary key to locate the instance in JS.
@@ -231,7 +257,7 @@ void _generateBelongsToInstanceMethods(
     buffer.writeln(
       '    final result = await QueryEngine().belongsToGet(',
     );
-    buffer.writeln('      sourceModel: $generatedClassName().name,');
+    buffer.writeln('      sourceModel: $generatedClassName().modelName,');
     buffer.writeln('      primaryKeyValues: pk,');
     buffer.writeln("      associationName: '$sequelizeAssociationName',");
     buffer.writeln('      options: options,');
@@ -240,7 +266,7 @@ void _generateBelongsToInstanceMethods(
     buffer.writeln('    );');
     buffer.writeln('    if (result == null) return null;');
     buffer.writeln(
-      '    return $targetValuesClassName.fromJson(result.data);',
+      '    return $targetValuesClassName.fromJson(result.data, operation: \'belongsToGet\');',
     );
     buffer.writeln('  }');
     buffer.writeln();
@@ -262,15 +288,14 @@ void _generateBelongsToInstanceMethods(
       '    if (targetOrKey is $targetValuesClassName) {',
     );
     // Best-effort: default to id or targetKey if configured.
-    final targetKeyExpr = assoc.targetKey != null
-        ? "'${assoc.targetKey}'"
-        : "'id'";
+    final targetKeyExpr =
+        assoc.targetKey != null ? "'${assoc.targetKey}'" : "'id'";
     buffer.writeln('      final json = targetOrKey.toJson();');
     buffer.writeln('      key = json[$targetKeyExpr] ?? json[\'id\'];');
     buffer.writeln('    }');
     buffer.writeln();
     buffer.writeln('    await QueryEngine().belongsToSet(');
-    buffer.writeln('      sourceModel: $generatedClassName().name,');
+    buffer.writeln('      sourceModel: $generatedClassName().modelName,');
     buffer.writeln('      primaryKeyValues: pk,');
     buffer.writeln("      associationName: '$sequelizeAssociationName',");
     buffer.writeln('      targetOrKey: key,');
@@ -298,7 +323,7 @@ void _generateBelongsToInstanceMethods(
     buffer.writeln('    }');
     buffer.writeln();
     buffer.writeln('    final result = await QueryEngine().belongsToCreate(');
-    buffer.writeln('      sourceModel: $generatedClassName().name,');
+    buffer.writeln('      sourceModel: $generatedClassName().modelName,');
     buffer.writeln('      primaryKeyValues: pk,');
     buffer.writeln("      associationName: '$sequelizeAssociationName',");
     buffer.writeln('      data: data.toJson(),');
@@ -306,7 +331,9 @@ void _generateBelongsToInstanceMethods(
     buffer.writeln('      sequelize: $generatedClassName().sequelizeInstance,');
     buffer.writeln('      model: $generatedClassName().sequelizeModel,');
     buffer.writeln('    );');
-    buffer.writeln('    return $targetValuesClassName.fromJson(result.data);');
+    buffer.writeln(
+      '    return $targetValuesClassName.fromJson(result.data, operation: \'belongsToCreate\');',
+    );
     buffer.writeln('  }');
   }
 }
@@ -419,9 +446,14 @@ void _generateUpdateFieldsHelper(
     final fieldName = field.fieldName;
     buffer.writeln('    $fieldName = source.$fieldName;');
   }
+  // Only update association fields when the source has a non-null value.
+  // This prevents save/increment/decrement from wiping out eagerly-loaded
+  // associations when the bridge response doesn't include them.
   for (final assoc in associations) {
     final assocFieldName = assoc.fieldName;
-    buffer.writeln('    $assocFieldName = source.$assocFieldName;');
+    buffer.writeln(
+      '    if (source.$assocFieldName != null) $assocFieldName = source.$assocFieldName;',
+    );
   }
   // TODO: Enable isNewRecord, changed & previous
   buffer.writeln('  }');

@@ -43,7 +43,7 @@ extension ListOperatorsExtension<T> on Column<T> {
     );
   }
 
-  /// All: `= ALL` (ARRAY[...])
+  /// All: `= ALL (ARRAY[...])`
   ///
   /// Can be combined with other operators. Checks all values in the array.
   ///
@@ -65,7 +65,7 @@ extension ListOperatorsExtension<T> on Column<T> {
     );
   }
 
-  /// Any: `= ANY` (ARRAY[...]) (PostgreSQL only)
+  /// Any: `= ANY (ARRAY[...])` (PostgreSQL only)
   ///
   /// Can be combined with other operators. Checks if any value in the array matches.
   ///

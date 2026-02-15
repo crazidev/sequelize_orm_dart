@@ -357,6 +357,11 @@
 
 ## Data Types
 
+Runtime bridge status:
+
+- ✅ JS bridge mappings now include `TINYINT`, `SMALLINT`, `MEDIUMINT`, `CHAR`, and `BLOB`.
+- ✅ Data type options are forwarded to runtime (`length`, `scale`, `UNSIGNED`, `ZEROFILL`, `BINARY`, `variant`).
+
 ### Integer Types
 
 - ✅ `TINYINT` — with length, UNSIGNED, ZEROFILL

@@ -1,9 +1,11 @@
 import 'package:sequelize_orm/src/model/model_interface.dart';
 import 'package:sequelize_orm/src/query/query/query.dart';
 
-/// Type-safe reference to a model association
+/// Type-safe reference to a model association.
 ///
 /// This class provides a type-safe way to reference associations in queries.
+///
+/// {@category Associations}
 /// Association references are generated automatically in query builder classes.
 ///
 /// Note: To include associations, use the `include` property on the query builder:

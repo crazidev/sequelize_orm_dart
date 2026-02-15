@@ -3,6 +3,8 @@
 import 'package:meta/meta.dart';
 
 /// Base DataType class for Sequelize data types
+///
+/// {@category Models}
 abstract class DataType {
   /// The name of the data type (e.g., 'STRING', 'INTEGER')
   @protected
@@ -15,6 +17,9 @@ abstract class DataType {
   /// The underlying [name] field is `@protected`, so generated / helper code
   /// should use this getter instead.
   String get typeName => name;
+
+  /// Serializes this datatype for bridge transport.
+  Map<String, dynamic> toJson() => {'type': typeName};
 
   // --- Integer Types ---
   static const IntegerDataType TINYINT = IntegerDataType._('TINYINT');
@@ -43,8 +48,9 @@ abstract class DataType {
   static const StandardDataType DATE = StandardDataType._('DATE');
   static const StandardDataType DATEONLY = StandardDataType._('DATEONLY');
   static const StandardDataType UUID = StandardDataType._('UUID');
-  static const StandardDataType JSON = StandardDataType._('JSON');
-  static const StandardDataType JSONB = StandardDataType._('JSONB');
+  // --- JSON Types ---
+  static const JsonDataType JSON = JsonDataType._('JSON');
+  static const JsonDataType JSONB = JsonDataType._('JSONB');
 
   @override
   bool operator ==(Object other);
@@ -87,6 +93,10 @@ class IntegerDataType extends DataType {
     this.zerofill = false,
   }) : super._();
 
+  int? get lengthValue => length;
+  bool get isUnsigned => unsigned;
+  bool get isZerofill => zerofill;
+
   /// Support for DataType.INTEGER(10)
   IntegerDataType call([int? length]) => IntegerDataType._(
     name,
@@ -126,6 +136,14 @@ class IntegerDataType extends DataType {
     if (zerofill) out += ' ZEROFILL';
     return out;
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (length != null) 'length': length,
+    if (unsigned) 'unsigned': true,
+    if (zerofill) 'zerofill': true,
+  };
 }
 
 /// Decimals (DECIMAL, FLOAT, DOUBLE)
@@ -146,6 +164,11 @@ class DecimalDataType extends DataType {
     this.unsigned = false,
     this.zerofill = false,
   }) : super._();
+
+  int? get precision => length;
+  int? get scaleValue => scale;
+  bool get isUnsigned => unsigned;
+  bool get isZerofill => zerofill;
 
   /// Support for DataType.DECIMAL(10, 2)
   @protected
@@ -193,6 +216,15 @@ class DecimalDataType extends DataType {
     if (zerofill) out += ' ZEROFILL';
     return out;
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (length != null) 'length': length,
+    if (scale != null) 'scale': scale,
+    if (unsigned) 'unsigned': true,
+    if (zerofill) 'zerofill': true,
+  };
 }
 
 /// Strings (STRING, CHAR)
@@ -207,6 +239,9 @@ class StringDataType extends DataType {
     this.length,
     this.binary = false,
   }) : super._();
+
+  int? get lengthValue => length;
+  bool get isBinary => binary;
 
   /// Support for DataType.STRING(255)
   @protected
@@ -232,6 +267,13 @@ class StringDataType extends DataType {
     if (binary) out += ' BINARY';
     return out;
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (length != null) 'length': length,
+    if (binary) 'binary': true,
+  };
 }
 
 /// Text types
@@ -240,6 +282,8 @@ class TextDataType extends DataType {
   final String? variant;
 
   const TextDataType._(super.name, {this.variant}) : super._();
+
+  String? get variantValue => variant;
 
   TextDataType get tiny => TextDataType._(name, variant: 'tiny');
   TextDataType get medium => TextDataType._(name, variant: 'medium');
@@ -254,6 +298,12 @@ class TextDataType extends DataType {
 
   @override
   String toString() => variant != null ? "$name('$variant')" : name;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (variant != null) 'variant': variant,
+  };
 }
 
 /// Blob types
@@ -262,6 +312,8 @@ class BlobDataType extends DataType {
   final String? variant;
 
   const BlobDataType._(super.name, {this.variant}) : super._();
+
+  String? get variantValue => variant;
 
   BlobDataType get tiny => BlobDataType._(name, variant: 'tiny');
   BlobDataType get medium => BlobDataType._(name, variant: 'medium');
@@ -276,4 +328,68 @@ class BlobDataType extends DataType {
 
   @override
   String toString() => variant != null ? "$name('$variant')" : name;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (variant != null) 'variant': variant,
+  };
+}
+
+/// JSON / JSONB types with optional Dart type hint.
+///
+/// By default, JSON columns map to `Map<String, dynamic>`.
+/// Use the `type:` parameter to specify a different Dart type:
+///
+/// ```dart
+/// DataType metadata = DataType.JSONB;                          // Map<String, dynamic>
+/// DataType tags = DataType.JSONB(type: List<String>);          // List<String>
+/// DataType scores = DataType.JSONB(type: List<int>);           // List<int>
+/// DataType items = DataType.JSONB(type: List<Map<String, dynamic>>); // List<Map<String, dynamic>>
+/// DataType labels = DataType.JSON(type: Map<String, String>);  // Map<String, String>
+/// ```
+///
+/// Supported types: `List` and `Map` of `dynamic`, `String`, `int`,
+/// `double`, `bool`, or `Map<String, dynamic>`.
+class JsonDataType extends DataType {
+  /// The Dart type hint as a string (e.g. "List<String>", "Map<String, int>").
+  /// `null` means the default `Map<String, dynamic>`.
+  @protected
+  final String? dartType;
+
+  const JsonDataType._(super.name, {this.dartType}) : super._();
+
+  /// The Dart type hint for code generation.
+  String? get dartTypeValue => dartType;
+
+  /// Specify the Dart type for this JSON column.
+  ///
+  /// ```dart
+  /// DataType tags = DataType.JSONB(type: List<String>);
+  /// ```
+  JsonDataType call({required Type type}) =>
+      JsonDataType._(name, dartType: _typeToString(type));
+
+  @override
+  bool operator ==(Object other) =>
+      other is JsonDataType &&
+      name == other.name &&
+      dartType == other.dartType;
+
+  @override
+  int get hashCode => Object.hash(name, dartType);
+
+  @override
+  String toString() => dartType != null ? '$name(type: $dartType)' : name;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (dartType != null) 'dartType': dartType,
+  };
+
+  /// Maps a Dart [Type] literal to its string representation.
+  static String _typeToString(Type type) {
+    return type.toString();
+  }
 }

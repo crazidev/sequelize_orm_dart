@@ -3,9 +3,10 @@ import Sequelize, { ModelStatic } from "@sequelize/core";
 let sequelize: Sequelize | null = null;
 const models = new Map<string, ModelStatic>();
 
-let options: { hoistIncludeOptions: boolean; dialect: string } = {
+let options: { hoistIncludeOptions: boolean; dialect: string; normalizeJsonTypes: boolean } = {
   hoistIncludeOptions: false,
   dialect: 'postgres',
+  normalizeJsonTypes: true,
 };
 
 // Notification callback for SQL logging
@@ -22,12 +23,12 @@ export function sendNotification(notification: any): void {
   }
 }
 
-export function getOptions(): { hoistIncludeOptions: boolean; dialect: string } {
+export function getOptions(): { hoistIncludeOptions: boolean; dialect: string; normalizeJsonTypes: boolean } {
   return options;
 }
 
 export function setOptions(
-  newOptions: Partial<{ hoistIncludeOptions: boolean; dialect: string }>,
+  newOptions: Partial<{ hoistIncludeOptions: boolean; dialect: string; normalizeJsonTypes: boolean }>,
 ): void {
   options = { ...options, ...newOptions };
 }

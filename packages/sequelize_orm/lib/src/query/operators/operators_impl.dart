@@ -81,12 +81,12 @@ ComparisonOperator notBetween(String column, List<dynamic> value) {
 // List Operators
 // ============================================================================
 
-/// In: IN [value1, value2, ...]
+/// In: `IN (value1, value2, ...)`
 ComparisonOperator in_(String column, List<dynamic> values) {
   return ComparisonOperator(column: column, value: {'\$in': values});
 }
 
-/// Not in: NOT IN [value1, value2, ...]
+/// Not in: `NOT IN (value1, value2, ...)`
 ComparisonOperator notIn(String column, List<dynamic> values) {
   return ComparisonOperator(column: column, value: {'\$notIn': values});
 }
@@ -96,7 +96,7 @@ ComparisonOperator all(String column, dynamic value) {
   return ComparisonOperator(column: column, value: {'\$all': value});
 }
 
-/// Any: ANY (ARRAY[...]) (PostgreSQL only)
+/// Any: `ANY (ARRAY[...])` (PostgreSQL only)
 ComparisonOperator any(String column, List<dynamic> values) {
   return ComparisonOperator(column: column, value: {'\$any': values});
 }

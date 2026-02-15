@@ -20,7 +20,7 @@ void _generateCountMethod(
   buffer.writeln('      columns: columns,');
   buffer.writeln('    );');
   buffer.writeln('    return QueryEngine().count(');
-  buffer.writeln('      modelName: name,');
+  buffer.writeln('      modelName: modelName,');
   buffer.writeln('      query: query,');
   buffer.writeln('      sequelize: sequelizeInstance,');
   buffer.writeln('      model: sequelizeModel,');

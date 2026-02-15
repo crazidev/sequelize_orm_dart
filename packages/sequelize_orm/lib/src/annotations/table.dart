@@ -63,6 +63,8 @@ class VersionOption {
 }
 
 /// Marks a class as a database table
+///
+/// {@category Models}
 @Target({TargetKind.classType})
 class Table {
   /// The name of the table in SQL.

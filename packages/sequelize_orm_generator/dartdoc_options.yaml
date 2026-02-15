@@ -1,0 +1,8 @@
+dartdoc:
+  categories:
+    generators:
+      displayName: Generators
+    cli:
+      displayName: CLI Utilities
+  categoryOrder: [generators, cli]
+  showUndocumentedCategories: true

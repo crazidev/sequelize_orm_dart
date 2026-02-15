@@ -1,18 +1,15 @@
 dartdoc:
   categories:
-    get-started:
-      markdown: ../../doc/get-started.md
-      displayName: Get Started
-    querying:
-      markdown: ../../doc/querying.md
-      displayName: Querying
-    models:
-      markdown: ../../doc/models.md
-      displayName: Models & Tables
-    associations:
-      markdown: ../../doc/associations.md
-      displayName: Associations
-  categoryOrder: [get-started, models, associations, querying]
+    "Get Started":
+      markdown: ./dartdoc/get-started.md
+      name: Get Started
+    "Querying":
+      markdown: ./dartdoc/querying.md
+      name: Querying
+    "Models":
+      markdown: ./dartdoc/models.md
+      name: Models
+    "Associations":
+      markdown: ./dartdoc/associations.md
+      name: Associations
   showUndocumentedCategories: true
-  includeExternal:
-    - ../../doc/templates/templates.dart
