@@ -131,6 +131,9 @@ class _Package {
   /// Tag name following monorepo convention: `<package>-v<version>`.
   String get tagName => '$name-v$version';
 
+  /// pub.dev URL for this specific version.
+  String get pubUrl => 'https://pub.dev/packages/$name/versions/$version';
+
   /// Extract the latest changelog section (everything between the first two
   /// `## ` headings, or until end-of-file if there is only one).
   String get latestChangelog {
@@ -151,6 +154,13 @@ class _Package {
     }
     final body = buf.toString().trim();
     return body.isEmpty ? 'No changelog entries for this version.' : body;
+  }
+
+  /// Full release body for GitHub releases: changelog + pub.dev link.
+  String get releaseBody {
+    final changelog = latestChangelog;
+    return '$changelog\n\n---\n\n'
+        '**pub.dev**: $pubUrl';
   }
 }
 
@@ -248,9 +258,13 @@ Future<void> _publish() async {
 
 Future<void> _createGithubRelease(_Package pkg) async {
   final tag = pkg.tagName;
-  final body = pkg.latestChangelog;
+  final body = pkg.releaseBody;
 
   _info('  Creating GitHub release for $tag...');
+  _info('  Release body preview:');
+  _info('  ${body.split('\n').first}...');
+  _info('  pub.dev: ${pkg.pubUrl}');
+
   await _run('gh', [
     'release',
     'create',

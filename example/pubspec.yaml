@@ -1,6 +1,7 @@
 name: sequelize_orm_example
 description: Example project demonstrating sequelize_orm usage.
 version: 1.0.0
+publish_to: none
 resolution: workspace
 
 environment:
