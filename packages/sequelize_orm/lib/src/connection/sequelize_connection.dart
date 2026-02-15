@@ -5,6 +5,8 @@ import 'package:sequelize_orm/src/connection/dialects/mysql.dart';
 import 'package:sequelize_orm/src/connection/dialects/postgres.dart';
 import 'package:sequelize_orm/src/connection/dialects/sqlite.dart';
 
+/// {@category Get Started}
+///
 /// Factory class for creating Sequelize connection configurations.
 ///
 /// Use the static methods to create connection options for specific database dialects:

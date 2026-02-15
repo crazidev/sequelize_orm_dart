@@ -10,6 +10,7 @@ export 'package:sequelize_orm/src/query/association/include_helper.dart';
 
 export 'query_attributes.dart';
 
+/// {@category Querying}
 class Query extends QueryInterface {
   final QueryOperator? where;
   final List<IncludeBuilder>?

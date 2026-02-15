@@ -7,6 +7,7 @@ import 'package:sequelize_orm/src/query/query/query.dart';
 import 'package:sequelize_orm/src/query/query_engine/query_engine.dart';
 import 'package:sequelize_orm/src/sequelize/sequelize.dart';
 
+/// {@category Models}
 abstract class Model<T> extends ModelInterface {
   @override
   @internal
@@ -116,7 +117,10 @@ abstract class Model<T> extends ModelInterface {
   /// Get model options for Sequelize
   Map<String, dynamic> getOptionsJson();
 
-  /// {@macro findAll}
+  /// Searches for multiple instances that match the query options.
+  ///
+  /// Returns a [List] of model instances. Returns an empty list if no
+  /// matches are found.
   Future<List<T>> findAll({
     covariant dynamic where,
     covariant dynamic include,
@@ -146,7 +150,10 @@ abstract class Model<T> extends ModelInterface {
         as Future<List<T>>;
   }
 
-  /// {@macro findOne}
+  /// Searches for a single instance that matches the query options.
+  ///
+  /// Returns the first matching model instance, or `null` if no match
+  /// is found.
   Future<T?> findOne({
     covariant dynamic where,
     covariant dynamic include,
@@ -172,7 +179,8 @@ abstract class Model<T> extends ModelInterface {
         as Future<T?>;
   }
 
-  /// {@macro create}
+  /// Creates a new instance in the database and returns the created model
+  /// instance with all auto-generated fields populated.
   Future<T> create(covariant dynamic data) {
     // Convert data to Map if it's not already (for Create classes)
     final Map<String, dynamic> dataMap = data is Map<String, dynamic>
@@ -188,7 +196,9 @@ abstract class Model<T> extends ModelInterface {
         as Future<T>;
   }
 
-  /// {@macro count}
+  /// Counts the number of instances matching the optional [where] clause.
+  ///
+  /// Returns the total count as an [int].
   Future<int> count({covariant dynamic where}) {
     final query = Query.fromCallbacks(where: where);
     return QueryEngine().count(

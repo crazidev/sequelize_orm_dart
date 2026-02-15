@@ -6,10 +6,12 @@ export 'package:sequelize_orm/src/query/operators/extentions/extensions.dart';
 // Export JSON column types for fluent JSON path queries
 export 'package:sequelize_orm/src/query/json_column.dart';
 
-/// Type-safe column reference for building queries
+/// Type-safe column reference for building queries.
 ///
 /// The [Column] class provides a type-safe way to reference database columns
 /// in queries. All operators are implemented as extensions for cleaner organization.
+///
+/// {@category Querying}
 ///
 /// Available operator extensions:
 /// - [BasicComparisonExtension] - eq, ne (equality)

@@ -3,6 +3,8 @@
 import 'package:meta/meta.dart';
 
 /// Base DataType class for Sequelize data types
+///
+/// {@category Models}
 abstract class DataType {
   /// The name of the data type (e.g., 'STRING', 'INTEGER')
   @protected

@@ -1,3 +1,7 @@
+/// Defines a one-to-many association where the foreign key exists on the
+/// target model.
+///
+/// {@category Associations}
 class HasMany {
   final Type model;
   final String? foreignKey;

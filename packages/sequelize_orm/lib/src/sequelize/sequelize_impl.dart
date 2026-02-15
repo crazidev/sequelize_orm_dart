@@ -6,6 +6,8 @@ import 'package:sequelize_orm/src/sequelize/sequelize_interface.dart';
 
 /// Unified Sequelize implementation for both Dart VM and dart2js.
 /// Both platforms now use the bridge pattern (stdio for VM, Worker Thread for JS).
+///
+/// {@category Get Started}
 class Sequelize extends SequelizeInterface {
   final BridgeClient _bridge = BridgeClient.instance;
   final Map<String, Model> _models = {};

@@ -1,3 +1,7 @@
+/// Defines an association where the foreign key exists on the source (this)
+/// model, pointing to the target model's primary key.
+///
+/// {@category Associations}
 class BelongsTo {
   final Type model;
 

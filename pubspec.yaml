@@ -1,5 +1,4 @@
 name: _
-publish_to: none
 environment:
   sdk: ^3.6.0
 
@@ -13,9 +12,6 @@ dev_dependencies:
   melos: ^7.4.0
   test: ^1.28.0
 
-dependencies:
-  sequelize_orm_example: ^1.0.0
-
 melos:
   sdkPath: auto
   repository: https://github.com/crazidev/sequelize_orm_dart
@@ -28,7 +24,7 @@ melos:
 
   command:
     version:
-      branch: dev
+      branch: main
       message: "chore(release): publish packages\n\n{new_package_versions}"
       linkToCommits: true
       workspaceChangelog: true
@@ -36,9 +32,6 @@ melos:
     publish:
       packageFilters:
         category: packages
-        # hooks:
-        # pre: dart pub run build_runner build
-        # post: dart pub run build_runner clean
 
   scripts:
     # ─── Analysis & Linting ─────────────────────────────
@@ -97,3 +90,16 @@ melos:
         concurrency: 1
       packageFilters:
         category: examples
+
+    # ─── Release & Publishing ─────────────────────────────
+    release:dry:
+      description: Dry-run release (merge dev to main, verify publish).
+      run: dart run tools/release_publish.dart
+
+    release:publish:
+      description: Merge dev to main and publish packages to pub.dev.
+      run: dart run tools/release_publish.dart --publish
+
+    release:publish:tag:
+      description: Publish, create git tags and GitHub releases per package.
+      run: dart run tools/release_publish.dart --publish --tag --github-release
