@@ -20,6 +20,10 @@ class _FieldInfo {
   final bool zerofill;
   final bool binary;
 
+  /// Optional Dart type hint for JSON/JSONB columns (e.g. `"List<String>"`).
+  /// When set, overrides the default `Map<String, dynamic>` mapping.
+  final String? jsonDartTypeHint;
+
   /// Whether this field has a default value (via @Default decorator or defaultValue in ColumnDefinition).
   bool get hasDefaultValue => defaultValue != null;
 
@@ -42,6 +46,7 @@ class _FieldInfo {
     this.unsigned = false,
     this.zerofill = false,
     this.binary = false,
+    this.jsonDartTypeHint,
   });
 }
 

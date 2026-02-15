@@ -33,12 +33,18 @@ class Sequelize extends SequelizeInterface {
     Function(String sql)? logging,
     SequelizePoolOptions? pool,
     bool debug = false,
+    bool normalizeJsonTypes = true,
   }) {
     _debug = debug;
 
     final Map<String, dynamic> config = Map<String, dynamic>.from(
       connection.toJson(),
     );
+
+    // Pass normalizeJsonTypes to the bridge so JSON/JSONB types are
+    // automatically converted based on the dialect (e.g. JSON -> JSONB on
+    // PostgreSQL, JSONB -> JSON on MySQL).
+    config['normalizeJsonTypes'] = normalizeJsonTypes;
 
     // Store the logging callback in the bridge client
     if (logging != null) {

@@ -46,8 +46,9 @@ abstract class DataType {
   static const StandardDataType DATE = StandardDataType._('DATE');
   static const StandardDataType DATEONLY = StandardDataType._('DATEONLY');
   static const StandardDataType UUID = StandardDataType._('UUID');
-  static const StandardDataType JSON = StandardDataType._('JSON');
-  static const StandardDataType JSONB = StandardDataType._('JSONB');
+  // --- JSON Types ---
+  static const JsonDataType JSON = JsonDataType._('JSON');
+  static const JsonDataType JSONB = JsonDataType._('JSONB');
 
   @override
   bool operator ==(Object other);
@@ -331,4 +332,62 @@ class BlobDataType extends DataType {
     'type': typeName,
     if (variant != null) 'variant': variant,
   };
+}
+
+/// JSON / JSONB types with optional Dart type hint.
+///
+/// By default, JSON columns map to `Map<String, dynamic>`.
+/// Use the `type:` parameter to specify a different Dart type:
+///
+/// ```dart
+/// DataType metadata = DataType.JSONB;                          // Map<String, dynamic>
+/// DataType tags = DataType.JSONB(type: List<String>);          // List<String>
+/// DataType scores = DataType.JSONB(type: List<int>);           // List<int>
+/// DataType items = DataType.JSONB(type: List<Map<String, dynamic>>); // List<Map<String, dynamic>>
+/// DataType labels = DataType.JSON(type: Map<String, String>);  // Map<String, String>
+/// ```
+///
+/// Supported types: `List` and `Map` of `dynamic`, `String`, `int`,
+/// `double`, `bool`, or `Map<String, dynamic>`.
+class JsonDataType extends DataType {
+  /// The Dart type hint as a string (e.g. "List<String>", "Map<String, int>").
+  /// `null` means the default `Map<String, dynamic>`.
+  @protected
+  final String? dartType;
+
+  const JsonDataType._(super.name, {this.dartType}) : super._();
+
+  /// The Dart type hint for code generation.
+  String? get dartTypeValue => dartType;
+
+  /// Specify the Dart type for this JSON column.
+  ///
+  /// ```dart
+  /// DataType tags = DataType.JSONB(type: List<String>);
+  /// ```
+  JsonDataType call({required Type type}) =>
+      JsonDataType._(name, dartType: _typeToString(type));
+
+  @override
+  bool operator ==(Object other) =>
+      other is JsonDataType &&
+      name == other.name &&
+      dartType == other.dartType;
+
+  @override
+  int get hashCode => Object.hash(name, dartType);
+
+  @override
+  String toString() => dartType != null ? '$name(type: $dartType)' : name;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': typeName,
+    if (dartType != null) 'dartType': dartType,
+  };
+
+  /// Maps a Dart [Type] literal to its string representation.
+  static String _typeToString(Type type) {
+    return type.toString();
+  }
 }

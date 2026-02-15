@@ -3,7 +3,7 @@ description: >-
   Code generator for sequelize_orm. Generates type-safe model classes, query
   builders, and a centralized model registry from annotated Dart classes using
   build_runner.
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/crazidev/sequelize_orm_dart
 resolution: workspace
 
@@ -29,4 +29,3 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.10.4
- 

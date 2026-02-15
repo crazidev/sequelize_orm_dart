@@ -248,15 +248,111 @@ DataType.UUID
 
 ### `JSON` & `JSONB`
 
-JSON column types.
+JSON column types. By default they map to `Map<String, dynamic>`, but you can specify a custom Dart type with the `type:` parameter.
 
 ```dart
-// JSON column
+// Default: Map<String, dynamic>
 DataType.JSON
-
-// JSONB column (PostgreSQL only)
 DataType.JSONB
+
+// Custom Dart types
+DataType.JSONB(type: List<String>)
+DataType.JSONB(type: List<int>)
+DataType.JSONB(type: List<double>)
+DataType.JSONB(type: List<bool>)
+DataType.JSONB(type: List<dynamic>)
+DataType.JSONB(type: List<Map<String, dynamic>>)
+DataType.JSON(type: Map<String, String>)
+DataType.JSON(type: Map<String, int>)
 ```
+
+#### Defining JSON columns with custom types
+
+```dart
+@Table()
+abstract class Users {
+  DataType tags = DataType.JSONB(type: List<String>);
+  DataType scores = DataType.JSONB(type: List<int>);
+  DataType metadata = DataType.JSONB; // default Map<String, dynamic>
+}
+```
+
+This generates correctly typed fields and parsers:
+
+```dart
+// Generated code
+final List<String>? tags;     // parsed with parseJsonList<String>
+final List<int>? scores;      // parsed with parseJsonList<int>
+final Map<String, dynamic>? metadata; // parsed with parseJsonMap<dynamic>
+```
+
+#### Creating records
+
+```dart
+await Db.users.create(CreateUsers(
+  tags: ['dart', 'flutter', 'sequelize'],
+  scores: [100, 200, 300],
+  metadata: {'role': 'admin', 'level': 5},
+));
+```
+
+#### Reading values
+
+The generated `fromJson` automatically handles JSON strings returned by the bridge (via `jsonDecode`), so you always get the correct Dart type:
+
+```dart
+final user = await Db.users.findOne();
+
+user?.tags;     // List<String>?
+user?.scores;   // List<int>?
+user?.metadata; // Map<String, dynamic>?
+```
+
+#### Supported `type:` values
+
+**Array JSON:**
+
+```dart
+DataType.JSONB(type: List<String>)
+DataType.JSONB(type: List<int>)
+DataType.JSONB(type: List<double>)
+DataType.JSONB(type: List<bool>)
+DataType.JSONB(type: List<dynamic>)
+DataType.JSONB(type: List<Map<String, dynamic>>)
+```
+
+**Object JSON:**
+
+```dart
+DataType.JSONB                                    // default: Map<String, dynamic>
+DataType.JSONB(type: Map<String, String>)
+DataType.JSONB(type: Map<String, int>)
+DataType.JSONB(type: Map<String, double>)
+DataType.JSONB(type: Map<String, bool>)
+```
+
+:::tip JSON vs JSONB
+`JSONB` stores data in a binary format and supports indexing in PostgreSQL. Use `JSONB` for PostgreSQL and `JSON` for MySQL / other databases.
+
+By default, Sequelize normalizes JSON types automatically (`normalizeJsonTypes: true`). This means you can write `DataType.JSON` or `DataType.JSONB` and Sequelize will convert it to the correct type for the connected database:
+- **PostgreSQL**: `JSON` is automatically promoted to `JSONB` (required for full JSON querying)
+- **MySQL / MariaDB**: `JSONB` is automatically downgraded to `JSON` (the only supported type)
+
+To disable this behavior, set `normalizeJsonTypes: false` when creating the Sequelize instance:
+
+```dart
+final sequelize = Sequelize().createInstance(
+  connection: SequelizeConnection.postgres(url: '...'),
+  normalizeJsonTypes: false, // opt out of automatic type normalization
+);
+```
+:::
+
+:::tip Bridge compatibility
+The bridge may return JSON columns as raw strings. The generated parsers automatically call `jsonDecode` when they receive a string, so no manual handling is needed.
+:::
+
+For a complete guide on querying JSON columns — including `.key()`, `.at()`, `.contains()`, and more — see **[JSON Querying](../querying/json)**.
 
 ## SQL to Dart Type Mapping
 
@@ -270,7 +366,7 @@ The following table shows how each SQL data type maps to a Dart type in generate
 | `BOOLEAN` | `bool` | Also parses `1`/`0` from `int` |
 | `DATE`, `DATEONLY` | `DateTime` | |
 | `STRING`, `CHAR`, `TEXT`, `UUID` | `String` | |
-| `JSON`, `JSONB` | `Map<String, dynamic>` | |
+| `JSON`, `JSONB` | `Map<String, dynamic>` | Customizable via `type:` parameter |
 | `BLOB` | `List<int>` | Raw bytes |
 
 ## Chaining Example
@@ -279,17 +375,11 @@ You can chain multiple options for supported types to refine your column definit
 
 ```dart
 @Table()
-class Product {
-  // ...
+abstract class Product {
+  // INTEGER UNSIGNED ZEROFILL
+  DataType stock = DataType.INTEGER.UNSIGNED.ZEROFILL;
 
-  @ModelAttributes(
-    type: DataType.INTEGER.UNSIGNED.ZEROFILL,
-  )
-  int stock;
-
-  @ModelAttributes(
-    type: DataType.DECIMAL(10,2).UNSIGNED,
-  )
-  double price;
+  // DECIMAL(10,2) UNSIGNED
+  DataType price = DataType.DECIMAL(10, 2).UNSIGNED;
 }
 ```

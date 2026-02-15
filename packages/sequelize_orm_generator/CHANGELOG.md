@@ -1,7 +1,14 @@
+## 0.1.3
+
+- **FEAT**: Generated columns now emit generic `JsonColumn<T>` references (e.g. `JsonColumn<List<String>>`) for type-safe JSON equality checks.
+- **FIX**: `_updateFields()` no longer overwrites eagerly-loaded associations with null when the bridge response omits them (e.g. after `save()`, `increment()`, `decrement()`).
+- **IMPROVEMENT**: JSON type hint extracted from `DataType.JSON(type: ...)` / `DataType.JSONB(type: ...)` and forwarded to column generation.
+
 ## 0.1.2
 
 - **FEAT**: Generated `fromJson` now uses shared parse helpers with structured error reporting (model, field, operation, row index).
 - **FEAT**: BIGINT columns generate `SequelizeBigInt` fields instead of plain `String`.
+- **FEAT**: JSON/JSONB columns now support `type:` parameter — generates correctly typed `List<T>` / `Map<String, T>` fields with `parseJsonList<T>` / `parseJsonMap<T>` parsers.
 - **IMPROVEMENT**: `TINYINT`, `SMALLINT`, `MEDIUMINT` mapped to `int`; `BIGINT` to `SequelizeBigInt`.
 - **IMPROVEMENT**: `findAll` passes row index to `fromJson` for per-row error context.
 

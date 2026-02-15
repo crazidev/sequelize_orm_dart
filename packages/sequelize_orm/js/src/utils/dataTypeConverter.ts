@@ -1,4 +1,5 @@
 import { DataTypes } from '@sequelize/core';
+import { getOptions } from './state';
 
 const dataTypeMap: Record<string, any> = {
   STRING: DataTypes.STRING,
@@ -23,6 +24,18 @@ const dataTypeMap: Record<string, any> = {
 };
 
 function buildSequelizeType(attrDef: any): any {
+  // Normalize JSON/JSONB types based on the target dialect so users can
+  // write DataType.JSON or DataType.JSONB and have it work everywhere.
+  const opts = getOptions();
+  if (opts.normalizeJsonTypes !== false) {
+    const dialect = opts.dialect;
+    if (dialect === 'postgres' && attrDef.type === 'JSON') {
+      attrDef = { ...attrDef, type: 'JSONB' };
+    } else if ((dialect === 'mysql' || dialect === 'mariadb') && attrDef.type === 'JSONB') {
+      attrDef = { ...attrDef, type: 'JSON' };
+    }
+  }
+
   const baseType = dataTypeMap[attrDef.type];
   if (!baseType) {
     throw new Error(`Unknown data type: ${attrDef.type}`);

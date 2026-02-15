@@ -3,7 +3,9 @@
 
 // import '../test_helper.dart';
 
-// void main() {
+void main() {}
+
+// void _main() {
 //   setUpAll(() async {
 //     await initTestEnvironment();
 //   });

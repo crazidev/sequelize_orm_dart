@@ -18,6 +18,7 @@ abstract class SequelizeInterface {
     Function(String sql)? logging,
     SequelizePoolOptions? pool,
     bool debug = false,
+    bool normalizeJsonTypes = true,
   });
 
   Future<void> authenticate();

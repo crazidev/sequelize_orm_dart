@@ -1,6 +1,6 @@
 part of '../../sequelize_model_generator.dart';
 
-String _getDartTypeForQuery(String dataType) {
+String _getDartTypeForQuery(String dataType, {String? jsonDartTypeHint}) {
   // Extract base type name if parameterized (e.g., "TINYINT(2)" -> "TINYINT")
   final baseType = dataType.contains('(') ? dataType.split('(')[0] : dataType;
 
@@ -23,7 +23,8 @@ String _getDartTypeForQuery(String dataType) {
       return 'DateTime';
     case 'JSON':
     case 'JSONB':
-      return 'Map<String, dynamic>';
+      // Use the developer-specified Dart type if provided, otherwise default
+      return jsonDartTypeHint ?? 'Map<String, dynamic>';
     default:
       return 'String';
   }

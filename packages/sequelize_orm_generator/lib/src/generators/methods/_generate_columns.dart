@@ -18,7 +18,7 @@ void _generateColumns(
 
   // Generate column references as static const for efficiency
   for (var field in fields) {
-    final dartType = _getDartTypeForQuery(field.dataType);
+    final dartType = _getDartTypeForQuery(field.dataType, jsonDartTypeHint: field.jsonDartTypeHint);
 
     final typeExpression = _getDataTypeExpression(field);
 
@@ -30,8 +30,14 @@ void _generateColumns(
     final isJson = baseType == 'JSON' || baseType == 'JSONB';
 
     if (isJson) {
+      // Determine the generic type for JsonColumn based on jsonDartTypeHint
+      final jsonTypeParam =
+          (field.jsonDartTypeHint != null &&
+                  field.jsonDartTypeHint!.startsWith('List<'))
+              ? field.jsonDartTypeHint!
+              : 'dynamic';
       buffer.writeln(
-        "  final ${field.fieldName} = const JsonColumn('${field.name}', $typeExpression);",
+        "  final ${field.fieldName} = const JsonColumn<$jsonTypeParam>('${field.name}', $typeExpression);",
       );
     } else {
       buffer.writeln(

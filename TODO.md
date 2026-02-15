@@ -1,3 +1,5 @@
+- Enhance json querying and provide better syntax for querying json, add support for json_contain etc.
+- Fix json not creating when we use {value: DateTime.now}
 - Use field name as default association annoation `as` instead of requiring `as`, then make `as` optional
 
 - implement association method for hasOne, hasMany, belongTo, belongsToMany methods like setX, getX, createX, addX, removeX, hasX, countX, 

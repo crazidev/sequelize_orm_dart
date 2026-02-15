@@ -446,9 +446,14 @@ void _generateUpdateFieldsHelper(
     final fieldName = field.fieldName;
     buffer.writeln('    $fieldName = source.$fieldName;');
   }
+  // Only update association fields when the source has a non-null value.
+  // This prevents save/increment/decrement from wiping out eagerly-loaded
+  // associations when the bridge response doesn't include them.
   for (final assoc in associations) {
     final assocFieldName = assoc.fieldName;
-    buffer.writeln('    $assocFieldName = source.$assocFieldName;');
+    buffer.writeln(
+      '    if (source.$assocFieldName != null) $assocFieldName = source.$assocFieldName;',
+    );
   }
   // TODO: Enable isNewRecord, changed & previous
   buffer.writeln('  }');

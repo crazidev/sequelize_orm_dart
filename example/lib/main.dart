@@ -2,16 +2,18 @@ import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:sequelize_orm_example/db/db.dart';
 import 'package:sequelize_orm_example/queries.dart';
 
-const connectionString =
+const connectionString = 'mysql://root@localhost:3306/sequelize_dart';
+const postgresConnectionString =
     'postgresql://postgres:postgres@localhost:5432/postgres';
 
 /// Main entry point - handles database setup and initialization
 Future<void> main() async {
   // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
-    connection: SequelizeConnection.postgres(url: connectionString),
+    connection: SequelizeConnection.postgres(url: postgresConnectionString),
+    // connection: SequelizeConnection.mysql(url: connectionString),
     logging: SqlFormatter.printFormatted,
-    debug: true,
+    normalizeJsonTypes: false,
   );
 
   // Initialize with models - this properly awaits:
@@ -22,7 +24,10 @@ Future<void> main() async {
     models: Db.allModels(),
   );
 
-  // await sequelize.sync(force: true);
+  // await sequelize.seed(
+  //   seeders: Db.allSeeders(),
+  //   syncTableMode: SyncTableMode.force,
+  // );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:sequelize_orm/src/types/sequelize_big_int.dart';
 import 'package:sequelize_orm/src/utils/model_parse_exception.dart';
 
@@ -23,6 +25,7 @@ SequelizeBigInt? parseSequelizeBigIntValue(dynamic v) {
 double? parseDoubleValue(dynamic v) {
   if (v == null) return null;
   if (v is double) return v;
+  if (v is int) return v.toDouble(); // JSON doesn't distinguish int/double
   throw FormatException('Expected double, got ${v.runtimeType}');
 }
 
@@ -39,6 +42,7 @@ bool? parseBoolValue(dynamic v) {
 DateTime? parseDateTimeValue(dynamic v) {
   if (v == null) return null;
   if (v is DateTime) return v;
+  if (v is String) return DateTime.parse(v); // Bridge returns ISO-8601 strings
   throw FormatException('Expected DateTime, got ${v.runtimeType}');
 }
 
@@ -51,6 +55,7 @@ String? parseStringValue(dynamic v) {
 Map<String, dynamic>? parseMapValue(dynamic v) {
   if (v == null) return null;
   if (v is Map) return Map<String, dynamic>.from(v);
+  if (v is String) return Map<String, dynamic>.from(jsonDecode(v) as Map); // Bridge may return JSON columns as strings
   throw FormatException('Expected Map, got ${v.runtimeType}');
 }
 
@@ -58,6 +63,30 @@ List<int>? parseBlobValue(dynamic v) {
   if (v == null) return null;
   if (v is List) return List<int>.from(v);
   throw FormatException('Expected List, got ${v.runtimeType}');
+}
+
+/// Parses a JSON list value with typed elements.
+///
+/// Handles the bridge returning JSON columns as strings by running [jsonDecode].
+/// The generator emits instantiated tear-offs: `parseJsonList<String>`,
+/// `parseJsonList<int>`, `parseJsonList<Map<String, dynamic>>`, etc.
+List<T>? parseJsonList<T>(dynamic v) {
+  if (v == null) return null;
+  if (v is String) v = jsonDecode(v);
+  if (v is List) return List<T>.from(v);
+  throw FormatException('Expected List<$T>, got ${v.runtimeType}');
+}
+
+/// Parses a JSON map value with typed values.
+///
+/// Handles the bridge returning JSON columns as strings by running [jsonDecode].
+/// The generator emits instantiated tear-offs: `parseJsonMap<dynamic>`,
+/// `parseJsonMap<String>`, `parseJsonMap<int>`, etc.
+Map<String, T>? parseJsonMap<T>(dynamic v) {
+  if (v == null) return null;
+  if (v is String) v = jsonDecode(v);
+  if (v is Map) return Map<String, T>.from(v);
+  throw FormatException('Expected Map<String, $T>, got ${v.runtimeType}');
 }
 
 /// Generic field parser with error context.

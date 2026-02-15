@@ -31,6 +31,11 @@ abstract class Users {
   @ColumnName('deleted_at')
   DataType deletedAt = DataType.DATE;
 
+  // JSON columns with custom Dart types
+  DataType tags = DataType.JSON(type: List<String>);
+  DataType scores = DataType.JSON(type: List<int>);
+  DataType metadata = DataType.JSON;
+
   @HasOne(Post, foreignKey: 'userId', as: 'post')
   Post? post;
 
