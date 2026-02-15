@@ -10,11 +10,11 @@ Add the generator as a dev dependency alongside `build_runner`:
 
 ```yaml
 dependencies:
-  sequelize_orm: ^1.0.0
+  sequelize_orm: ^0.1.3
 
 dev_dependencies:
-  sequelize_orm_generator: ^1.0.0
-  build_runner: ^2.4.0
+  sequelize_orm_generator: ^0.1.3
+  build_runner: latest
 ```
 
 ### build.yaml

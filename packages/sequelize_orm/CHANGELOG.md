@@ -1,4 +1,4 @@
-## 0.1.2
+## 0.1.3
 
 - **FEAT**: Type-safe JSON querying via `JsonColumn<T>`, `JsonPath`, and `JsonText` classes — fluent API for navigating and comparing JSON/JSONB columns.
 - **FEAT**: `.key()` for object property access, `.at()` for array index access, `.unquote()` for text extraction with string-specific operators.
