@@ -31,10 +31,10 @@ Add `sequelize_orm` to your dependencies and the generator to your dev dependenc
 
 ```yaml
 dependencies:
-  sequelize_orm: ^0.1.2
+  sequelize_orm: ^0.1.3
 
 dev_dependencies:
-  sequelize_orm_generator: ^0.1.2
+  sequelize_orm_generator: ^0.1.3
   build_runner: latest
 ```
 

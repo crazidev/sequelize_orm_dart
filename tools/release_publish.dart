@@ -90,9 +90,14 @@ Future<void> main(List<String> args) async {
 
     // ── GitHub Releases ─────────────────────────────────────────────────
     if (doGithubRelease) {
-      _info('\nCreating GitHub releases...');
-      for (final pkg in packages) {
-        await _createGithubRelease(pkg);
+      if (await _isToolAvailable('gh')) {
+        _info('\nCreating GitHub releases...');
+        for (final pkg in packages) {
+          await _createGithubRelease(pkg);
+        }
+      } else {
+        _info('\nSkipping GitHub releases: gh CLI is not installed.');
+        _info('  Install it from https://cli.github.com/ then re-run with --github-release');
       }
     }
 
@@ -293,6 +298,20 @@ Future<void> _ensureToolsAvailable() async {
   await _run('git', ['--version']);
 
   _info('  All required tools available.');
+}
+
+/// Returns true if [tool] is available on the system PATH.
+Future<bool> _isToolAvailable(String tool) async {
+  try {
+    final result = await Process.run(
+      tool,
+      ['--version'],
+      runInShell: true,
+    );
+    return result.exitCode == 0;
+  } catch (_) {
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------------------

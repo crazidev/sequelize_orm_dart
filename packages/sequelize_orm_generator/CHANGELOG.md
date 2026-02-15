@@ -1,4 +1,4 @@
-## 0.1.2
+## 0.1.3
 
 - **FEAT**: Generated columns now emit generic `JsonColumn<T>` references (e.g. `JsonColumn<List<String>>`) for type-safe JSON equality checks.
 - **FIX**: `_updateFields()` no longer overwrites eagerly-loaded associations with null when the bridge response omits them (e.g. after `save()`, `increment()`, `decrement()`).
