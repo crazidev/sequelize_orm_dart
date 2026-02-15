@@ -1,4 +1,4 @@
-## 0.1.3
+## 0.1.2
 
 - **FEAT**: Type-safe JSON querying via `JsonColumn<T>`, `JsonPath`, and `JsonText` classes — fluent API for navigating and comparing JSON/JSONB columns.
 - **FEAT**: `.key()` for object property access, `.at()` for array index access, `.unquote()` for text extraction with string-specific operators.
@@ -8,8 +8,6 @@
 - **FIX**: PostgreSQL `TRUNCATE CASCADE` now executes correctly via raw SQL fallback when `Model.truncate({cascade: true})` doesn't cascade properly in Sequelize v7.
 - **FIX**: Non-PostgreSQL dialects no longer receive a `public` schema default, preventing `Unknown database 'public'` errors on MySQL/MariaDB.
 - **IMPROVEMENT**: `$contains`, `$contained`, and `$overlap` operators mapped in the query converter for JSONB queries.
-
-## 0.1.2
 
 - **FEAT**: `SequelizeBigInt` type for BIGINT columns — wraps the string value with `.toBigInt()`, `.toInt()`, and `.toJson()` helpers.
 - **FEAT**: Colored `ModelParseException` for `fromJson` failures — shows field, model, operation, types, and row index in a single line.
