@@ -31,10 +31,10 @@ Add `sequelize_orm` to your dependencies and the generator to your dev dependenc
 
 ```yaml
 dependencies:
-  sequelize_orm: ^0.1.0
+  sequelize_orm: ^0.1.3
 
 dev_dependencies:
-  sequelize_orm_generator: ^0.1.0
+  sequelize_orm_generator: ^0.1.3
   build_runner: latest
 ```
 
@@ -42,20 +42,6 @@ Or you can run the following command:
 
 ```bash
 dart pub add sequelize_orm dev:sequelize_orm_generator dev:build_runner
-```
-
-### build.yaml
-
-Create a `build.yaml` in your project root to enable the generators:
-
-```yaml
-targets:
-  $default:
-    builders:
-      sequelize_orm_generator|sequelize_model_builder:
-        enabled: true
-      sequelize_orm_generator|models_registry_builder:
-        enabled: true
 ```
 
 ## Quick start

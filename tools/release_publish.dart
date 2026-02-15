@@ -90,9 +90,16 @@ Future<void> main(List<String> args) async {
 
     // ── GitHub Releases ─────────────────────────────────────────────────
     if (doGithubRelease) {
-      _info('\nCreating GitHub releases...');
-      for (final pkg in packages) {
-        await _createGithubRelease(pkg);
+      if (await _isToolAvailable('gh')) {
+        _info('\nCreating GitHub releases...');
+        // Create in reverse order so the main package (sequelize_orm)
+        // is created last and appears first on the GitHub releases page.
+        for (final pkg in packages.reversed) {
+          await _createGithubRelease(pkg);
+        }
+      } else {
+        _info('\nSkipping GitHub releases: gh CLI is not installed.');
+        _info('  Install it from https://cli.github.com/ then re-run with --github-release');
       }
     }
 
@@ -131,6 +138,9 @@ class _Package {
   /// Tag name following monorepo convention: `<package>-v<version>`.
   String get tagName => '$name-v$version';
 
+  /// pub.dev URL for this specific version.
+  String get pubUrl => 'https://pub.dev/packages/$name/versions/$version';
+
   /// Extract the latest changelog section (everything between the first two
   /// `## ` headings, or until end-of-file if there is only one).
   String get latestChangelog {
@@ -151,6 +161,13 @@ class _Package {
     }
     final body = buf.toString().trim();
     return body.isEmpty ? 'No changelog entries for this version.' : body;
+  }
+
+  /// Full release body for GitHub releases: changelog + pub.dev link.
+  String get releaseBody {
+    final changelog = latestChangelog;
+    return '$changelog\n\n---\n\n'
+        '**pub.dev**: $pubUrl';
   }
 }
 
@@ -196,9 +213,7 @@ Future<void> _mergeDevToMain() async {
     _info('Pushing main to origin...');
     await _run('git', ['push', 'origin', 'main']);
   } else if (branch == 'main') {
-    _info('Already on main. Pulling latest...');
-    await _run('git', ['fetch', 'origin']);
-    await _run('git', ['pull', '--ff-only', 'origin', 'main']);
+    _info('Already on main.');
   } else {
     throw StateError(
       'Expected to be on "dev" or "main" branch, but found "$branch".\n'
@@ -226,8 +241,33 @@ Future<void> _createTag(_Package pkg) async {
 // Publish
 // ---------------------------------------------------------------------------
 
+/// Check if a specific version of a package is already published on pub.dev
+/// by querying the pub.dev API directly. Fast and doesn't hang.
+Future<bool> _isAlreadyPublished(_Package pkg) async {
+  try {
+    final client = HttpClient();
+    try {
+      final request = await client.getUrl(
+        Uri.parse('https://pub.dev/api/packages/${pkg.name}/versions/${pkg.version}'),
+      );
+      final response = await request.close();
+      await response.drain<void>();
+      return response.statusCode == 200;
+    } finally {
+      client.close();
+    }
+  } catch (_) {
+    // Network error — assume not published, let publish handle it
+    return false;
+  }
+}
+
 Future<void> _publishDryRun() async {
   for (final pkg in packages) {
+    if (await _isAlreadyPublished(pkg)) {
+      _info('  ${pkg.name} v${pkg.version} already published, skipping.');
+      continue;
+    }
     _info('  Dry-run for ${pkg.name}...');
     await _run(
       'dart',
@@ -238,6 +278,21 @@ Future<void> _publishDryRun() async {
 }
 
 Future<void> _publish() async {
+  // Check if all packages are already published
+  var allPublished = true;
+  for (final pkg in packages) {
+    if (await _isAlreadyPublished(pkg)) {
+      _info('  ${pkg.name} v${pkg.version} already published, skipping.');
+    } else {
+      allPublished = false;
+    }
+  }
+
+  if (allPublished) {
+    _info('  All packages already published. Nothing to do.');
+    return;
+  }
+
   // Use melos publish which respects the package filters in pubspec.yaml
   await _run('dart', ['run', 'melos', 'publish', '--no-dry-run', '--yes']);
 }
@@ -248,21 +303,33 @@ Future<void> _publish() async {
 
 Future<void> _createGithubRelease(_Package pkg) async {
   final tag = pkg.tagName;
-  final body = pkg.latestChangelog;
+  final body = pkg.releaseBody;
 
   _info('  Creating GitHub release for $tag...');
-  await _run('gh', [
-    'release',
-    'create',
-    tag,
-    '--repo',
-    repoSlug,
-    '--title',
-    '${pkg.name} ${pkg.version}',
-    '--notes',
-    body,
-  ]);
-  _info('  GitHub release created for $tag');
+  _info('  Release body preview:');
+  _info('  ${body.split('\n').first}...');
+  _info('  pub.dev: ${pkg.pubUrl}');
+
+  // Write release notes to a temp file to avoid shell escaping issues
+  // with markdown special characters (#, *, `, etc.)
+  final tempFile = File('.release_notes_${pkg.name}.md');
+  try {
+    tempFile.writeAsStringSync(body);
+    await _run('gh', [
+      'release',
+      'create',
+      tag,
+      '--repo',
+      repoSlug,
+      '--title',
+      '${pkg.name} ${pkg.version}',
+      '--notes-file',
+      tempFile.path,
+    ]);
+    _info('  GitHub release created for $tag');
+  } finally {
+    if (tempFile.existsSync()) tempFile.deleteSync();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -279,6 +346,20 @@ Future<void> _ensureToolsAvailable() async {
   await _run('git', ['--version']);
 
   _info('  All required tools available.');
+}
+
+/// Returns true if [tool] is available on the system PATH.
+Future<bool> _isToolAvailable(String tool) async {
+  try {
+    final result = await Process.run(
+      tool,
+      ['--version'],
+      runInShell: true,
+    );
+    return result.exitCode == 0;
+  } catch (_) {
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------------------
