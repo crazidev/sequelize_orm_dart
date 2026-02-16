@@ -1,18 +1,13 @@
-import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:sequelize_orm_example/db/db.dart';
 
 /// Run all query examples
 /// This function is called from
 /// main.dart after the database connection is established
 Future<void> runQueries() async {
+  // JSON path query: find user where metadata.role contains 'user'
   final user = await Db.users.findOne(
-    where: (users) => or([
-      // users.metadata.key('isAdmin').eq(true),
-      users.metadata.key('role').unquote().substring('user'),
-      // users.scores.at(0).unquote().gt(1),
-      // users.tags.contains(['dart', 'flutter']),
-    ]),
+    where: (users) => users.scores.at(0).lt(100),
   );
 
-  print(user?.toJson());
+  print('JSON path findOne (role=user): ${user?.toJson()}');
 }

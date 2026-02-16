@@ -3,7 +3,7 @@ description: >-
   A type-safe ORM for Dart powered by Sequelize. Supports PostgreSQL, MySQL,
   MariaDB, SQLite, and MSSQL with code generation, model annotations,
   associations, and query building.
-version: 0.1.3
+version: 0.1.4
 repository: https://github.com/crazidev/sequelize_orm_dart
 resolution: workspace
 

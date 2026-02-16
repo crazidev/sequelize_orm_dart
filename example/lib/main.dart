@@ -10,8 +10,9 @@ const postgresConnectionString =
 Future<void> main() async {
   // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
-    connection: SequelizeConnection.postgres(url: postgresConnectionString),
+    // connection: SequelizeConnection.postgres(url: postgresConnectionString),
     // connection: SequelizeConnection.mysql(url: connectionString),
+    connection: SequelizeConnection.sqlite(storage: 'test_db.db'),
     logging: SqlFormatter.printFormatted,
     normalizeJsonTypes: false,
   );

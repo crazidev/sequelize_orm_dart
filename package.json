@@ -10,9 +10,10 @@
     "prettier": "^3.0.0"
   },
   "dependencies": {
-    "@sequelize/core": "^7.0.0-alpha.47",
-    "@sequelize/postgres": "^7.0.0-alpha.47",
-    "@sequelize/mysql": "^7.0.0-alpha.47",
-    "@sequelize/mariadb": "^7.0.0-alpha.47"
+    "@sequelize/core": "^7.0.0-alpha.48",
+    "@sequelize/mariadb": "^7.0.0-alpha.48",
+    "@sequelize/mysql": "^7.0.0-alpha.48",
+    "@sequelize/postgres": "^7.0.0-alpha.48",
+    "@sequelize/sqlite3": "^7.0.0-alpha.48"
   }
 }

@@ -1,3 +1,7 @@
+## 0.1.4
+
+- **IMPROVEMENT**: Dependency bump to `sequelize_orm: ^0.1.4`.
+
 ## 0.1.3
 
 - **FEAT**: Generated columns now emit generic `JsonColumn<T>` references (e.g. `JsonColumn<List<String>>`) for type-safe JSON equality checks.

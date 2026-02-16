@@ -66,7 +66,7 @@ class SqliteConnection extends SequelizeCoreOptions {
   @override
   Map<String, dynamic> toJson() {
     return {
-      ...super.toJson(),
+      // ...super.toJson(),
       'storage': storage,
       'dialect': dialect.value,
       'foreignKeys': foreignKeys,

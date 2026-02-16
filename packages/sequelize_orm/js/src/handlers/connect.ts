@@ -1,5 +1,6 @@
 import { Sequelize } from '@sequelize/core';
 import { selectDialect } from '../utils/dialectSelector';
+import { enableSqliteJsonSupport } from '../utils/sqliteJsonSupport';
 import { setOptions, setSequelize, sendNotification } from '../utils/state';
 
 type ConnectParams = {
@@ -130,6 +131,9 @@ export async function handleConnect(params: ConnectParams): Promise<{ connected:
       throw err;
     }
   }
+
+  // Enable JSON path support for SQLite (not yet implemented in Sequelize v7 alpha)
+  enableSqliteJsonSupport(sequelize);
 
   setSequelize(sequelize);
 

@@ -1,3 +1,14 @@
+## 0.1.4
+
+- **FEAT**: Full SQLite dialect support — JSON path querying via monkey-patched `->` / `->>` operators on the Sequelize v7 SQLite query generator.
+- **FEAT**: SQLite auto-database creation — `enableSqliteJsonSupport()` patches `jsonOperations`, `jsonExtraction`, `jsonPathExtractionQuery`, and `formatUnquoteJson` at connect time.
+- **FEAT**: SQLite test infrastructure — `DB_TYPE=sqlite` environment variable switches the test suite to SQLite with automatic test isolation (fresh database per suite).
+- **FIX**: Removed hardcoded `where` clause in `QueryEngine.findOne` that was overriding user-provided queries.
+- **REFACTOR**: Extracted `buildJsonPath` and `enableSqliteJsonSupport` from `connect.ts` into `utils/sqliteJsonSupport.ts`.
+- **REFACTOR**: Extracted `cleanOptions` from `associateModel.ts` into `utils/cleanOptions.ts`.
+- **IMPROVEMENT**: Test helpers — `isSqlite`, `isPostgres`, `isMysqlFamily` convenience getters for dialect-aware test assertions.
+- **IMPROVEMENT**: Tests conditionally skip unsupported SQLite operations (TRUNCATE CASCADE, REGEXP, BIGINT precision).
+
 ## 0.1.3
 
 - **FEAT**: Type-safe JSON querying via `JsonColumn<T>`, `JsonPath`, and `JsonText` classes — fluent API for navigating and comparing JSON/JSONB columns.

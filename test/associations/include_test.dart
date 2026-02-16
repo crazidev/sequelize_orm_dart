@@ -9,7 +9,9 @@ import '../test_helper.dart';
 late int seededUserId;
 
 void main() {
-  group('Include Query Tests', () {
+  group('Include Query Tests',
+      skip: isSqlite ? 'SQLite does not support TRUNCATE with CASCADE' : null,
+      () {
     setUpAll(() async {
       await initTestEnvironment();
 
