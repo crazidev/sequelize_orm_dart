@@ -97,8 +97,17 @@ class ModelsRegistryBuilder implements Builder {
         return;
       }
 
+      // Also scan for seeder files to include in the registry
+      final seederFiles = await _findSeederFiles(buildStep);
+      final seeders = <_SeederInfo>[];
+      for (final seederFile in seederFiles) {
+        final infos = await _extractSeederInfos(seederFile, buildStep);
+        seeders.addAll(infos);
+      }
+      seeders.sort((a, b) => a.className.compareTo(b.className));
+
       // Generate the registry class with the derived class name
-      content = _generateRegistryClass(models, className);
+      content = _generateRegistryClass(models, className, seeders);
     }
 
     // Write to the output file in the same directory as the registry file
@@ -254,8 +263,10 @@ class ModelsRegistryBuilder implements Builder {
   String _generateRegistryClass(
     List<_ModelInfo> models,
     String className,
+    List<_SeederInfo> seeders,
   ) {
     final buffer = StringBuffer();
+    final hasSeeders = seeders.isNotEmpty;
 
     // Generate imports
     for (final model in models) {
@@ -264,12 +275,21 @@ class ModelsRegistryBuilder implements Builder {
         "import 'package:${model.packageName}/$importPathPosix.dart';",
       );
     }
+    for (final seeder in seeders) {
+      final importPathPosix = seeder.importPath.replaceAll('\\', '/');
+      buffer.writeln(
+        "import 'package:${seeder.packageName}/$importPathPosix.dart';",
+      );
+    }
     buffer.writeln();
     buffer.writeln("import 'package:sequelize_orm/sequelize_orm.dart';");
     buffer.writeln();
 
     // Generate class
-    buffer.writeln('/// Registry class for accessing all models');
+    final classDoc = hasSeeders
+        ? '/// Registry class for accessing all models and seeders'
+        : '/// Registry class for accessing all models';
+    buffer.writeln(classDoc);
     buffer.writeln('class $className {');
     buffer.writeln('  $className._();');
     buffer.writeln();
@@ -294,6 +314,20 @@ class ModelsRegistryBuilder implements Builder {
     }
     buffer.writeln('    ];');
     buffer.writeln('  }');
+
+    // Generate allSeeders() method if seeders exist
+    if (hasSeeders) {
+      buffer.writeln();
+      buffer.writeln('  /// Returns a list of all seeders');
+      buffer.writeln('  static List<SequelizeSeeding> allSeeders() {');
+      buffer.writeln('    return [');
+      for (final seeder in seeders) {
+        buffer.writeln('      ${seeder.className}(),');
+      }
+      buffer.writeln('    ];');
+      buffer.writeln('  }');
+    }
+
     buffer.writeln('}');
 
     return buffer.toString();

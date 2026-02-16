@@ -1,5 +1,6 @@
 ## 0.1.4
 
+- **FIX**: Enhance registry generation to include seeders
 - **IMPROVEMENT**: Widen `analyzer` dependency constraint to `>=9.0.0 <11.0.0` to support analyzer 10.x.
 - **IMPROVEMENT**: Add package example for pub.dev scoring.
 - **IMPROVEMENT**: Dependency bump to `sequelize_orm: ^0.1.4`.
