@@ -8,6 +8,8 @@
 - **REFACTOR**: Extracted `cleanOptions` from `associateModel.ts` into `utils/cleanOptions.ts`.
 - **IMPROVEMENT**: Test helpers — `isSqlite`, `isPostgres`, `isMysqlFamily` convenience getters for dialect-aware test assertions.
 - **IMPROVEMENT**: Tests conditionally skip unsupported SQLite operations (TRUNCATE CASCADE, REGEXP, BIGINT precision).
+- **FIX**: Created missing dartdoc category markdown files (`get-started.md`, `querying.md`, `models.md`, `associations.md`) that were preventing documentation generation on pub.dev.
+- **FIX**: Escaped angle brackets in dartdoc comments to resolve `unintended_html_in_doc_comment` lint warnings.
 
 ## 0.1.3
 

@@ -665,8 +665,9 @@ class ValidateOption {
     if (isIPv4 != null) json['isIPv4'] = isIPv4!.toJson();
     if (isIPv6 != null) json['isIPv6'] = isIPv6!.toJson();
     if (isAlpha != null) json['isAlpha'] = isAlpha!.toJson();
-    if (isAlphanumeric != null)
+    if (isAlphanumeric != null) {
       json['isAlphanumeric'] = isAlphanumeric!.toJson();
+    }
     if (isNumeric != null) json['isNumeric'] = isNumeric!.toJson();
     if (isInt != null) json['isInt'] = isInt!.toJson();
     if (isFloat != null) json['isFloat'] = isFloat!.toJson();
