@@ -93,6 +93,10 @@ Users.model.findAll(
 
 For a full guide on querying JSON/JSONB columns — including navigating keys, array indices, containment checks, and more — see the dedicated **[JSON Querying](./json)** page.
 
+### Enum Querying
+
+For a full guide on querying ENUM columns — including prefix shortcuts, grouped accessors, and type-safe enum comparisons — see the dedicated **[Enum Querying](./enums)** page.
+
 ### Casting
 
 Cast columns using the `::` syntax within a `Column` definition.

@@ -3,13 +3,19 @@ part of '../../sequelize_model_generator.dart';
 void _generateClassUpdate(
   StringBuffer buffer,
   String updateClassName,
-  List<_FieldInfo> fields,
-) {
+  List<_FieldInfo> fields, {
+  required String className,
+}) {
   buffer.writeln('class $updateClassName {');
   // Add regular fields (omit primary keys and auto-increment — these identify the row and should not be updated)
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
-      buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
+      if (field.enumValues != null && field.enumValues!.isNotEmpty) {
+        final enumName = _getEnumName(className, field.fieldName);
+        buffer.writeln('  final $enumName? ${field.fieldName};');
+      } else {
+        buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
+      }
     }
   }
 

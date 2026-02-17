@@ -7,7 +7,8 @@ part of '../../sequelize_model_generator.dart';
 /// (which handle String → jsonDecode from the bridge) instead of the BLOB parser.
 String _parserFunctionForType(String dartType, {bool isJsonColumn = false}) {
   // JSON List types — emit generic tear-off: parseJsonList<InnerType>
-  if (dartType.startsWith('List<') && (isJsonColumn || dartType != 'List<int>')) {
+  if (dartType.startsWith('List<') &&
+      (isJsonColumn || dartType != 'List<int>')) {
     final inner = dartType.substring(5, dartType.length - 1);
     return 'parseJsonList<$inner>';
   }
@@ -50,6 +51,13 @@ String _generateJsonValueParser(_FieldInfo field, {required String modelName}) {
       ? field.dataType.split('(')[0]
       : field.dataType;
   final isJson = baseType == 'JSON' || baseType == 'JSONB';
+  final isEnum = baseType == 'ENUM';
+
+  if (isEnum && field.enumValues != null && field.enumValues!.isNotEmpty) {
+    // Enum parsing: EnumName.fromValue(_p('key', parseStringValue, 'String'))
+    final enumName = _getEnumName(modelName, field.fieldName);
+    return "$enumName.fromValue(_p('${field.name}', parseStringValue, 'String'))";
+  }
 
   final parser = _parserFunctionForType(field.dartType, isJsonColumn: isJson);
   if (parser.isEmpty) {

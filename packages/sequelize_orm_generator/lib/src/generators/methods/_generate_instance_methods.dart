@@ -259,9 +259,16 @@ void _generateInstanceMethods(
     buffer.writeln();
     // Generate named parameters by extracting from data map
     for (final field in updateableFields) {
-      buffer.writeln(
-        '      ${field.fieldName}: data[\'${field.name}\'] as ${field.dartType}?,',
-      );
+      if (field.enumValues != null && field.enumValues!.isNotEmpty) {
+        final enumName = _getEnumName(className, field.fieldName);
+        buffer.writeln(
+          "      ${field.fieldName}: $enumName.fromValue(data['${field.name}'] as String?),",
+        );
+      } else {
+        buffer.writeln(
+          "      ${field.fieldName}: data['${field.name}'] as ${field.dartType}?,",
+        );
+      }
     }
     buffer.writeln('      where: pkWhere,');
     buffer.writeln('    );');
@@ -304,7 +311,8 @@ void _generateInstanceMethods(
 
     // Generate restore() instance method
     buffer.writeln(
-        '  /// Restores this soft-deleted instance (for paranoid models)');
+      '  /// Restores this soft-deleted instance (for paranoid models)',
+    );
     buffer.writeln('  Future<void> restore() async {');
     buffer.writeln('    final pkValues = getPrimaryKeyMap();');
     buffer.writeln('    if (pkValues == null || pkValues.isEmpty) {');
@@ -321,7 +329,8 @@ void _generateInstanceMethods(
     buffer.writeln('    );');
     buffer.writeln();
     buffer.writeln(
-        '    // Reload to get updated values (deletedAt should be null)');
+      '    // Reload to get updated values (deletedAt should be null)',
+    );
     buffer.writeln('    await reload();');
     buffer.writeln('  }');
     buffer.writeln();

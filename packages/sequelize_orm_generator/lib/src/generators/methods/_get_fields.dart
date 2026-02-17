@@ -37,6 +37,9 @@ Future<List<_FieldInfo>> _getFields(
   const indexChecker = TypeChecker.fromUrl(
     'package:sequelize_orm/src/annotations/table.dart#Index',
   );
+  const enumPrefixChecker = TypeChecker.fromUrl(
+    'package:sequelize_orm/src/annotations/enum_prefix.dart#EnumPrefix',
+  );
 
   for (var field in element.fields) {
     if (field.name == null) continue;
@@ -55,6 +58,7 @@ Future<List<_FieldInfo>> _getFields(
         bool zerofill = false;
         bool binary = false;
         String? jsonDartTypeHint;
+        List<String>? enumValues;
 
         if (typeObj != null) {
           final typeReader = ConstantReader(typeObj);
@@ -78,10 +82,24 @@ Future<List<_FieldInfo>> _getFields(
             zerofill = typeReader.peek('zerofill')?.boolValue ?? false;
             binary = typeReader.peek('binary')?.boolValue ?? false;
 
+            // ENUM: read values list
+            final valuesObj = typeReader.peek('values');
+            if (nameValue == 'ENUM' && valuesObj != null && !valuesObj.isNull) {
+              final listValue = valuesObj.listValue;
+              if (listValue.isNotEmpty) {
+                enumValues = listValue
+                    .map((c) => ConstantReader(c).stringValue)
+                    .whereType<String>()
+                    .toList();
+              }
+            }
+
             // Construct the full dataType representation
             if (variantValue != null) {
               // e.g., TEXT('tiny')
               dataType = "$dataType('$variantValue')";
+            } else if (enumValues != null && enumValues.isNotEmpty) {
+              dataType = 'ENUM';
             } else if (scaleValue != null && lengthValue != null) {
               // e.g., DECIMAL(10, 2)
               dataType = '$dataType($lengthValue, $scaleValue)';
@@ -131,7 +149,8 @@ Future<List<_FieldInfo>> _getFields(
         // Extract validate option
         final validateCode = _extractValidateCode(reader.peek('validate'));
 
-        final dartType = _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
+        final dartType =
+            _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
 
         fields.add(
           _FieldInfo(
@@ -143,7 +162,6 @@ Future<List<_FieldInfo>> _getFields(
             primaryKey: primaryKey,
             allowNull: allowNull,
             defaultValue: defaultValue,
-            defaultValueSource: null,
             validateCode: validateCode,
             columnName: columnName,
             comment: comment,
@@ -154,6 +172,7 @@ Future<List<_FieldInfo>> _getFields(
             zerofill: zerofill,
             binary: binary,
             jsonDartTypeHint: jsonDartTypeHint,
+            enumValues: enumValues,
           ),
         );
         continue;
@@ -178,6 +197,7 @@ Future<List<_FieldInfo>> _getFields(
         uniqueChecker,
         indexChecker,
         validatorChecker,
+        enumPrefixChecker,
       );
       if (fieldInfo != null) {
         fields.add(fieldInfo);
@@ -202,6 +222,7 @@ Future<List<_FieldInfo>> _getFields(
         uniqueChecker,
         indexChecker,
         validatorChecker,
+        enumPrefixChecker,
       );
       if (fieldInfo != null) {
         fields.add(fieldInfo);
@@ -241,6 +262,7 @@ Future<_FieldInfo?> _extractFromAttributeField(
   TypeChecker uniqueChecker,
   TypeChecker indexChecker,
   TypeChecker validatorChecker,
+  TypeChecker enumPrefixChecker,
 ) async {
   final fieldName = field.name ?? 'unknown_field';
 
@@ -250,6 +272,7 @@ Future<_FieldInfo?> _extractFromAttributeField(
   bool zerofill = false;
   bool binary = false;
   String? jsonDartTypeHint;
+  List<String>? enumValues;
 
   // Try to get constant value from field first (works if field is const)
   final constantValue = field.computeConstantValue();
@@ -282,11 +305,13 @@ Future<_FieldInfo?> _extractFromAttributeField(
             if ((baseType == 'JSON' || baseType == 'JSONB') &&
                 paramValues.contains('type:')) {
               dataType = baseType;
-              final typeMatch =
-                  RegExp(r'type:\s*(.+)').firstMatch(paramValues);
+              final typeMatch = RegExp(r'type:\s*(.+)').firstMatch(paramValues);
               if (typeMatch != null) {
                 jsonDartTypeHint = typeMatch.group(1)!.trim();
               }
+            } else if (baseType == 'ENUM') {
+              dataType = 'ENUM';
+              enumValues = _parseEnumValues(paramValues);
             } else {
               dataType = '$baseType($paramValues)';
             }
@@ -332,6 +357,18 @@ Future<_FieldInfo?> _extractFromAttributeField(
         final scaleValue = typeReader.peek('scale')?.intValue;
         final variantValue = typeReader.peek('variant')?.stringValue;
 
+        // ENUM: read values list
+        final valuesObj = typeReader.peek('values');
+        if (nameValue == 'ENUM' && valuesObj != null && !valuesObj.isNull) {
+          final listValue = valuesObj.listValue;
+          if (listValue.isNotEmpty) {
+            enumValues = listValue
+                .map((c) => ConstantReader(c).stringValue)
+                .whereType<String>()
+                .toList();
+          }
+        }
+
         // Check for chained properties
         unsigned = typeReader.peek('unsigned')?.boolValue ?? false;
         zerofill = typeReader.peek('zerofill')?.boolValue ?? false;
@@ -341,6 +378,8 @@ Future<_FieldInfo?> _extractFromAttributeField(
         if (variantValue != null) {
           // e.g., TEXT('tiny')
           dataType = "$dataType('$variantValue')";
+        } else if (enumValues != null && enumValues.isNotEmpty) {
+          dataType = 'ENUM';
         } else if (scaleValue != null && lengthValue != null) {
           // e.g., DECIMAL(10, 2)
           dataType = '$dataType($lengthValue, $scaleValue)';
@@ -435,13 +474,26 @@ Future<_FieldInfo?> _extractFromAttributeField(
 
   // Default to nullable (allowNull = null) if no @NotNull decorator
 
-  final dartType = _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
+  final dartType =
+      _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
 
   // Use columnName if provided, otherwise use fieldName (will be converted to snake_case)
   final name = columnName ?? fieldName;
 
   // Extract validators
   final validateCode = _extractValidators(field, validatorChecker);
+
+  // Extract enum prefix from @EnumPrefix annotation
+  String? enumPrefix;
+  String? enumOpposite;
+  if (enumPrefixChecker.hasAnnotationOfExact(field)) {
+    final annotation = enumPrefixChecker.firstAnnotationOfExact(field);
+    if (annotation != null) {
+      final reader = ConstantReader(annotation);
+      enumPrefix = reader.peek('prefix')?.stringValue;
+      enumOpposite = reader.peek('opposite')?.stringValue;
+    }
+  }
 
   return _FieldInfo(
     fieldName: fieldName,
@@ -463,6 +515,9 @@ Future<_FieldInfo?> _extractFromAttributeField(
     zerofill: zerofill,
     binary: binary,
     jsonDartTypeHint: jsonDartTypeHint,
+    enumValues: enumValues,
+    enumPrefix: enumPrefix,
+    enumOpposite: enumOpposite,
   );
 }
 

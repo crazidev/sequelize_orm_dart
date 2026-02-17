@@ -24,6 +24,15 @@ class _FieldInfo {
   /// When set, overrides the default `Map<String, dynamic>` mapping.
   final String? jsonDartTypeHint;
 
+  /// Enum values for ENUM columns (e.g. `['draft', 'published', 'archived']`).
+  final List<String>? enumValues;
+
+  /// Prefix for enum value accessors (from @EnumPrefix annotation).
+  final String? enumPrefix;
+
+  /// Prefix for enum negation accessors (from @EnumPrefix annotation).
+  final String? enumOpposite;
+
   /// Whether this field has a default value (via @Default decorator or defaultValue in ColumnDefinition).
   bool get hasDefaultValue => defaultValue != null;
 
@@ -47,6 +56,9 @@ class _FieldInfo {
     this.zerofill = false,
     this.binary = false,
     this.jsonDartTypeHint,
+    this.enumValues,
+    this.enumPrefix,
+    this.enumOpposite,
   });
 }
 

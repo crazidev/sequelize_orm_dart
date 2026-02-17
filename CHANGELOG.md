@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-02-17
+
+### Changes
+
+---
+
+Packages with other changes:
+
+ - [`sequelize_orm` - `v0.1.4`](#sequelize_orm---v014)
+ - [`sequelize_orm_generator` - `v0.1.4`](#sequelize_orm_generator---v014)
+
+---
+
+#### `sequelize_orm` - `v0.1.4`
+
+ - **FEAT**: Enhanced enum query accessors with prefix shortcuts (`isActive`, `notActive`) and grouped `eq`/`not` operators.
+ - **FEAT**: Added `@EnumPrefix` annotation supporting both positive and opposite prefixes.
+ - **FIX**: Improved null check API by converting `isNull` and `isNotNull` to standard methods.
+
+#### `sequelize_orm_generator` - `v0.1.4`
+
+ - **FEAT**: Implemented multi-layered enum query API (shortcuts + grouped accessors).
+ - **FEAT**: Support for custom enum prefixes via `@EnumPrefix` annotation.
+ - **FIX**: Sanitized and simplified generated enum classes and member naming conventions.
+
+---
+
 ## 2026-02-12
 
 ### Changes

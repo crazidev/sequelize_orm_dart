@@ -246,6 +246,29 @@ Universally Unique Identifier.
 DataType.UUID
 ```
 
+### `ENUM`
+
+A string column that only accepts value from a predefined set of values.
+
+```dart
+// ENUM
+DataType.ENUM(['active', 'inactive', 'pending'])
+```
+
+#### Customizing Query Accessors
+
+You can customize the prefixes for generated query accessors using the `@EnumPrefix` annotation.
+
+```dart
+@Table()
+abstract class Users {
+  @EnumPrefix('is', 'not')
+  DataType status = DataType.ENUM(['active', 'inactive', 'pending']);
+}
+```
+
+This configuration enables direct query shortcuts like `u.status.isActive` and `u.status.notActive`. For more details on querying enums, see **[Enum Querying](../querying/enums)**.
+
 ### `JSON` & `JSONB`
 
 JSON column types. By default they map to `Map<String, dynamic>`, but you can specify a custom Dart type with the `type:` parameter.

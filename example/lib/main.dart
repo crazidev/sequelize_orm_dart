@@ -25,10 +25,12 @@ Future<void> main() async {
     models: Db.allModels(),
   );
 
-  // await sequelize.seed(
-  //   seeders: Db.allSeeders(),
-  //   syncTableMode: SyncTableMode.force,
-  // );
+  // await sequelize.sync(alter: true);
+
+  await sequelize.seed(
+    seeders: Db.allSeeders(),
+    syncTableMode: SyncTableMode.alter,
+  );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

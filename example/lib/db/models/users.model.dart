@@ -31,6 +31,9 @@ abstract class Users {
   @ColumnName('deleted_at')
   DataType deletedAt = DataType.DATE;
 
+  @EnumPrefix('is', 'not')
+  DataType status = DataType.ENUM(['active', 'inactive', 'pending']);
+
   // JSON columns with custom Dart types
   DataType tags = DataType.JSON(type: List<String>);
   DataType scores = DataType.JSON(type: List<int>);

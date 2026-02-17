@@ -15,7 +15,12 @@ void _generateUpdateMethod(
   // Add named parameters for each field (excluding primary keys and auto-increment)
   for (var field in fields) {
     if (!field.autoIncrement && !field.primaryKey) {
-      buffer.writeln('    ${field.dartType}? ${field.fieldName},');
+      if (field.enumValues != null && field.enumValues!.isNotEmpty) {
+        final enumName = _getEnumName(className, field.fieldName);
+        buffer.writeln('    $enumName? ${field.fieldName},');
+      } else {
+        buffer.writeln('    ${field.dartType}? ${field.fieldName},');
+      }
     }
   }
 

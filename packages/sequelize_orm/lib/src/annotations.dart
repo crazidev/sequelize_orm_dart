@@ -5,6 +5,7 @@ export 'package:meta/meta.dart';
 export 'package:sequelize_orm/src/annotations/attribute.dart';
 export 'package:sequelize_orm/src/annotations/belongs_to.dart';
 export 'package:sequelize_orm/src/annotations/datatype.dart';
+export 'package:sequelize_orm/src/annotations/enum_prefix.dart';
 export 'package:sequelize_orm/src/annotations/enums.dart';
 export 'package:sequelize_orm/src/annotations/has_many.dart';
 export 'package:sequelize_orm/src/annotations/has_one.dart';
