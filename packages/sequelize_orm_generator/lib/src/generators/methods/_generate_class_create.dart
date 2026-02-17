@@ -5,13 +5,19 @@ void _generateClassCreate(
   String createClassName,
   List<_FieldInfo> fields,
   List<_AssociationInfo> associations,
-  GeneratorNamingConfig namingConfig,
-) {
+  GeneratorNamingConfig namingConfig, {
+  required String className,
+}) {
   buffer.writeln('class $createClassName {');
   // Add regular fields (omit only auto-increment fields — DB generates those)
   for (var field in fields) {
     if (!field.autoIncrement) {
-      buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
+      if (field.enumValues != null && field.enumValues!.isNotEmpty) {
+        final enumName = _getEnumName(className, field.fieldName);
+        buffer.writeln('  final $enumName? ${field.fieldName};');
+      } else {
+        buffer.writeln('  final ${field.dartType}? ${field.fieldName};');
+      }
     }
   }
 

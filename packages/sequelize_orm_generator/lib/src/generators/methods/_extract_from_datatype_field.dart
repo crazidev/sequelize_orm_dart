@@ -12,6 +12,7 @@ Future<_FieldInfo?> _extractFromDataTypeField(
   TypeChecker uniqueChecker,
   TypeChecker indexChecker,
   TypeChecker validatorChecker,
+  TypeChecker enumPrefixChecker,
 ) async {
   final fieldName = field.name ?? 'unknown_field';
 
@@ -33,6 +34,7 @@ Future<_FieldInfo?> _extractFromDataTypeField(
   bool zerofill = false;
   bool binary = false;
   String? jsonDartTypeHint;
+  List<String>? enumValues;
 
   // Try to get constant value from field first (works if field is const/final)
   final constantValue = field.computeConstantValue();
@@ -61,11 +63,13 @@ Future<_FieldInfo?> _extractFromDataTypeField(
             if ((baseType == 'JSON' || baseType == 'JSONB') &&
                 paramValues.contains('type:')) {
               dataType = baseType;
-              final typeMatch =
-                  RegExp(r'type:\s*(.+)').firstMatch(paramValues);
+              final typeMatch = RegExp(r'type:\s*(.+)').firstMatch(paramValues);
               if (typeMatch != null) {
                 jsonDartTypeHint = typeMatch.group(1)!.trim();
               }
+            } else if (baseType == 'ENUM') {
+              dataType = 'ENUM';
+              enumValues = _parseEnumValues(paramValues);
             } else {
               dataType = '$baseType($paramValues)';
             }
@@ -114,10 +118,24 @@ Future<_FieldInfo?> _extractFromDataTypeField(
       zerofill = typeReader.peek('zerofill')?.boolValue ?? false;
       binary = typeReader.peek('binary')?.boolValue ?? false;
 
+      // ENUM: read values list
+      final valuesObj = typeReader.peek('values');
+      if (nameValue == 'ENUM' && valuesObj != null && !valuesObj.isNull) {
+        final listValue = valuesObj.listValue;
+        if (listValue.isNotEmpty) {
+          enumValues = listValue
+              .map((c) => ConstantReader(c).stringValue)
+              .whereType<String>()
+              .toList();
+        }
+      }
+
       // Construct the full dataType representation
       if (variantValue != null) {
         // e.g., TEXT('tiny')
         dataType = "$dataType('$variantValue')";
+      } else if (enumValues != null && enumValues.isNotEmpty) {
+        dataType = 'ENUM';
       } else if (scaleValue != null && lengthValue != null) {
         // e.g., DECIMAL(10, 2)
         dataType = '$dataType($lengthValue, $scaleValue)';
@@ -198,13 +216,26 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     }
   }
 
-  final dartType = _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
+  final dartType =
+      _getDartTypeForQuery(dataType, jsonDartTypeHint: jsonDartTypeHint);
 
   // Use columnName if provided, otherwise use fieldName (will be converted to snake_case)
   final name = columnName ?? fieldName;
 
   // Extract validators
   final validateCode = _extractValidators(field, validatorChecker);
+
+  // Extract enum prefix from @EnumPrefix annotation
+  String? enumPrefix;
+  String? enumOpposite;
+  if (enumPrefixChecker.hasAnnotationOfExact(field)) {
+    final annotation = enumPrefixChecker.firstAnnotationOfExact(field);
+    if (annotation != null) {
+      final reader = ConstantReader(annotation);
+      enumPrefix = reader.peek('prefix')?.stringValue;
+      enumOpposite = reader.peek('opposite')?.stringValue;
+    }
+  }
 
   return _FieldInfo(
     fieldName: fieldName,
@@ -226,5 +257,29 @@ Future<_FieldInfo?> _extractFromDataTypeField(
     zerofill: zerofill,
     binary: binary,
     jsonDartTypeHint: jsonDartTypeHint,
+    enumValues: enumValues,
+    enumPrefix: enumPrefix,
+    enumOpposite: enumOpposite,
   );
+}
+
+/// Parses enum values from source like "'a', 'b'" or "['a', 'b']".
+List<String> _parseEnumValues(String paramValues) {
+  final trimmed = paramValues.trim();
+  final inner = trimmed.startsWith('[')
+      ? trimmed.substring(1, trimmed.length - 1).trim()
+      : trimmed;
+  return inner
+      .split(',')
+      .map((s) {
+        final t = s.trim();
+        if (t.length >= 2 &&
+            ((t.startsWith("'") && t.endsWith("'")) ||
+                (t.startsWith('"') && t.endsWith('"')))) {
+          return t.substring(1, t.length - 1);
+        }
+        return t;
+      })
+      .where((s) => s.isNotEmpty)
+      .toList();
 }

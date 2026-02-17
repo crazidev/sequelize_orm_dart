@@ -24,7 +24,12 @@ void _generateClassValues(
   }
 
   for (var field in fields) {
-    buffer.writeln('  ${field.dartType}? ${field.fieldName};');
+    if (field.enumValues != null && field.enumValues!.isNotEmpty) {
+      final enumName = _getEnumName(className, field.fieldName);
+      buffer.writeln('  $enumName? ${field.fieldName};');
+    } else {
+      buffer.writeln('  ${field.dartType}? ${field.fieldName};');
+    }
   }
   // Add association fields
   for (var assoc in associations) {
@@ -91,7 +96,7 @@ void _generateClassValues(
   for (var field in fields) {
     final jsonValue = _generateJsonValueParser(
       field,
-      modelName: valuesClassName,
+      modelName: className,
     );
     buffer.writeln('      ${field.fieldName}: $jsonValue,');
   }
@@ -206,6 +211,9 @@ String _toJsonFieldValueExpression(
   }
   if (field.dartType == 'DateTime') {
     return '$valueExpression?.toIso8601String()';
+  }
+  if (field.enumValues != null && field.enumValues!.isNotEmpty) {
+    return '$valueExpression?.value';
   }
   return valueExpression;
 }
