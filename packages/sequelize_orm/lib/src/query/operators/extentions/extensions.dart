@@ -1,6 +1,6 @@
 /// Barrel file exporting all Column operator extensions
 ///
-/// Import this file to get access to all operator methods on Column<T>:
+/// Import this file to get access to all operator methods on `Column<T>`:
 /// ```dart
 /// import 'package:sequelize_orm/src/query/operators/extentions/extensions.dart';
 /// ```

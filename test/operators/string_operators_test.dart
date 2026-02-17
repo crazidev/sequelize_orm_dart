@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:sequelize_orm_example/db/models/users.model.dart';
 import 'package:test/test.dart';
@@ -93,10 +91,8 @@ void main() {
         where: (user) => user.email.iLike('%@EXAMPLE.COM'),
       );
 
-      final dbType =
-          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
-      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
-      if (isMysqlFamily) {
+      // MySQL, MariaDB, and SQLite don't have ILIKE; the bridge falls back to LIKE.
+      if (isMysqlFamily || isSqlite) {
         expect(lastSql, containsSql("LIKE '%@EXAMPLE.COM'"));
       } else {
         expect(lastSql, containsSql("ILIKE '%@EXAMPLE.COM'"));
@@ -108,10 +104,8 @@ void main() {
         where: (user) => user.email.notILike('%@SPAM.COM'),
       );
 
-      final dbType =
-          Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
-      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
-      if (isMysqlFamily) {
+      // MySQL, MariaDB, and SQLite don't have NOT ILIKE; the bridge falls back to NOT LIKE.
+      if (isMysqlFamily || isSqlite) {
         expect(lastSql, containsSql("NOT LIKE '%@SPAM.COM'"));
       } else {
         expect(lastSql, containsSql("NOT ILIKE '%@SPAM.COM'"));

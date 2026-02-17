@@ -9,6 +9,9 @@ export function selectDialect(dialect: string): any {
     case 'mariadb':
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require('@sequelize/mariadb').MariaDbDialect;
+    case 'sqlite':
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('@sequelize/sqlite3').SqliteDialect;
     default:
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       return require('@sequelize/postgres').PostgresDialect;

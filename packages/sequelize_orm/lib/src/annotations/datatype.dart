@@ -339,7 +339,7 @@ class BlobDataType extends DataType {
 
 /// JSON / JSONB types with optional Dart type hint.
 ///
-/// By default, JSON columns map to `Map<String, dynamic>`.
+/// By default, JSON columns map to `Map&lt;String, dynamic>`.
 /// Use the `type:` parameter to specify a different Dart type:
 ///
 /// ```dart
@@ -351,10 +351,10 @@ class BlobDataType extends DataType {
 /// ```
 ///
 /// Supported types: `List` and `Map` of `dynamic`, `String`, `int`,
-/// `double`, `bool`, or `Map<String, dynamic>`.
+/// `double`, `bool`, or `Map&lt;String, dynamic>`.
 class JsonDataType extends DataType {
-  /// The Dart type hint as a string (e.g. "List<String>", "Map<String, int>").
-  /// `null` means the default `Map<String, dynamic>`.
+  /// The Dart type hint as a string (e.g. `List&lt;String>`, `Map&lt;String, int>`).
+  /// `null` means the default `Map&lt;String, dynamic>`.
   @protected
   final String? dartType;
 

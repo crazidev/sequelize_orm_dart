@@ -165,7 +165,9 @@ void main() {
     });
   });
 
-  group('Model.truncate() - Static Method', () {
+  group('Model.truncate() - Static Method',
+      skip: isSqlite ? 'SQLite does not support TRUNCATE with CASCADE' : null,
+      () {
     test('truncate removes all records from table', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -432,7 +434,9 @@ void main() {
     });
   });
 
-  group('Sequelize.truncate() - Instance Method', () {
+  group('Sequelize.truncate() - Instance Method',
+      skip: isSqlite ? 'SQLite does not support TRUNCATE with CASCADE' : null,
+      () {
     test('sequelize truncate all tables', () async {
       // Create test data
       final timestamp = DateTime.now().millisecondsSinceEpoch;

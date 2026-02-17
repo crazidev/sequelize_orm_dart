@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:sequelize_orm_example/db/models/post.model.dart';
 import 'package:sequelize_orm_example/db/models/users.model.dart';
@@ -86,8 +84,6 @@ void main() {
         reason: 'SQL should contain views field',
       );
 
-      final dbType = Platform.environment['DB_TYPE']?.toLowerCase();
-      final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
       if (isMysqlFamily) {
         await newUser.post?.reload();
       }
@@ -161,8 +157,6 @@ void main() {
             where: (p) => p.id.eq(post.id),
           );
 
-          final dbType = Platform.environment['DB_TYPE']?.toLowerCase();
-          final isMysqlFamily = dbType == 'mysql' || dbType == 'mariadb';
           if (!isMysqlFamily) {
             expect(
               updatedPost,

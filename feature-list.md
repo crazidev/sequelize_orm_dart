@@ -9,7 +9,7 @@
 - ✅ PostgreSQL
 - ✅ MySQL
 - ✅ MariaDB
-- ⚠️ SQLite — Dart API only, JS bridge not wired
+- ✅ SQLite — full support including JSON path querying
 - ⚠️ MSSQL — Dart API only, JS bridge not wired
 - ⚠️ DB2 — Dart API only, JS bridge not wired
 - ❌ DB2 for IBM i
@@ -603,14 +603,16 @@ Runtime bridge status:
 ## JSON Querying ([docs ref](https://sequelize.org/docs/v7/querying/json/))
 
 - ✅ `DataType.JSON` / `DataType.JSONB` — column types
-- ❌ Dot notation for JSON access (`'jsonColumn.nested.property'`)
-- ❌ JSON path extraction (`sql.jsonPath()`)
+- ✅ JSON path extraction via fluent API — `.key('prop')` for object access, `.at(index)` for array access
+- ✅ JSON unquoting — `.unquote()` for text extraction with string-specific operators
+- ✅ JSON equality checks — `.eq()`, `.ne()` on JSON paths
+- ✅ `contains()` operator — PostgreSQL JSONB containment (`@>`)
+- ✅ Cross-dialect JSON support — PostgreSQL (native), MySQL/MariaDB (native), SQLite (monkey-patched `->` / `->>`)
+- ✅ `normalizeJsonTypes` — auto-converts `JSON`↔`JSONB` based on connected dialect
 - ❌ JSON casting syntax (`jsonAttribute.age::integer`)
-- ❌ JSON unquoting (`:unquote` modifier / `sql.unquote()`)
-- ❌ JSON array index access (`jsonColumn.passwords[0]`)
+- ❌ JSON array index access (`jsonColumn.passwords[0]`) — infrastructure exists via `.at()` but not tested
 - ❌ `JSON_NULL` / `SQL_NULL` constants
-- ❌ Nested JSON extraction syntax
-- ❌ JSON-specific operators (`Op.contains`, `Op.anyKeyExists`, etc. on JSON columns)
+- ❌ JSON-specific operators (`Op.anyKeyExists`, `Op.allKeysExist` on JSON columns)
 
 ---
 

@@ -24,11 +24,17 @@ const dataTypeMap: Record<string, any> = {
 };
 
 function buildSequelizeType(attrDef: any): any {
+  const opts = getOptions();
+  const dialect = opts.dialect;
+
+  // sqlite3 in Sequelize v7 rejects BIGINT, so map it to INTEGER for this dialect.
+  if (dialect === 'sqlite' && attrDef.type === 'BIGINT') {
+    attrDef = { ...attrDef, type: 'INTEGER' };
+  }
+
   // Normalize JSON/JSONB types based on the target dialect so users can
   // write DataType.JSON or DataType.JSONB and have it work everywhere.
-  const opts = getOptions();
   if (opts.normalizeJsonTypes !== false) {
-    const dialect = opts.dialect;
     if (dialect === 'postgres' && attrDef.type === 'JSON') {
       attrDef = { ...attrDef, type: 'JSONB' };
     } else if ((dialect === 'mysql' || dialect === 'mariadb') && attrDef.type === 'JSONB') {

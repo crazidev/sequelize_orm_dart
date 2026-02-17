@@ -11,11 +11,40 @@ const postgresUrl = 'postgresql://postgres:postgres@localhost:5432/postgres';
 const mysqlUrl = 'mysql://root@localhost:3306/sequelize_orm';
 const mariadbUrl = 'mariadb://root@localhost:3307/sequelize_orm';
 
+/// SQLite database file path for tests (auto-cleaned on teardown)
+const sqliteStorage = 'test_sequelize.db';
+
 /// List to capture SQL queries for assertions
 final List<String> capturedSql = [];
 
 /// Sequelize instance for tests
 late Sequelize sequelize;
+
+/// The active dialect resolved from the DB_TYPE environment variable.
+/// Available after [initTestEnvironment] is called, but the getter itself
+/// can be used before that (it only reads the env var).
+///
+/// Supported values: `postgres` (default), `mysql`, `mariadb`, `sqlite`.
+///
+/// Usage:
+/// ```sh
+/// # Run tests with SQLite
+/// DB_TYPE=sqlite dart test
+///
+/// # Run tests with MySQL
+/// DB_TYPE=mysql dart test
+/// ```
+String get dbType =>
+    Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
+
+/// Whether the active dialect is SQLite.
+bool get isSqlite => dbType == 'sqlite';
+
+/// Whether the active dialect is PostgreSQL.
+bool get isPostgres => dbType == 'postgres';
+
+/// Whether the active dialect is MySQL or MariaDB.
+bool get isMysqlFamily => dbType == 'mysql' || dbType == 'mariadb';
 
 /// Initialize the test environment
 /// Call this in setUpAll() in your test files
@@ -23,9 +52,8 @@ Future<void> initTestEnvironment() async {
   // Clear any previously captured SQL
   capturedSql.clear();
 
-  final dbType = Platform.environment['DB_TYPE']?.toLowerCase() ?? 'postgres';
-
   SequelizeCoreOptions connection;
+  bool normalizeJsonTypes = true;
 
   switch (dbType) {
     case 'mysql':
@@ -33,6 +61,15 @@ Future<void> initTestEnvironment() async {
       break;
     case 'mariadb':
       connection = MariadbConnection(url: mariadbUrl);
+      break;
+    case 'sqlite':
+      // Delete stale SQLite file to ensure test isolation between suites
+      final dbFile = File(sqliteStorage);
+      if (dbFile.existsSync()) {
+        dbFile.deleteSync();
+      }
+      connection = SqliteConnection(storage: sqliteStorage);
+      normalizeJsonTypes = false;
       break;
     case 'postgres':
     default:
@@ -46,6 +83,7 @@ Future<void> initTestEnvironment() async {
     logging: (String sql) {
       capturedSql.add(sql);
     },
+    normalizeJsonTypes: normalizeJsonTypes,
     pool: SequelizePoolOptions(
       max: 5,
       min: 1,
@@ -88,6 +126,14 @@ Future<void> seedInitialData() async {
 /// Call this in tearDownAll() in your test files
 Future<void> cleanupTestEnvironment() async {
   await sequelize.close();
+
+  // Remove the SQLite database file if it was created
+  if (isSqlite) {
+    final dbFile = File(sqliteStorage);
+    if (dbFile.existsSync()) {
+      dbFile.deleteSync();
+    }
+  }
 }
 
 /// Clear captured SQL between tests

@@ -88,7 +88,7 @@ class QueryEngine extends QueryEngineInterface {
     try {
       final result = await getBridge(sequelize).call('findOne', {
         'model': modelName,
-        'options': query?.toJson(),
+        'options': query?.toJson() ?? {},
       });
 
       if (result == null) return null;
