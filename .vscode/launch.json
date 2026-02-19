@@ -52,6 +52,15 @@
       "type": "dart",
       "request": "launch",
       "program": "./test/"
+    },
+    {
+      "name": "Run Tests (tools)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/run.dart",
+      "args": ["test"],
+      "cwd": "${workspaceFolder}",
+      "console": "debugConsole"
     }
   ]
 }

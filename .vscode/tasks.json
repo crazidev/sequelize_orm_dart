@@ -6,7 +6,7 @@
       "label": "1. Watch Models",
       "detail": "Watch model files and regenerate code on changes",
       "type": "shell",
-      "command": "./tools/watch_models.sh",
+      "command": "dart run tools/run.dart watch-models",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -38,7 +38,7 @@
       "label": "2. Watch Dart VM",
       "detail": "Watch Dart files and restart Dart VM server on changes",
       "type": "shell",
-      "command": "./tools/watch_dart.sh",
+      "command": "dart run tools/run.dart watch-dart",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -68,7 +68,7 @@
       "label": "3. Watch dart2js",
       "detail": "Watch Dart files and recompile to JavaScript on changes",
       "type": "shell",
-      "command": "./tools/watch_js.sh",
+      "command": "dart run tools/run.dart watch-js",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -98,7 +98,7 @@
       "label": "4. Watch Bridge",
       "detail": "Watch TypeScript files and rebuild bridge bundles on changes",
       "type": "shell",
-      "command": "./tools/watch_bridge.sh",
+      "command": "dart run tools/run.dart watch-bridge",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -145,7 +145,7 @@
       "label": "Build: Bridge",
       "detail": "Build both stdio and worker bridge bundles",
       "type": "shell",
-      "command": "./tools/setup_bridge.sh",
+      "command": "dart run tools/run.dart setup-bridge",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -161,7 +161,7 @@
       "label": "Build: dart2js",
       "detail": "Compile main.dart to JavaScript",
       "type": "shell",
-      "command": "./tools/build.sh",
+      "command": "dart run tools/run.dart build",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -186,6 +186,39 @@
         "reveal": "always",
         "panel": "shared"
       }
+    },
+    // ==================== Tool Tasks ====================
+    {
+      "label": "Tools: Format",
+      "detail": "Format Dart and JS/JSON (dart format + Prettier)",
+      "type": "shell",
+      "command": "dart run tools/run.dart format",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tools: Test",
+      "detail": "Run tests (tools/test.dart)",
+      "type": "shell",
+      "command": "dart run tools/run.dart test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
     },
     // ==================== Run Tasks ====================
     {
@@ -253,7 +286,7 @@
       "label": "Run: Benchmark (dart2js)",
       "detail": "Build and run performance benchmark with Node.js",
       "type": "shell",
-      "command": "./tools/build.sh --input=example/lib/benchmark.dart --output=benchmark && node example/build/benchmark.js",
+      "command": "dart run tools/run.dart build --input=example/lib/benchmark.dart --output=benchmark && node example/build/benchmark.js",
       "options": {
         "cwd": "${workspaceFolder}"
       },
