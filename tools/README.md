@@ -32,14 +32,3 @@ Each command can be run **individually**. There is no need to run scripts from a
 
 - **Tasks**: Use **Terminal → Run Task**. All build and watch tasks call `dart run tools/run.dart` so they work on every OS.
 - **Launch**: **Debug Node.js (dart2js)** uses the **Build: dart2js** task (which uses the tool). **Run Tests (tools)** runs `dart run tools/run.dart test`.
-
-## Shell scripts (optional)
-
-The `.sh` scripts in this directory are still present for Unix/macOS/Linux users who prefer to run `./tools/build.sh` or `./tools/watch_models.sh`. On Windows, use:
-
-```powershell
-dart run tools/run.dart build
-dart run tools/run.dart watch-models
-```
-
-instead of the shell scripts.
