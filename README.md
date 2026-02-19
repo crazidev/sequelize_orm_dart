@@ -121,6 +121,10 @@ Access tasks via: `Cmd+Shift+P` → "Tasks: Run Task"
 
    ```bash
    cd example
+   # Recommended (Faster)
+   dart run sequelize_orm_generator:generate
+   
+   # Or using build_runner
    dart run build_runner build --delete-conflicting-outputs
    ```
 
@@ -139,7 +143,8 @@ Access tasks via: `Cmd+Shift+P` → "Tasks: Run Task"
 
    ```bash
    # Watch mode (regenerates on file changes)
-   ./tools/watch_models.sh
+   dart run sequelize_orm_generator:generate --watch
+
 
    # In another terminal, run your app
    dart run example/lib/main.dart

@@ -16,19 +16,16 @@ Future<void> main() async {
     normalizeJsonTypes: false,
   );
 
-  // Initialize with models - this properly awaits:
-  // 1. Bridge connection
-  // 2. All model definitions
-  // 3. All model associations
   await sequelize.initialize(
     models: Db.allModels(),
   );
 
   // await sequelize.sync(alter: true);
-  // await sequelize.seed(
-  //   seeders: Db.allSeeders(),
-  //   syncTableMode: SyncTableMode.alter,
-  // );
+
+  await sequelize.seed(
+    seeders: Db.allSeeders(),
+    syncTableMode: SyncTableMode.alter,
+  );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

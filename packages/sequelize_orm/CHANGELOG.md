@@ -1,3 +1,13 @@
+## 0.1.5
+
+- **FEAT**: Added support for `ENUM` data types with custom parsing and code generation.
+- **FEAT**: Introduced `@EnumPrefix` annotation for configuring enum name generation.
+- **FEAT**: Added `EnumDataType` class to handle list of values and type safety.
+- **CHORE**: Centralized and improved data type definitions for better extensibility.
+- **IMPROVEMENT**: Updated documentation to recommend `dart run sequelize_orm_generator:generate` for faster code generation.
+- **FIX**: Resolved list equality issues in enum types by adding `collection` dependency.
+- **NOTICE**: Revised SQLite support — Native drivers are no longer bundled; working on a build hook or script for downloading OS-specific drivers (manual configuration required).
+
 ## 0.1.4
 
 - **FEAT**: Full SQLite dialect support — JSON path querying via monkey-patched `->` / `->>` operators on the Sequelize v7 SQLite query generator.

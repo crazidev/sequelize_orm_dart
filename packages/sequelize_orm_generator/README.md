@@ -10,10 +10,10 @@ Add the generator as a dev dependency alongside `build_runner`:
 
 ```yaml
 dependencies:
-  sequelize_orm: ^0.1.4
+  sequelize_orm: ^0.1.5
 
 dev_dependencies:
-  sequelize_orm_generator: ^0.1.4
+  sequelize_orm_generator: ^0.1.5
   build_runner: latest
 ```
 
@@ -32,6 +32,17 @@ targets:
 ```
 
 ## Running the generator
+
+### Method 1: CLI (Recommended & Faster)
+The `generate` command is optimized for model generation and runs significantly faster than `build_runner`.
+
+```bash
+# Generate all models and registry
+dart run sequelize_orm_generator:generate
+```
+
+### Method 2: `build_runner`
+Standard Dart code generation.
 
 ```bash
 # One-time generation

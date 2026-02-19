@@ -31,10 +31,10 @@ Add `sequelize_orm` to your dependencies and the generator to your dev dependenc
 
 ```yaml
 dependencies:
-  sequelize_orm: ^0.1.4
+  sequelize_orm: ^0.1.5
 
 dev_dependencies:
-  sequelize_orm_generator: ^0.1.4
+  sequelize_orm_generator: ^0.1.5
   build_runner: latest
 ```
 
@@ -98,6 +98,10 @@ class Db {
 ### 3. Run code generation
 
 ```bash
+# Recommended (Faster)
+dart run sequelize_orm_generator:generate
+
+# Or using build_runner
 dart run build_runner build --delete-conflicting-outputs
 ```
 

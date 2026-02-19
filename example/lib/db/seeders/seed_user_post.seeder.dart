@@ -24,7 +24,7 @@ class SeedUserPost extends SequelizeSeeding<CreatePost> {
               email: 'seed$index@example.com',
               firstName: 'Seed $index',
               lastName: 'User',
-              status: UsersStatus.active,
+              status: index.isEven ? UsersStatus.active : UsersStatus.inactive,
               phoneNumber: SequelizeBigInt('${9000000000000 + index}'),
               tags: ['dart', 'flutter', 'sequelize'],
               scores: [index * 10, index * 20, index * 30],

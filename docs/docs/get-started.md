@@ -47,11 +47,11 @@ Add Sequelize Dart to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  sequelize_orm: ^1.0.0
+  sequelize_orm: ^0.1.5
   sequelize_orm_annotations: ^1.0.0
 
 dev_dependencies:
-  sequelize_orm_generator: ^1.0.0
+  sequelize_orm_generator: ^0.1.5
   build_runner: ^2.4.0
 ```
 
@@ -115,7 +115,13 @@ class User {
 
 ### Generating Model Code
 
-After defining your model, generate the implementation code:
+We recommend using our optimized CLI for faster code generation:
+
+```bash
+dart run sequelize_orm_generator:generate
+```
+
+Alternatively, you can use standard `build_runner`:
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs

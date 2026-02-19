@@ -35,6 +35,10 @@
 /// ## 2. Run code generation
 ///
 /// ```bash
+/// # Recommended
+/// dart run sequelize_orm_generator:generate
+///
+/// # Or
 /// dart run build_runner build --delete-conflicting-outputs
 /// ```
 ///

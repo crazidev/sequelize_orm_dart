@@ -14,10 +14,10 @@ node --version   # Should print v18.x.x or later
 
 ```yaml
 dependencies:
-  sequelize_orm: ^0.1.4
+  sequelize_orm: ^0.1.5
 
 dev_dependencies:
-  sequelize_orm_generator: ^0.1.4
+  sequelize_orm_generator: ^0.1.5
   build_runner: ^2.10.4
 ```
 
@@ -71,6 +71,16 @@ class Users {
 ```
 
 ## Generate Code
+
+### `generate` (Recommended)
+This command is significantly faster than `build_runner` as it only processes your models.
+
+```bash
+dart run sequelize_orm_generator:generate
+```
+
+### `build_runner`
+Standard Dart code generation. Use this if you have other builders in your project.
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
