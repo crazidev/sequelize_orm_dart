@@ -1,3 +1,9 @@
+## 0.1.5
+
+- **FEAT**: Added support for `ENUM` data type code generation.
+- **FEAT**: Support for `@EnumPrefix` annotation for configurable enum name generation.
+- **IMPROVEMENT**: Updated dependency to `sequelize_orm: ^0.1.5`.
+
 ## 0.1.4
 
 - **FIX**: Enhance registry generation to include seeders
