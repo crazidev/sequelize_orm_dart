@@ -14,6 +14,7 @@ void main() {
       () {
     setUpAll(() async {
       await initTestEnvironment();
+      await sequelize.sync(alter: true);
 
       // Clean slate: truncate tables before seeding to ensure predictable IDs
       await Post.model.truncate(cascade: true);

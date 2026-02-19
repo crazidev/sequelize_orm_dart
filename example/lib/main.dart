@@ -10,9 +10,8 @@ const postgresConnectionString =
 Future<void> main() async {
   // Create and configure Sequelize instance
   final sequelize = Sequelize().createInstance(
-    // connection: SequelizeConnection.postgres(url: postgresConnectionString),
+    connection: SequelizeConnection.postgres(url: postgresConnectionString),
     // connection: SequelizeConnection.mysql(url: connectionString),
-    connection: SequelizeConnection.sqlite(storage: 'test_db.db'),
     logging: SqlFormatter.printFormatted,
     normalizeJsonTypes: false,
   );
@@ -26,11 +25,10 @@ Future<void> main() async {
   );
 
   // await sequelize.sync(alter: true);
-
-  await sequelize.seed(
-    seeders: Db.allSeeders(),
-    syncTableMode: SyncTableMode.alter,
-  );
+  // await sequelize.seed(
+  //   seeders: Db.allSeeders(),
+  //   syncTableMode: SyncTableMode.alter,
+  // );
 
   // Run queries - all query logic is in queries.dart
   await runQueries();

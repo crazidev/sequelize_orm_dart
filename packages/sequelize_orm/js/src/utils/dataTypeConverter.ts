@@ -27,6 +27,16 @@ function buildSequelizeType(attrDef: any): any {
   const opts = getOptions();
   const dialect = opts.dialect;
 
+  // ENUM: requires values array from Dart (DataType.ENUM(['a', 'b']))
+  if (attrDef.type === 'ENUM') {
+    const values = Array.isArray(attrDef.values) ? attrDef.values : [];
+    // SQLite has no native ENUM; Sequelize uses TEXT. Use STRING for sqlite so we don't rely on ENUM.
+    if (dialect === 'sqlite') {
+      return DataTypes.STRING;
+    }
+    return values.length > 0 ? DataTypes.ENUM(...values) : DataTypes.STRING;
+  }
+
   // sqlite3 in Sequelize v7 rejects BIGINT, so map it to INTEGER for this dialect.
   if (dialect === 'sqlite' && attrDef.type === 'BIGINT') {
     attrDef = { ...attrDef, type: 'INTEGER' };

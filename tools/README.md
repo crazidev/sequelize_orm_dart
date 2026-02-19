@@ -2,6 +2,9 @@
 
 Cross-platform tooling for **Windows, macOS, and Linux**. All commands run via Dart so they work everywhere without Bash.
 
+- **`run.dart`** – Entry point: parses command and dispatches to commands.
+- **`run_commands.dart`** – Command implementations (build, format, watch-*, setup-*, etc.). Edit this file to change or add behavior.
+
 ## Single entry point
 
 ```bash

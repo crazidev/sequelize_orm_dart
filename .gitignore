@@ -27,6 +27,3 @@ package-lock.json
 package.json
 .idea/
 *.iml
-
-# SQLite test databases
-*.db

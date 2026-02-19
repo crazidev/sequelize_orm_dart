@@ -1,7 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
+part of '../run.dart';
 
-Future<void> main(List<String> args) async {
+/// Run tests (forwards to tools/test.dart)
+Future<void> cmdTest(Directory root, List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     print('Usage: dart tools/test.dart [flags] [test_files]');
     print('Flags:');

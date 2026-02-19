@@ -28,13 +28,17 @@ class TimestampOption {
   final String? columnName;
 
   /// Create a TimestampOption that disables the timestamp
-  const TimestampOption.disabled() : enable = false, columnName = null;
+  const TimestampOption.disabled()
+      : enable = false,
+        columnName = null;
 
   /// Create a TimestampOption with a custom column name
   const TimestampOption.custom(this.columnName) : enable = true;
 
   /// Create a TimestampOption that enables with default name
-  const TimestampOption.enabled() : enable = true, columnName = null;
+  const TimestampOption.enabled()
+      : enable = true,
+        columnName = null;
 
   Object? toJson() {
     if (!enable) return false;
@@ -323,16 +327,20 @@ class Default {
   final DefaultType? type;
   final String? functionName;
 
-  const Default(this.value) : type = null, functionName = null;
+  const Default(this.value)
+      : type = null,
+        functionName = null;
   const Default.uniqid()
-    : value = null,
-      type = DefaultType.uniqid,
-      functionName = null;
+      : value = null,
+        type = DefaultType.uniqid,
+        functionName = null;
   const Default.now()
-    : value = null,
-      type = DefaultType.now,
-      functionName = null;
-  const Default.fn(this.functionName) : value = null, type = DefaultType.fn;
+      : value = null,
+        type = DefaultType.now,
+        functionName = null;
+  const Default.fn(this.functionName)
+      : value = null,
+        type = DefaultType.fn;
 }
 
 @Target({TargetKind.field})

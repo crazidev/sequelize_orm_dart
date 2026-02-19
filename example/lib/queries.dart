@@ -1,3 +1,4 @@
+import 'package:sequelize_orm/sequelize_orm.dart';
 import 'package:sequelize_orm_example/db/db.dart';
 import 'package:sequelize_orm_example/db/models/users.model.dart';
 
