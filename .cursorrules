@@ -1,0 +1,60 @@
+# Sequelize Dart – Cursor Rules
+
+When working in this repo, follow these rules so changes stay consistent with the architecture and conventions.
+
+## Codebase context
+
+- Read `.cursor/context.md` for package layout, data flow (Dart → QueryEngine → bridge → Node/Sequelize.js), and key files. Use it when touching multiple packages or the bridge.
+
+## Package boundaries
+
+- **ORM runtime** lives in `packages/sequelize_orm`. Do not add generator-only or analyzer-only logic there.
+- **Code generation** lives in `packages/sequelize_orm_generator`. Generated code must match what `Model` and `QueryEngine` expect (e.g. `$getAttributesJson()`, `getOptionsJson()`, `associateModel()`).
+- **Node bridge** lives in `packages/sequelize_orm/js`. Any new RPC method needs: a handler in `request_handler.ts`, a corresponding `bridge.call('methodName', …)` in the Dart/QueryEngine side, and the same method supported in both Dart VM and dart2js bridge clients if it affects connection/lifecycle.
+
+## Models and generation
+
+- User-facing models are **abstract** classes with `@Table(...)` and `part '*.model.g.dart';`. The generator produces the concrete `*Model` class and related helpers.
+- When adding or changing annotations (e.g. new `@Table` option or new `DataType`): update the generator in `sequelize_orm_generator` so that attributes/options and, if needed, associations are emitted correctly; update the Node bridge’s attribute/option handling only if the JS side must understand the new option.
+- Do not rely on generated files (e.g. `*.model.g.dart`) being committed; they are produced by the generator command (see **Commands**). Prefer changing the generator rather than editing generated code by hand.
+
+## Queries and the bridge
+
+- Query shape is defined in Dart (`Query`, `QueryOperator`, `toJson()`). The bridge receives JSON and passes it to Sequelize.js. When adding query options (e.g. new `where` operators or `include` behavior): implement the Dart side first (operators, serialization in `toJson()`), then ensure the JS handlers pass the options through to Sequelize as expected.
+- Exceptions: Use the project’s `SequelizeException` and error formatting so that bridge errors are reported consistently to the Dart caller.
+
+## Example app
+
+- The **example** app is the reference usage. When changing public API or flow (e.g. `initialize`, `seed`, `createInstance`), keep the example working and update it if the recommended usage changes.
+- New features that should be demonstrable (e.g. a new query method or association type) should have a minimal example in **example** (or in tests) so behavior is documented and regression-checked.
+
+## Commands
+
+Use these commands in this project (prefer them over alternatives where stated):
+
+- **Generate model code** (faster than build_runner):  
+  `dart run sequelize_orm_generator:generate`  
+  Run from the package that contains your `lib/db/models` (e.g. from `example/`). Do not use `dart run build_runner build` for model generation unless the generator CLI is unavailable.
+
+- **Rebuild the Node bridge** (required after editing anything under `packages/sequelize_orm/js`):  
+  `./tools/setup_bridge.sh`  
+  If you change TypeScript/JS in the bridge (handlers, request_handler, utils, etc.), run this so the Dart app uses the updated bridge.
+
+- **Run tests:**  
+  `dart test`
+
+- **Run the example app:**  
+  `dart run example/lib/main.dart` or from `example/`: `dart run lib/main.dart`
+
+- **Watch/generator scripts:** See `tools/` (e.g. `watch_models.sh`, `watch_dart.sh`) and the root README for VSCode tasks.
+
+## Tests and tooling
+
+- Run `dart test` after changes that affect the ORM or generator. Run the example app (Dart VM and, if relevant, dart2js) when touching the bridge or connection flow.
+- If you make changes to the bridge files (`packages/sequelize_orm/js`), run `./tools/setup_bridge.sh` to rebuild the bridge before testing.
+- Use the existing scripts in `tools/` and VSCode tasks described in the root README for build/bridge/watch workflows.
+
+## Style and consistency
+
+- Prefer the existing patterns: e.g. singleton model instances (`ModelClassName()` returning a shared instance), `Db.allModels()` / `Db.allSeeders()` for registration, and the same naming for generated classes (e.g. `*Model`, `*Values`, `*Columns`) as in the current generator.
+- When adding new files under `packages/sequelize_orm/lib`, export them from the appropriate barrel (e.g. `sequelize_orm.dart`) if they are part of the public API.
