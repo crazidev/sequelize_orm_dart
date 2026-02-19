@@ -34,6 +34,22 @@ export async function handleTruncate(params: TruncateParams): Promise<void> {
     return;
   }
 
+  // For MySQL/MariaDB, TRUNCATE fails if the table is referenced by a foreign key
+  // (even when the child table is empty). Always use a transaction so we can run
+  // SET FOREIGN_KEY_CHECKS=0, TRUNCATE, SET FOREIGN_KEY_CHECKS=1 on the same connection.
+  if (dialect === 'mysql' || dialect === 'mariadb') {
+    const tableName = model.table?.tableName ?? model.tableName ?? modelName;
+    await sequelize.transaction(async (t) => {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { transaction: t });
+      try {
+        await sequelize.query(`TRUNCATE TABLE \`${tableName}\``, { transaction: t });
+      } finally {
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 1', { transaction: t });
+      }
+    });
+    return;
+  }
+
   // For other dialects, use Sequelize's Model.truncate with
   // withoutForeignKeyChecks when cascade is requested.
   if (options.cascade && options.withoutForeignKeyChecks === undefined) {

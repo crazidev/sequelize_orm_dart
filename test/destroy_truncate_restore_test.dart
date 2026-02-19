@@ -200,9 +200,10 @@ void main() {
       // Truncate the table
       await Users.model.truncate(cascade: true);
 
+      // On MySQL/MariaDB truncate runs in a transaction (SET FK checks, TRUNCATE, COMMIT), so lastSql may be COMMIT
       expect(
-        lastSql,
-        containsSql('TRUNCATE'),
+        capturedSql.any((s) => s.toLowerCase().contains('truncate')),
+        isTrue,
         reason: 'truncate() should use TRUNCATE statement',
       );
 
@@ -224,9 +225,10 @@ void main() {
         restartIdentity: true,
       );
 
+      // On MySQL/MariaDB truncate runs in a transaction, so lastSql may be COMMIT
       expect(
-        lastSql,
-        containsSql('TRUNCATE'),
+        capturedSql.any((s) => s.toLowerCase().contains('truncate')),
+        isTrue,
         reason: 'truncate() should use TRUNCATE statement',
       );
     });
@@ -453,9 +455,10 @@ void main() {
       // Truncate all tables
       await sequelize.truncate(cascade: true);
 
+      // On MySQL/MariaDB truncate runs in a transaction, so lastSql may be COMMIT
       expect(
-        lastSql,
-        containsSql('TRUNCATE'),
+        capturedSql.any((s) => s.toLowerCase().contains('truncate')),
+        isTrue,
         reason: 'sequelize.truncate() should use TRUNCATE statement',
       );
 
